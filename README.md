@@ -31,7 +31,7 @@ MVP
 
 ## Mockup
 
-![](../Design/PineappleMockup.png?raw=true)
+![](Design/PineappleMockup.png?raw=true)
 
 ## Tagline
 Network  | Account
