@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */; };
 		49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28841D5B9D58009FADF3 /* AppDelegate.swift */; };
 		49FB28871D5B9D58009FADF3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28861D5B9D58009FADF3 /* ViewController.swift */; };
 		49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49FB28881D5B9D58009FADF3 /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hoods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		49FB28811D5B9D58009FADF3 /* hoods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hoods.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49FB28841D5B9D58009FADF3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49FB28861D5B9D58009FADF3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -24,6 +26,8 @@
 		49FB288E1D5B9D58009FADF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		49FB28961D5B9DA5009FADF3 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		49FB289D1D5B9E2C009FADF3 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
+		6F7607D53EF5103EC6EA5FAA /* Pods-hoods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.debug.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.debug.xcconfig"; sourceTree = "<group>"; };
+		7E15E638073E00E6010B3855 /* Pods-hoods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.release.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +47,8 @@
 			children = (
 				49FB28831D5B9D58009FADF3 /* hoods */,
 				49FB28821D5B9D58009FADF3 /* Products */,
+				706CE9EE40BADD612259EB54 /* Pods */,
+				649B6C28AD0283B8F6B628D0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -107,6 +114,23 @@
 			name = Infrastructure;
 			sourceTree = "<group>";
 		};
+		649B6C28AD0283B8F6B628D0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		706CE9EE40BADD612259EB54 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6F7607D53EF5103EC6EA5FAA /* Pods-hoods.debug.xcconfig */,
+				7E15E638073E00E6010B3855 /* Pods-hoods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -114,9 +138,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 49FB28931D5B9D58009FADF3 /* Build configuration list for PBXNativeTarget "hoods" */;
 			buildPhases = (
+				FC77302594D15B8551EAC981 /* 📦 Check Pods Manifest.lock */,
 				49FB287D1D5B9D58009FADF3 /* Sources */,
 				49FB287E1D5B9D58009FADF3 /* Frameworks */,
 				49FB287F1D5B9D58009FADF3 /* Resources */,
+				BB8A1191F9419FD62B1FEF11 /* 📦 Embed Pods Frameworks */,
+				E319B62E1CFD91967BFCB7CA /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -173,6 +200,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BB8A1191F9419FD62B1FEF11 /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-hoods/Pods-hoods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E319B62E1CFD91967BFCB7CA /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-hoods/Pods-hoods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FC77302594D15B8551EAC981 /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		49FB287D1D5B9D58009FADF3 /* Sources */ = {
@@ -291,6 +366,7 @@
 		};
 		49FB28941D5B9D58009FADF3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6F7607D53EF5103EC6EA5FAA /* Pods-hoods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = hoods/Info.plist;
@@ -302,6 +378,7 @@
 		};
 		49FB28951D5B9D58009FADF3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7E15E638073E00E6010B3855 /* Pods-hoods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = hoods/Info.plist;
@@ -330,6 +407,7 @@
 				49FB28951D5B9D58009FADF3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
