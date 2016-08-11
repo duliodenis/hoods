@@ -15,22 +15,27 @@ class MapViewController: UIViewController {
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
     private let locationManager = CLLocationManager()
-    private var scanningHood = false
+    private var hoodScanning = false
     private var feedView = FeedView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // listen for "NotInAHood" notification from data source
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
 
-        // set up Mapbox view
+        // Mapbox view
         mapboxView.delegate = self
         mapboxView.tintColor = UIColor.clearColor()
         mapboxView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        print("mapboxView.delegate set, tintColor set, autoresizingMask set")
         
-        // set up location manager
+        // location manager
         DataSource.sharedInstance.locationManager.delegate = self
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
-
+        
+        setCameraToManhattan()
         addFeedView()
     }
 
@@ -82,6 +87,12 @@ class MapViewController: UIViewController {
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 90, width: view.frame.width, height: 130))
         mapboxView.addSubview(feedView)
     }
+    
+// MARK: Helper Methods
+    
+    @objc private func setHoodScanningToFalse() {
+        hoodScanning = false
+    }
 }
 
 // MARK: CLLocationManagerDelegate
@@ -97,7 +108,7 @@ extension MapViewController: CLLocationManagerDelegate {
             mapboxView.showsUserLocation = true
             
             // turns on hood checking until it fails and this gets set to false
-            scanningHood = true
+            hoodScanning = true
             
             locationManager.startUpdatingLocation()
             locationManager.startUpdatingHeading()
@@ -105,18 +116,17 @@ extension MapViewController: CLLocationManagerDelegate {
             // update the current hood label
             feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(locationManager.location!.coordinate)
             
+            // move camera into your location
+            attemptToMoveCameraToUserLocation()
         }
         
         // notify the app delegate to release the hole
         NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
-        
-        // move camera into your location
-        attemptToMoveCameraToUserLocation()
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        if scanningHood == true {
+        if hoodScanning == true {
             feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
         }
         

@@ -13,10 +13,23 @@
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="MGLMapView">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="string" keyPath="styleURL__" value="mapbox://styles/andrewcar/cigjifhox00059em63qbqemcm"/>
+                            <userDefinedRuntimeAttribute type="number" keyPath="latitude">
+                                <real key="value" value="40.735987000000002"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="longitude">
+                                <real key="value" value="-73.993630999999993"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="allowsZooming" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="allowsScrolling" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="allowsRotating" value="YES"/>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="allowsTilting" value="YES"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <navigationItem key="navigationItem" id="3Wi-ft-91v"/>
                     <connections>
@@ -30,7 +43,7 @@
         <!--Navigation Controller-->
         <scene sceneID="qD1-Rl-xta">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="xmI-wx-L2F" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="xmI-wx-L2F" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ePG-9l-IIL">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
