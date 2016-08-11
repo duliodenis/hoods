@@ -91,6 +91,10 @@ class MapViewController: UIViewController {
     @objc private func setHoodScanningToFalse() {
         hoodScanning = false
     }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
 }
 
 // MARK: CLLocationManagerDelegate
