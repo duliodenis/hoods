@@ -13,6 +13,7 @@ import MapKit
 class MapViewController: UIViewController {
 
     @IBOutlet var mapboxView: MGLMapView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
