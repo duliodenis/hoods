@@ -14,7 +14,6 @@ class MapViewController: UIViewController {
     
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
-    private let locationManager = CLLocationManager()
     private var hoodScanning = false
     private var feedView = FeedView()
     
@@ -28,7 +27,6 @@ class MapViewController: UIViewController {
         mapboxView.delegate = self
         mapboxView.tintColor = UIColor.clearColor()
         mapboxView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        print("mapboxView.delegate set, tintColor set, autoresizingMask set")
         
         // location manager
         DataSource.sharedInstance.locationManager.delegate = self
@@ -104,24 +102,30 @@ extension MapViewController: CLLocationManagerDelegate {
         
         if status == .AuthorizedWhenInUse {
             
-            // only show user location if status is authorized when in use
-            mapboxView.showsUserLocation = true
-            
             // turns on hood checking until it fails and this gets set to false
             hoodScanning = true
             
-            locationManager.startUpdatingLocation()
-            locationManager.startUpdatingHeading()
+            DataSource.sharedInstance.locationManager.startUpdatingLocation()
+            DataSource.sharedInstance.locationManager.startUpdatingHeading()
+            
+            // only show user location if status is authorized when in use
+            mapboxView.showsUserLocation = true
             
             // update the current hood label
-            feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(locationManager.location!.coordinate)
+            feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(DataSource.sharedInstance.locationManager.location!.coordinate)
             
             // move camera into your location
             attemptToMoveCameraToUserLocation()
+            
+            // notify the app delegate to release the hole
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
+            
+        } else if status == .Denied {
+            
+            // notify the app delegate to release the hole
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
+            setCameraToManhattan()
         }
-        
-        // notify the app delegate to release the hole
-        NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
