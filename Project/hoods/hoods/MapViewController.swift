@@ -82,7 +82,7 @@ class MapViewController: UIViewController {
 // MARK: Feed
     
     private func addFeedView() {
-        feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 90, width: view.frame.width, height: 130))
+        feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 90, width: view.frame.width, height: view.frame.width))
         mapboxView.addSubview(feedView)
     }
     
@@ -140,7 +140,6 @@ extension MapViewController: CLLocationManagerDelegate {
         
         // if hood label is blank after hood check, set label to "Hoods"
         if feedView.currentHoodLabel.text == "" {
-            feedView.youAreInLabel.text = "You're not in any"
             feedView.currentHoodLabel.text = "Hoods"
         }
     }
