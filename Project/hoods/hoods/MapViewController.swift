@@ -34,7 +34,6 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
         
         setCameraToManhattan()
-        addFeedView()
     }
 
     override func didReceiveMemoryWarning() {
@@ -79,14 +78,7 @@ class MapViewController: UIViewController {
         moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
     }
     
-// MARK: Feed
-    
-    private func addFeedView() {
-        feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 90, width: view.frame.width, height: view.frame.width))
-        mapboxView.addSubview(feedView)
-    }
-    
-// MARK: Helper Methods
+// MARK: Miscellaneous
     
     @objc private func setHoodScanningToFalse() {
         hoodScanning = false
@@ -115,8 +107,10 @@ extension MapViewController: CLLocationManagerDelegate {
             // only show user location if status is authorized when in use
             mapboxView.showsUserLocation = true
             
-            // update the current hood label
-            feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(DataSource.sharedInstance.locationManager.location!.coordinate)
+            // check if location isn't nil then update the current hood label
+            if DataSource.sharedInstance.locationManager.location != nil {
+                feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(DataSource.sharedInstance.locationManager.location!.coordinate)
+            }
             
             // move camera into your location
             attemptToMoveCameraToUserLocation()

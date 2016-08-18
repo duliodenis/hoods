@@ -22,12 +22,12 @@ class FeedView: UIView {
         
         backgroundColor = UIColor.whiteColor()
         
-        currentHoodLabel.font = UIFont.boldSystemFontOfSize(18)
+        currentHoodLabel.font = UIFont.boldSystemFontOfSize(23)
         currentHoodLabel.setContentHuggingPriority(251, forAxis: .Vertical)
         currentHoodLabel.textAlignment = .Left
         currentHoodLabel.adjustsFontSizeToFitWidth = true
         
-        vPlaceholder.backgroundColor = UIColor.grayColor()
+        vPlaceholder.backgroundColor = UIColor.whiteColor()
         
         let views = [currentHoodLabel, vPlaceholder]
         
