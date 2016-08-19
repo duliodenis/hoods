@@ -82,7 +82,7 @@ class MapViewController: UIViewController {
     // MARK: Feed
     
     private func addFeedView() {
-        feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 100, width: view.frame.width, height: view.frame.height))
+        feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
         mapboxView.addSubview(feedView)
     }
     

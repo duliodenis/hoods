@@ -22,9 +22,9 @@ class FeedView: UIView {
         
         backgroundColor = UIColor.whiteColor()
         
-        currentHoodLabel.font = UIFont.boldSystemFontOfSize(23)
+        currentHoodLabel.font = UIFont.boldSystemFontOfSize(32)
         currentHoodLabel.setContentHuggingPriority(251, forAxis: .Vertical)
-        currentHoodLabel.textAlignment = .Left
+        currentHoodLabel.textAlignment = .Center
         currentHoodLabel.adjustsFontSizeToFitWidth = true
         
         vPlaceholder.backgroundColor = UIColor.whiteColor()
@@ -39,7 +39,7 @@ class FeedView: UIView {
         let constraints: [NSLayoutConstraint] = [
             currentHoodLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor),
             currentHoodLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
-            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerXAnchor),
+            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),
             currentHoodLabel.bottomAnchor.constraintEqualToAnchor(vPlaceholder.topAnchor),
             
             vPlaceholder.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: currentHoodLabel.frame.height + 30),
