@@ -18,6 +18,7 @@ class DataSource {
     var lastHoodName: String?
     var lastPolygonRenderer: MKPolygonRenderer?
     var calloutRepresentedObjectTitle = ""
+    var subLocality = "Manhattan"
     
     func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String {
         
@@ -50,8 +51,10 @@ class DataSource {
     
     private func fullHoodCheck(currentLocation: CLLocationCoordinate2D) -> String {
         
+        // set file path to geoJSON for current subLocality
+        let filePath = NSBundle.mainBundle().pathForResource(geoJSON(), ofType: "geojson")!
+        
         // convert GeoJSON to NSData
-        let filePath = NSBundle.mainBundle().pathForResource("manualNYC", ofType: "geojson")!
         let data = NSData(contentsOfFile: filePath)
         do {
             let json = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments)
@@ -132,6 +135,22 @@ class DataSource {
             }
         } else {
             return false
+        }
+    }
+    
+    private func geoJSON() -> String {
+        
+        switch subLocality {
+            case "Brooklyn":
+                return "nyc"
+            case "Queens":
+                return "nyc"
+            case "Bronx":
+                return "nyc"
+            case "Staten Island":
+                return "nyc"
+            default:
+                return "manualNYC"
         }
     }
 }

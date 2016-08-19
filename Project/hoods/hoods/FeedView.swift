@@ -10,8 +10,8 @@ import UIKit
 
 class FeedView: UIView {
     
-    let youAreInLabel = UILabel()
     let currentHoodLabel = UILabel()
+    let vPlaceholder = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -22,30 +22,30 @@ class FeedView: UIView {
         
         backgroundColor = UIColor.whiteColor()
         
-        youAreInLabel.font = UIFont.systemFontOfSize(23)
-        youAreInLabel.text = "You are in"
-        youAreInLabel.setContentHuggingPriority(251, forAxis: .Vertical)
+        currentHoodLabel.font = UIFont.boldSystemFontOfSize(23)
+        currentHoodLabel.setContentHuggingPriority(251, forAxis: .Vertical)
+        currentHoodLabel.textAlignment = .Left
+        currentHoodLabel.adjustsFontSizeToFitWidth = true
         
-        currentHoodLabel.font = UIFont.systemFontOfSize(50)
+        vPlaceholder.backgroundColor = UIColor.whiteColor()
         
-        let labels = [youAreInLabel, currentHoodLabel]
+        let views = [currentHoodLabel, vPlaceholder]
         
-        for label in labels {
-            label.textAlignment = .Center
-            label.adjustsFontSizeToFitWidth = true
-            label.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(label)
+        for view in views {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(view)
         }
         
         let constraints: [NSLayoutConstraint] = [
-            youAreInLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
-            youAreInLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor),
-            youAreInLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerXAnchor),
-            youAreInLabel.bottomAnchor.constraintEqualToAnchor(currentHoodLabel.topAnchor, constant: frame.size.height * 0.25),
-            
+            currentHoodLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor),
             currentHoodLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
-            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),
-            currentHoodLabel.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.bottomAnchor, constant: -10)
+            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerXAnchor),
+            currentHoodLabel.bottomAnchor.constraintEqualToAnchor(vPlaceholder.topAnchor),
+            
+            vPlaceholder.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: currentHoodLabel.frame.height + 30),
+            vPlaceholder.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
+            vPlaceholder.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),
+            vPlaceholder.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.bottomAnchor, constant: -10)
         ]
         NSLayoutConstraint.activateConstraints(constraints)
     }
