@@ -141,6 +141,18 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
+    override func motionEnded(motion: UIEventSubtype, withEvent event: UIEvent?) {
+        
+        // if motion was a shake and location available
+        if motion == .MotionShake {
+            if DataSource.sharedInstance.locationManager.location != nil {
+
+                // zoom to location
+                attemptToMoveCameraToUserLocation()
+            }
+        }
+    }
+    
     @objc private func setHoodScanningToFalse() {
         hoodScanning = false
     }

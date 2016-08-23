@@ -23,7 +23,7 @@ class FeedView: UIView {
         backgroundColor = UIColor.whiteColor()
         
         currentHoodLabel.adjustsFontSizeToFitWidth = true
-        currentHoodLabel.font = UIFont.boldSystemFontOfSize(32)
+        currentHoodLabel.font = UIFont.boldSystemFontOfSize(42)
         currentHoodLabel.setContentHuggingPriority(251, forAxis: .Vertical)
         currentHoodLabel.textAlignment = .Center
         
