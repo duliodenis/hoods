@@ -16,6 +16,7 @@ class MapViewController: UIViewController {
     @IBOutlet var mapboxView: MGLMapView!
     private var hoodScanning = false
     private var feedView = FeedView()
+    private var feedPan = UIPanGestureRecognizer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +35,7 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
         
         setCameraToManhattan()
-        addFeedView()
+        addFeedViewAndPanGesture()
     }
 
     override func didReceiveMemoryWarning() {
@@ -81,18 +82,100 @@ class MapViewController: UIViewController {
     
     // MARK: Feed
     
-    private func addFeedView() {
+    private func addFeedViewAndPanGesture() {
+        
+        // feed
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
-        mapboxView.addSubview(feedView)
+        view.addSubview(feedView)
+        
+        // pan
+        feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panDetected(_:)))
+        feedPan.delegate = self
+        mapboxView.addGestureRecognizer(feedPan)
+    }
+    
+    private func feedAnimationTo(topOrBottom: String) {
+        switch topOrBottom {
+        case "top":
+            
+            // animate the feed's minY to the view's minY
+            UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                self.feedView.frame = CGRectMake(0, self.view.frame.origin.y, self.feedView.frame.width, self.feedView.frame.height)
+                }, completion: { (Bool) -> Void in
+            })
+        case "bottom":
+            
+            // animate the feed's minY to the view's height - 100
+            UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                self.feedView.frame = CGRectMake(0, self.view.frame.height - 100, self.feedView.frame.width, self.feedView.frame.height)
+                }, completion: { (Bool) -> Void in
+            })
+        default: break
+        }
+    }
+    
+    // MARK: Touches
+    
+    func panDetected(sender: UIPanGestureRecognizer) {
+        
+        let translation = sender.translationInView(mapboxView)
+        let touchLocation = sender.locationInView(mapboxView)
+        
+        // pan gesture is inside feed view
+        if feedView.frame.contains(touchLocation) {
+            
+            // pan gesture just ended
+            if feedPan.state == .Changed {
+                
+                // pan gesture is going up at least 12
+                if translation.y <= -12 {
+                    feedAnimationTo("top")
+                    
+                // pan gesture is going down at least 12
+                } else if translation.y >= 12 {
+                    feedAnimationTo("bottom")
+                }
+            }
+        }
     }
     
 // MARK: Miscellaneous
+    
+    override func motionEnded(motion: UIEventSubtype, withEvent event: UIEvent?) {
+        
+        // if motion was a shake and location available
+        if motion == .MotionShake {
+            if DataSource.sharedInstance.locationManager.location != nil {
+
+                // zoom to location
+                attemptToMoveCameraToUserLocation()
+            }
+        }
+    }
     
     @objc private func setHoodScanningToFalse() {
         hoodScanning = false
     }
     
     override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+}
+
+// MARK: UIGestureRecognizerDelegate
+
+extension MapViewController: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+
+        // intercept feed gesture
+        if gestureRecognizer == feedPan {
+            
+            // if touch is not in feed, let gesture pass through to map
+            if !feedView.frame.contains(touch.locationInView(view)) {
+                return false
+            }
+        }
         return true
     }
 }
