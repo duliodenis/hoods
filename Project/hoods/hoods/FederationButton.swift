@@ -10,6 +10,8 @@ import UIKit
 
 class FederationButton: UIButton {
     
+    let federationIconImageView = UIImageView()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         

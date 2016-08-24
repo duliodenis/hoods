@@ -18,6 +18,7 @@ class MapViewController: UIViewController {
     private var feedView = FeedView()
     private var feedPan = UIPanGestureRecognizer()
     private var federationButton = FederationButton()
+    private var federationButtonShadow = UIView()
     private var buttonFrameDict = [String:CGRect]()
     
     override func viewDidLoad() {
@@ -134,7 +135,7 @@ class MapViewController: UIViewController {
         federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), forControlEvents: .TouchUpInside)
         
         // shadow
-        let federationButtonShadow = UIView(frame: CGRect(x: federationButton.frame.minX + 4, y: federationButton.frame.minY + 4, width: federationButtonSize.width, height: federationButtonSize.height))
+        federationButtonShadow = UIView(frame: buttonFrameDict["federationButtonShadowNormal"]!)
         federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         federationButtonShadow.layer.cornerRadius = federationButtonSize.width / 2
         federationButtonShadow.layer.masksToBounds = true
@@ -150,9 +151,11 @@ class MapViewController: UIViewController {
         UIView.animateWithDuration(0.2, animations: {
             self.federationButton.backgroundColor = UIColor.blackColor()
             self.federationButton.frame = self.buttonFrameDict["federationButtonTapped"]!
+            self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowTapped"]!
         }) { (Bool) in
             UIView.animateWithDuration(0.3, animations: {
                 self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
+                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
             })
         }
         
@@ -194,6 +197,8 @@ class MapViewController: UIViewController {
     private func populateButtonFrameDict() {
         buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
         buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        buttonFrameDict["federationButtonShadowNormal"] = CGRect(x: buttonFrameDict["federationButtonNormal"]!.minX + 4, y: buttonFrameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
+        buttonFrameDict["federationButtonShadowTapped"] = CGRect(x: buttonFrameDict["federationButtonTapped"]!.minX + 3, y: buttonFrameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
     }
     
     @objc private func setHoodScanningToFalse() {
