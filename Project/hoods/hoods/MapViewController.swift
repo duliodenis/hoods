@@ -17,6 +17,7 @@ class MapViewController: UIViewController {
     private var hoodScanning = false
     private var feedView = FeedView()
     private var feedPan = UIPanGestureRecognizer()
+    private var federationButton = FederationButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +39,7 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
         
         setCameraToManhattan()
+        addFederationButton()
         addFeedViewAndPanGesture()
     }
 
@@ -68,7 +70,7 @@ class MapViewController: UIViewController {
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into your location at a 30° angle over 3 seconds
-            moveCameraTo(centerCoordinate, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
+            moveCameraTo(centerCoordinate, distance: 4000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
@@ -80,7 +82,7 @@ class MapViewController: UIViewController {
     private func setCameraToManhattan() {
         
         // set camera to manhattan instantly
-        moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
+        moveCameraTo(manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
     }
     
 // MARK: Feed
@@ -90,11 +92,12 @@ class MapViewController: UIViewController {
         // feed
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
         feedView.currentHoodLabel.text = "Hoods"
-        view.addSubview(feedView)
         
         // pan
         feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panDetected(_:)))
         feedPan.delegate = self
+        
+        view.addSubview(feedView)
         mapboxView.addGestureRecognizer(feedPan)
     }
     
@@ -115,6 +118,43 @@ class MapViewController: UIViewController {
                 }, completion: { (Bool) -> Void in
             })
         default: break
+        }
+    }
+    
+// MARK: Federation Button
+    
+    func addFederationButton() {
+        
+        // button
+        let federationButtonSize = CGSize(width: 50, height: 50)
+        federationButton = FederationButton(frame: CGRect(x: view.frame.maxX - federationButtonSize.width - 20, y: view.frame.height - 120 - federationButtonSize.height - 20, width: federationButtonSize.width, height: federationButtonSize.height))
+        federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), forControlEvents: .TouchUpInside)
+        
+        // shadow
+        let federationButtonShadow = UIView(frame: CGRect(x: federationButton.frame.minX + 2, y: federationButton.frame.minY + 3, width: federationButtonSize.width, height: federationButtonSize.height))
+        federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        federationButtonShadow.layer.cornerRadius = federationButtonSize.width / 2
+        federationButtonShadow.layer.masksToBounds = true
+        
+        view.addSubview(federationButtonShadow)
+        view.addSubview(federationButton)
+        
+    }
+    
+    @objc private func federationButtonTapped(sender: UIButton) {
+        
+        // animate the color green for half a sec
+        federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
+        UIView.animateWithDuration(0.5, animations: {
+            self.federationButton.backgroundColor = UIColor.blackColor()
+        }) { (Bool) in
+        }
+        
+        // if location is available
+        if DataSource.sharedInstance.locationManager.location != nil {
+            
+            // zoom to location
+            attemptToMoveCameraToUserLocation()
         }
     }
     
@@ -144,18 +184,6 @@ class MapViewController: UIViewController {
     }
     
 // MARK: Miscellaneous
-    
-    override func motionEnded(motion: UIEventSubtype, withEvent event: UIEvent?) {
-        
-        // if motion was a shake and location available
-        if motion == .MotionShake {
-            if DataSource.sharedInstance.locationManager.location != nil {
-
-                // zoom to location
-                attemptToMoveCameraToUserLocation()
-            }
-        }
-    }
     
     @objc private func setHoodScanningToFalse() {
         hoodScanning = false

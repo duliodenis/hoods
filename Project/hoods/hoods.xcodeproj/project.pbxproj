@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */; };
+		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
 		49986BC21D5CA2BB00B8A312 /* manualNYC.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49986BC11D5CA2BB00B8A312 /* manualNYC.geojson */; };
 		49986BC41D672C6F00B8A312 /* nyc.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49986BC31D672C6E00B8A312 /* nyc.geojson */; };
 		49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28841D5B9D58009FADF3 /* AppDelegate.swift */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hoods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
 		49986BC11D5CA2BB00B8A312 /* manualNYC.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manualNYC.geojson; sourceTree = "<group>"; };
 		49986BC31D672C6E00B8A312 /* nyc.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nyc.geojson; sourceTree = "<group>"; };
 		49FB28811D5B9D58009FADF3 /* hoods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hoods.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,6 +92,7 @@
 				49FB28881D5B9D58009FADF3 /* Main.storyboard */,
 				49FB288D1D5B9D58009FADF3 /* LaunchScreen.storyboard */,
 				49FB28A71D5C2016009FADF3 /* FeedView.swift */,
+				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -277,6 +280,7 @@
 				49FB28A01D5BDDF5009FADF3 /* MapViewController.swift in Sources */,
 				49FB28A41D5BE186009FADF3 /* CalloutViewController.swift in Sources */,
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,
+				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,
 				49FB28A81D5C2016009FADF3 /* FeedView.swift in Sources */,
 				49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */,
