@@ -39,7 +39,8 @@ class FeedView: UIView {
         let constraints: [NSLayoutConstraint] = [
             currentHoodLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor),
             currentHoodLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
-            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),            currentHoodLabel.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 40),
+            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),
+            currentHoodLabel.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 50),
             
             vPlaceholder.topAnchor.constraintEqualToAnchor(currentHoodLabel.bottomAnchor),
             vPlaceholder.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),

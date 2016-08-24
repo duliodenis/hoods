@@ -21,6 +21,9 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // listen for "ApplicationDidBecomeActive" notification from app delegate
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: "ApplicationDidBecomeActive", object: nil)
+        
         // listen for "NotInAHood" notification from data source
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
 
@@ -57,7 +60,7 @@ class MapViewController: UIViewController {
     }
     
     @objc private func attemptToMoveCameraToUserLocation() {
-        
+                
         // if location available, start far out and then zoom into location at an angle over 3s
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
             
@@ -80,12 +83,13 @@ class MapViewController: UIViewController {
         moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
     }
     
-    // MARK: Feed
+// MARK: Feed
     
     private func addFeedViewAndPanGesture() {
         
         // feed
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
+        feedView.currentHoodLabel.text = "Hoods"
         view.addSubview(feedView)
         
         // pan
@@ -114,7 +118,7 @@ class MapViewController: UIViewController {
         }
     }
     
-    // MARK: Touches
+// MARK: Touches
     
     func panDetected(sender: UIPanGestureRecognizer) {
         
@@ -221,21 +225,26 @@ extension MapViewController: CLLocationManagerDelegate {
         
         if hoodScanning == true {
             
-            // use data source hood check to set current hood label
-            feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
-            
-            // update the subLocality
-            let geocoder = CLGeocoder()
-            geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
-                if error == nil {
-                    DataSource.sharedInstance.subLocality = placemarks![0].subLocality!
+            // if location is available
+            if DataSource.sharedInstance.locationManager.location != nil {
+                
+                // use hood check to try and set current hood label
+                let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
+                
+                if newLocation != "" {
+                    feedView.currentHoodLabel.text = newLocation
+                } else {
+                    feedView.currentHoodLabel.text = "Hoods"
                 }
-            })
-        }
-        
-        // if hood label is blank after hood check, set label to "Hoods"
-        if feedView.currentHoodLabel.text == "" {
-            feedView.currentHoodLabel.text = "Hoods"
+                
+                // update the subLocality
+                let geocoder = CLGeocoder()
+                geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                    if error == nil {
+                        DataSource.sharedInstance.subLocality = placemarks![0].subLocality!
+                    }
+                })
+            }
         }
     }
 }
