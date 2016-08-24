@@ -18,6 +18,7 @@ class MapViewController: UIViewController {
     private var feedView = FeedView()
     private var feedPan = UIPanGestureRecognizer()
     private var federationButton = FederationButton()
+    private var buttonFrameDict = [String:CGRect]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +38,8 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.delegate = self
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
+        
+        populateButtonFrameDict()
         
         setCameraToManhattan()
         addFederationButton()
@@ -127,27 +130,30 @@ class MapViewController: UIViewController {
         
         // button
         let federationButtonSize = CGSize(width: 50, height: 50)
-        federationButton = FederationButton(frame: CGRect(x: view.frame.maxX - federationButtonSize.width - 20, y: view.frame.height - 120 - federationButtonSize.height - 20, width: federationButtonSize.width, height: federationButtonSize.height))
+        federationButton = FederationButton(frame: buttonFrameDict["federationButtonNormal"]!)
         federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), forControlEvents: .TouchUpInside)
         
         // shadow
-        let federationButtonShadow = UIView(frame: CGRect(x: federationButton.frame.minX + 2, y: federationButton.frame.minY + 3, width: federationButtonSize.width, height: federationButtonSize.height))
+        let federationButtonShadow = UIView(frame: CGRect(x: federationButton.frame.minX + 4, y: federationButton.frame.minY + 4, width: federationButtonSize.width, height: federationButtonSize.height))
         federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         federationButtonShadow.layer.cornerRadius = federationButtonSize.width / 2
         federationButtonShadow.layer.masksToBounds = true
         
         view.addSubview(federationButtonShadow)
         view.addSubview(federationButton)
-        
     }
     
     @objc private func federationButtonTapped(sender: UIButton) {
         
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
-        UIView.animateWithDuration(0.5, animations: {
+        UIView.animateWithDuration(0.2, animations: {
             self.federationButton.backgroundColor = UIColor.blackColor()
+            self.federationButton.frame = self.buttonFrameDict["federationButtonTapped"]!
         }) { (Bool) in
+            UIView.animateWithDuration(0.3, animations: {
+                self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
+            })
         }
         
         // if location is available
@@ -184,6 +190,11 @@ class MapViewController: UIViewController {
     }
     
 // MARK: Miscellaneous
+    
+    private func populateButtonFrameDict() {
+        buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
+        buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+    }
     
     @objc private func setHoodScanningToFalse() {
         hoodScanning = false
@@ -269,7 +280,9 @@ extension MapViewController: CLLocationManagerDelegate {
                 let geocoder = CLGeocoder()
                 geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
                     if error == nil {
-                        DataSource.sharedInstance.subLocality = placemarks![0].subLocality!
+                        if let subLocality = placemarks![0].subLocality {
+                            DataSource.sharedInstance.subLocality = subLocality
+                        }
                     }
                 })
             }
