@@ -20,39 +20,27 @@ class DataSource {
     var calloutRepresentedObjectTitle = ""
     var subLocality = "Manhattan"
     
-    func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String {
+    func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String? {
         
         // if your coords are not in the last polygon...
         if stillInTheHood(currentLocation) == false {
             
-            // check through all hood polygons for your coords and update last hood name
+            // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
             lastHoodName = fullHoodCheck(currentLocation)
             
-            // if full hood check failed, send notification to set scanningHoods to false and return blank string
-            if lastHoodName == "" {
+            // if full hood check failed, send notification to set scanningHoods to false
+            if lastHoodName == nil {
                 NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
-                return ""
-                
-            // if full hood check succeeded, return last hood name
-            } else {
-                return lastHoodName!
             }
-            
-        // else you have been to a hood and your coords are in the last polygon, return last hood name
-        } else if lastHoodName != nil {
-            print("You are still in \(lastHoodName!).")
-            return lastHoodName!
-            
-        // else your coords are in the last polygon, return blank string
-        } else {
-            return ""
         }
+        return lastHoodName
     }
     
     private func fullHoodCheck(currentLocation: CLLocationCoordinate2D) -> String {
         
         // set file path to geoJSON for current subLocality
         let filePath = NSBundle.mainBundle().pathForResource(geoJSON(), ofType: "geojson")!
+        print("geoJSON used: \(geoJSON())")
         
         // convert GeoJSON to NSData
         let data = NSData(contentsOfFile: filePath)
@@ -127,15 +115,10 @@ class DataSource {
                 // check if your coords are in the last polygon renderer path
                 if CGPathContainsPoint(lastPolygonRenderer!.path, nil, cgPoint, true) {
                     return true
-                } else {
-                    return false
                 }
-            } else {
-                return false
             }
-        } else {
-            return false
         }
+        return false
     }
     
     private func geoJSON() -> String {
@@ -149,6 +132,8 @@ class DataSource {
                 return "nyc"
             case "Staten Island":
                 return "nyc"
+            case "San Francisco":
+                return "sanFrancisco"
             default:
                 return "manualNYC"
         }

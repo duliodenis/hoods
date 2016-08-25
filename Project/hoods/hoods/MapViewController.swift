@@ -17,9 +17,15 @@ class MapViewController: UIViewController {
     private var hoodScanning = false
     private var feedView = FeedView()
     private var feedPan = UIPanGestureRecognizer()
+    private var federationButton = FederationButton()
+    private var federationButtonShadow = UIView()
+    private var buttonFrameDict = [String:CGRect]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // listen for "ApplicationDidBecomeActive" notification from app delegate
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: "ApplicationDidBecomeActive", object: nil)
         
         // listen for "NotInAHood" notification from data source
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
@@ -34,7 +40,9 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
         
-        setCameraToManhattan()
+        populateButtonFrameDict()
+        
+        addFederationButton()
         addFeedViewAndPanGesture()
     }
 
@@ -57,7 +65,7 @@ class MapViewController: UIViewController {
     }
     
     @objc private func attemptToMoveCameraToUserLocation() {
-        
+                
         // if location available, start far out and then zoom into location at an angle over 3s
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
             
@@ -65,7 +73,7 @@ class MapViewController: UIViewController {
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into your location at a 30° angle over 3 seconds
-            moveCameraTo(centerCoordinate, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
+            moveCameraTo(centerCoordinate, distance: 4000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
@@ -77,20 +85,22 @@ class MapViewController: UIViewController {
     private func setCameraToManhattan() {
         
         // set camera to manhattan instantly
-        moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
+        moveCameraTo(manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
     }
     
-    // MARK: Feed
+// MARK: Feed
     
     private func addFeedViewAndPanGesture() {
         
         // feed
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
-        view.addSubview(feedView)
+        feedView.currentHoodLabel.text = "Hoods"
         
         // pan
         feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panDetected(_:)))
         feedPan.delegate = self
+        
+        view.addSubview(feedView)
         mapboxView.addGestureRecognizer(feedPan)
     }
     
@@ -114,7 +124,49 @@ class MapViewController: UIViewController {
         }
     }
     
-    // MARK: Touches
+// MARK: Federation Button
+    
+    func addFederationButton() {
+        
+        // button
+        let federationButtonSize = CGSize(width: 50, height: 50)
+        federationButton = FederationButton(frame: buttonFrameDict["federationButtonNormal"]!)
+        federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), forControlEvents: .TouchUpInside)
+        
+        // shadow
+        federationButtonShadow = UIView(frame: buttonFrameDict["federationButtonShadowNormal"]!)
+        federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        federationButtonShadow.layer.cornerRadius = federationButtonSize.width / 2
+        federationButtonShadow.layer.masksToBounds = true
+        
+        view.addSubview(federationButtonShadow)
+        view.addSubview(federationButton)
+    }
+    
+    @objc private func federationButtonTapped(sender: UIButton) {
+        
+        // animate the color green for half a sec
+        federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
+        UIView.animateWithDuration(0.2, animations: {
+            self.federationButton.backgroundColor = UIColor.blackColor()
+            self.federationButton.frame = self.buttonFrameDict["federationButtonTapped"]!
+            self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowTapped"]!
+        }) { (Bool) in
+            UIView.animateWithDuration(0.3, animations: {
+                self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
+                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
+            })
+        }
+        
+        // if location is available
+        if DataSource.sharedInstance.locationManager.location != nil {
+            
+            // zoom to location
+            attemptToMoveCameraToUserLocation()
+        }
+    }
+    
+// MARK: Touches
     
     func panDetected(sender: UIPanGestureRecognizer) {
         
@@ -141,16 +193,11 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
-    override func motionEnded(motion: UIEventSubtype, withEvent event: UIEvent?) {
-        
-        // if motion was a shake and location available
-        if motion == .MotionShake {
-            if DataSource.sharedInstance.locationManager.location != nil {
-
-                // zoom to location
-                attemptToMoveCameraToUserLocation()
-            }
-        }
+    private func populateButtonFrameDict() {
+        buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
+        buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        buttonFrameDict["federationButtonShadowNormal"] = CGRect(x: buttonFrameDict["federationButtonNormal"]!.minX + 4, y: buttonFrameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
+        buttonFrameDict["federationButtonShadowTapped"] = CGRect(x: buttonFrameDict["federationButtonTapped"]!.minX + 3, y: buttonFrameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
     }
     
     @objc private func setHoodScanningToFalse() {
@@ -221,21 +268,34 @@ extension MapViewController: CLLocationManagerDelegate {
         
         if hoodScanning == true {
             
-            // use data source hood check to set current hood label
-            feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
-            
-            // update the subLocality
-            let geocoder = CLGeocoder()
-            geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
-                if error == nil {
-                    DataSource.sharedInstance.subLocality = placemarks![0].subLocality!
+            // if location is available
+            if DataSource.sharedInstance.locationManager.location != nil {
+                
+                // use hood check to try and set current hood label
+                let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
+                
+                if newLocation != "" {
+                    feedView.currentHoodLabel.text = newLocation
+                } else {
+                    feedView.currentHoodLabel.text = "Hoods"
                 }
-            })
-        }
-        
-        // if hood label is blank after hood check, set label to "Hoods"
-        if feedView.currentHoodLabel.text == "" {
-            feedView.currentHoodLabel.text = "Hoods"
+                
+                // update the subLocality
+                let geocoder = CLGeocoder()
+                geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                    if error == nil {
+                        if let locality = placemarks![0].locality {
+                            if locality == "San Francisco" {
+                                DataSource.sharedInstance.subLocality = locality
+                            } else {
+                                if let subLocality = placemarks![0].subLocality {
+                                    DataSource.sharedInstance.subLocality = subLocality
+                                }
+                            }
+                        }
+                    }
+                })
+            }
         }
     }
 }

@@ -19,12 +19,6 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="string" keyPath="styleURL__" value="mapbox://styles/andrewcar/cigjifhox00059em63qbqemcm"/>
-                            <userDefinedRuntimeAttribute type="number" keyPath="latitude">
-                                <real key="value" value="40.735987000000002"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="number" keyPath="longitude">
-                                <real key="value" value="-73.993630999999993"/>
-                            </userDefinedRuntimeAttribute>
                             <userDefinedRuntimeAttribute type="boolean" keyPath="allowsZooming" value="YES"/>
                             <userDefinedRuntimeAttribute type="boolean" keyPath="allowsScrolling" value="YES"/>
                             <userDefinedRuntimeAttribute type="boolean" keyPath="allowsRotating" value="YES"/>
