@@ -42,7 +42,6 @@ class MapViewController: UIViewController {
         
         populateButtonFrameDict()
         
-        setCameraToManhattan()
         addFederationButton()
         addFeedViewAndPanGesture()
     }
@@ -285,8 +284,14 @@ extension MapViewController: CLLocationManagerDelegate {
                 let geocoder = CLGeocoder()
                 geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
                     if error == nil {
-                        if let subLocality = placemarks![0].subLocality {
-                            DataSource.sharedInstance.subLocality = subLocality
+                        if let locality = placemarks![0].locality {
+                            if locality == "San Francisco" {
+                                DataSource.sharedInstance.subLocality = locality
+                            } else {
+                                if let subLocality = placemarks![0].subLocality {
+                                    DataSource.sharedInstance.subLocality = subLocality
+                                }
+                            }
                         }
                     }
                 })

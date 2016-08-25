@@ -40,6 +40,7 @@ class DataSource {
         
         // set file path to geoJSON for current subLocality
         let filePath = NSBundle.mainBundle().pathForResource(geoJSON(), ofType: "geojson")!
+        print("geoJSON used: \(geoJSON())")
         
         // convert GeoJSON to NSData
         let data = NSData(contentsOfFile: filePath)
@@ -86,6 +87,8 @@ class DataSource {
                                     
                                     print("You are in \(currentNeighborhood).")
                                     return currentNeighborhood
+                                } else {
+                                    print("You are not in \(currentNeighborhood).")
                                 }
                             }
                         }
@@ -129,6 +132,8 @@ class DataSource {
                 return "nyc"
             case "Staten Island":
                 return "nyc"
+            case "San Francisco":
+                return "sanFrancisco"
             default:
                 return "manualNYC"
         }
