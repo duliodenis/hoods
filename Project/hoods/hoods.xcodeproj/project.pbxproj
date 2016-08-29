@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */; };
+		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
+		490CAD451D715662003E9B34 /* manhattan.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD441D715662003E9B34 /* manhattan.geojson */; };
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
-		49986BC21D5CA2BB00B8A312 /* manualNYC.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49986BC11D5CA2BB00B8A312 /* manualNYC.geojson */; };
 		49986BC41D672C6F00B8A312 /* nyc.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49986BC31D672C6E00B8A312 /* nyc.geojson */; };
-		49C143F31D6F6AD700305EE7 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49C143F21D6F6AD700305EE7 /* sanFrancisco.geojson */; };
 		49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28841D5B9D58009FADF3 /* AppDelegate.swift */; };
 		49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49FB28881D5B9D58009FADF3 /* Main.storyboard */; };
 		49FB288C1D5B9D58009FADF3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49FB288B1D5B9D58009FADF3 /* Assets.xcassets */; };
@@ -26,10 +26,10 @@
 
 /* Begin PBXFileReference section */
 		08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hoods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
+		490CAD441D715662003E9B34 /* manhattan.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manhattan.geojson; sourceTree = "<group>"; };
 		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
-		49986BC11D5CA2BB00B8A312 /* manualNYC.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manualNYC.geojson; sourceTree = "<group>"; };
 		49986BC31D672C6E00B8A312 /* nyc.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nyc.geojson; sourceTree = "<group>"; };
-		49C143F21D6F6AD700305EE7 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
 		49FB28811D5B9D58009FADF3 /* hoods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hoods.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49FB28841D5B9D58009FADF3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49FB28891D5B9D58009FADF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -61,9 +61,9 @@
 		49C143F41D6F6AE300305EE7 /* GeoJSON */ = {
 			isa = PBXGroup;
 			children = (
-				49986BC11D5CA2BB00B8A312 /* manualNYC.geojson */,
+				490CAD441D715662003E9B34 /* manhattan.geojson */,
 				49986BC31D672C6E00B8A312 /* nyc.geojson */,
-				49C143F21D6F6AD700305EE7 /* sanFrancisco.geojson */,
+				490CAD421D71556D003E9B34 /* sanFrancisco.geojson */,
 			);
 			name = GeoJSON;
 			sourceTree = "<group>";
@@ -224,10 +224,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				490CAD451D715662003E9B34 /* manhattan.geojson in Resources */,
 				49FB288F1D5B9D58009FADF3 /* LaunchScreen.storyboard in Resources */,
-				49986BC21D5CA2BB00B8A312 /* manualNYC.geojson in Resources */,
 				49FB289E1D5B9E2C009FADF3 /* Settings.bundle in Resources */,
-				49C143F31D6F6AD700305EE7 /* sanFrancisco.geojson in Resources */,
+				490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */,
 				49FB288C1D5B9D58009FADF3 /* Assets.xcassets in Resources */,
 				49986BC41D672C6F00B8A312 /* nyc.geojson in Resources */,
 				49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */,

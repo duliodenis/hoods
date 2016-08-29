@@ -135,7 +135,7 @@ class DataSource {
             case "San Francisco":
                 return "sanFrancisco"
             default:
-                return "manualNYC"
+                return "manhattan"
         }
     }
 }
