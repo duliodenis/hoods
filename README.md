@@ -1,37 +1,44 @@
-# Hoods (Design)
+# Hoods
 
-Hoods is a geofencing real-time social network.  
+Hoods is a geofencing real-time social network. This is the White Label product.
 
-##Concept
+##Local ads
 
-The White Label Geofencing Social Network Product.
+Activated when you enter the hood the business is in
 
-##Monetization
-
-Monetization will be through different-tiered ads purchased by local businesses to offer deals when users enter the geofences (hoods).
+Types of ads:
+Picture
+Gif
+Video
 
 ## Feature List
-Below is the feature list for the full version:
 
 Full version
 
-1. Facebook profile linking for profile picture, name and friends
-2. Mapbox map with hoods, subways and geofencing location detection
-3. Party hosting with date, location, max people, amenities and Facebook invites (emoji on map)
-4. Scancode invites (in person)
-5. Uber button
-6. Hood feed (v)
-7. Party feed (v)
+1. Mapbox-powered map with hoods, subways, geofencing detection, etc
+2. Hood name
+3. Hood weather
+4. Top five posts collection view
+5. Hood feed with upvotes/downvotes
+6. Party hosting (public/private) with live annotation visible to others
+7. Party feed (comments, posts and story) with upvotes/downvotes
+8. Tiered local ads shown in hood (pic/gif/video)
+9. Ranking system to gain abilities: host a party, etc
 
 MVP
 
-1. Facebook profile linking for profile picture, name and friends
-2. Mapbox map with hoods, subways and geofencing location detection
-6. Hood feed (v)
+1. Mapbox-powered map with hoods, subways, geofencing detection, etc
+2. Hood name
+3. Hood weather
+4. Top five posts collection view
+5. Hood feed with upvotes/downvotes
+6. Party hosting (public/private) with live annotation visible to others
+7. Party feed (comments, posts and story) with upvotes/downvotes
+9. Ranking system to gain abilities: host a party, etc
 
 ## Mockup
 
-![](Design/PineappleMockup.png?raw=true)
+![](Design/HoodsMockup.png?raw=true)
 
 ## Tagline
 Network  | Account
