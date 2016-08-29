@@ -7,9 +7,13 @@ Hoods is a geofencing real-time social network. This is the White Label product.
 Activated when you enter the hood the business is in
 
 Types of ads:
+
 Picture
+
 Gif
+
 Video
+
 
 ## Feature List
 
@@ -42,13 +46,15 @@ MVP
 
 ## Tagline
 Gather
+
+
 Network  | Account
 ------------- | -------------
 Andrew | andrew@yugetech.com
 Dulio | dulio@yugetech.com
 Twitter | [@yugeafterparty](https://twitter.com/yugeafterparty)
 App Website | [yugeafter.party](http://yugeafter.party)
-AppStore | Hoods - GeoChat in your Hood
+AppStore | Hoods - Chat in your Hood
 
 
 
