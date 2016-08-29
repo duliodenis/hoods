@@ -108,12 +108,17 @@ class MapViewController: UIViewController {
         switch topOrBottom {
         case "top":
             
+            self.feedView.animateCornerRadiusOf(self.feedView, fromValue: self.feedView.frame.width * 0.07, toValue: 0.0, duration: 0.5)
+            
             // animate the feed's minY to the view's minY
             UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                 self.feedView.frame = CGRectMake(0, self.view.frame.origin.y, self.feedView.frame.width, self.feedView.frame.height)
                 }, completion: { (Bool) -> Void in
+                    
             })
         case "bottom":
+            
+            self.feedView.animateCornerRadiusOf(feedView, fromValue: 0.0, toValue: feedView.frame.width * 0.07, duration: 0.5)
             
             // animate the feed's minY to the view's height - 100
             UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
@@ -329,5 +334,17 @@ extension MapViewController: MGLMapViewDelegate {
             return CalloutViewController(representedObject: annotation)
         }
         return nil
+    }
+}
+
+extension UIView {
+    func animateCornerRadiusOf(viewToAnimate: UIView, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval) {
+        let animation = CABasicAnimation(keyPath: "cornerRadius")
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        animation.fromValue = fromValue
+        animation.toValue = toValue
+        animation.duration = duration
+        viewToAnimate.layer.addAnimation(animation, forKey: "cornerRadius")
+        viewToAnimate.layer.cornerRadius = toValue
     }
 }
