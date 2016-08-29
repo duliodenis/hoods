@@ -41,6 +41,7 @@ MVP
 ![](Design/HoodsMockup.png?raw=true)
 
 ## Tagline
+Gather
 Network  | Account
 ------------- | -------------
 Andrew | andrew@yugetech.com
