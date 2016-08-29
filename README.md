@@ -32,9 +32,13 @@ MVP
 3. Hood weather
 4. Top five posts collection view
 5. Hood feed with upvotes/downvotes
-6. Party hosting (public/private) with live annotation visible to others
-7. Party feed (comments, posts and story) with upvotes/downvotes
-9. Ranking system to gain abilities: host a party, etc
+6. Communicate with your Facebook friends in your Hood
+
+App Update for Parties
+
+1. Party hosting (public/private) with live annotation visible to others
+2. Party feed (comments, posts and story) with upvotes/downvotes
+3. Ranking system to gain abilities: host a party, etc
 
 ## Mockup
 
@@ -42,6 +46,7 @@ MVP
 
 ## Tagline
 Gather
+
 Network  | Account
 ------------- | -------------
 Andrew | andrew@yugetech.com
