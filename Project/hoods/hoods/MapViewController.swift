@@ -39,6 +39,8 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.delegate = self
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
+        DataSource.sharedInstance.locationManager.startUpdatingLocation()
+        DataSource.sharedInstance.locationManager.startUpdatingHeading()
         
         populateButtonFrameDict()
         
@@ -244,16 +246,8 @@ extension MapViewController: CLLocationManagerDelegate {
             // turns on hood checking until it fails and this gets set to false
             hoodScanning = true
             
-            DataSource.sharedInstance.locationManager.startUpdatingLocation()
-            DataSource.sharedInstance.locationManager.startUpdatingHeading()
-            
             // only show user location if status is authorized when in use
             mapboxView.showsUserLocation = true
-            
-            // check if location isn't nil then update the current hood label
-            if DataSource.sharedInstance.locationManager.location != nil {
-                feedView.currentHoodLabel.text = DataSource.sharedInstance.currentHoodName(DataSource.sharedInstance.locationManager.location!.coordinate)
-            }
             
             // move camera into your location
             attemptToMoveCameraToUserLocation()
@@ -276,30 +270,28 @@ extension MapViewController: CLLocationManagerDelegate {
             // if location is available
             if DataSource.sharedInstance.locationManager.location != nil {
                 
+                // update the area singleton
+                let geocoder = CLGeocoder()
+                geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                    if error == nil {
+                        
+                        // update the user location placemark singleton
+                        DataSource.sharedInstance.lastPlacemark = placemarks![0]
+                        
+                        // update the area singleton
+                        DataSource.sharedInstance.updateArea()
+                    }
+                })
+                
                 // use hood check to try and set current hood label
                 let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
                 
-                if newLocation != "" {
+                // if hood check failed, set label to Hoods
+                if newLocation != nil {
                     feedView.currentHoodLabel.text = newLocation
                 } else {
                     feedView.currentHoodLabel.text = "Hoods"
                 }
-                
-                // update the subLocality
-                let geocoder = CLGeocoder()
-                geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
-                    if error == nil {
-                        if let locality = placemarks![0].locality {
-                            if locality == "San Francisco" {
-                                DataSource.sharedInstance.subLocality = locality
-                            } else {
-                                if let subLocality = placemarks![0].subLocality {
-                                    DataSource.sharedInstance.subLocality = subLocality
-                                }
-                            }
-                        }
-                    }
-                })
             }
         }
     }
