@@ -128,6 +128,8 @@ class DataSource {
                 
                 // check if your coords are in the last polygon renderer path
                 if CGPathContainsPoint(lastPolygonRenderer!.path, nil, cgPoint, true) {
+                    
+                    print("You're still in the hood.")
                     return true
                 }
             }

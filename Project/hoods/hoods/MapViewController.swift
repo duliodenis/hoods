@@ -43,10 +43,10 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.delegate = self
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
-        DataSource.sharedInstance.locationManager.startUpdatingLocation()
-        DataSource.sharedInstance.locationManager.startUpdatingHeading()
-        
+
         populateButtonFrameDict()
+        
+        setCameraToManhattan()
         
         addTapGesture()
         addProfile()
@@ -77,6 +77,8 @@ class MapViewController: UIViewController {
                 
         // if location available, start far out and then zoom into location at an angle over 3s
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
+            
+            print("using location manager location coordinate")
             
             // start far out at a 50° angle
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
@@ -366,6 +368,9 @@ extension MapViewController: CLLocationManagerDelegate {
         
         if status == .AuthorizedWhenInUse {
             
+            DataSource.sharedInstance.locationManager.startUpdatingLocation()
+            DataSource.sharedInstance.locationManager.startUpdatingHeading()
+            
             // turns on hood checking until it fails and this gets set to false
             hoodScanning = true
             
@@ -392,6 +397,9 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // if location is available
             if DataSource.sharedInstance.locationManager.location != nil {
+                
+                DataSource.sharedInstance.locationManager.startUpdatingLocation()
+                DataSource.sharedInstance.locationManager.startUpdatingHeading()
                 
                 // update the area singleton
                 let geocoder = CLGeocoder()
