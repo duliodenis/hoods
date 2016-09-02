@@ -227,6 +227,11 @@ class MapViewController: UIViewController {
     
     @objc private func federationButtonTapped(sender: UIButton) {
         
+        // close profile
+        if DataSource.sharedInstance.profileState == .Open {
+            toggleProfileSizeForState(.Closed)
+        }
+        
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
         UIView.animateWithDuration(0.2, animations: {
@@ -290,6 +295,11 @@ class MapViewController: UIViewController {
                 // pan gesture is going up at least 12
                 if translation.y <= -12 {
                     feedAnimationTo("top")
+                    
+                    // close profile
+                    if DataSource.sharedInstance.profileState == .Open {
+                        toggleProfileSizeForState(.Closed)
+                    }
                     
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
