@@ -19,6 +19,7 @@ class MapViewController: UIViewController {
     private var tap = UITapGestureRecognizer()
     private var feedPan = UIPanGestureRecognizer()
     private var profileView = ProfileView()
+    private var profileViewShadow = UIView()
     private var profileButton = UIButton()
     private var federationButton = FederationButton()
     private var federationButtonShadow = UIView()
@@ -136,21 +137,20 @@ class MapViewController: UIViewController {
         
         // add the profile view with profile frame CLOSED
         profileView = ProfileView(frame: buttonFrameDict["profileViewClosed"]!)
-        
-        // set the profile corner radius to half its width
         profileView.layer.cornerRadius = profileView.frame.width / 2
-        
-        // add the profile view to the map view
-        mapboxView.addSubview(profileView)
-        
+
+        // add the profile view shadow
+        profileViewShadow = UIView(frame: buttonFrameDict["profileViewShadowClosed"]!)
+        profileViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        profileViewShadow.layer.cornerRadius = profileViewShadow.frame.width / 2
+        profileViewShadow.layer.masksToBounds = true
         
         // set the profile button frame to CLOSED
         profileButton.frame = buttonFrameDict["profileViewClosed"]!
-        
-        // set the profile button target to didPressProfileButton:
         profileButton.addTarget(self, action: #selector(MapViewController.profileButtonTapped(_:)), forControlEvents: .TouchUpInside)
         
-        // add the profile button to the map view
+        mapboxView.addSubview(profileViewShadow)
+        mapboxView.addSubview(profileView)
         mapboxView.addSubview(profileButton)
         
         // activate constraints for closed profile
@@ -173,8 +173,9 @@ class MapViewController: UIViewController {
             
             UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseOut, animations: {
                 
-                // set the profile frame to OPEN
+                // set the profile frame and its shadow to OPEN
                 self.profileView.frame = self.buttonFrameDict["profileViewOpen"]!
+                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowOpen"]!
                 
                 // activate the profile subview constraints for OPENED state
                 self.profileView.activateConstraintsForState(.Open)
@@ -189,6 +190,7 @@ class MapViewController: UIViewController {
                 
                 // set the profile frame to CLOSED
                 self.profileView.frame = self.buttonFrameDict["profileViewClosed"]!
+                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowClosed"]!
                 
                 // activate the profile subview constraints for CLOSED state
                 self.profileView.activateConstraintsForState(.Closed)
@@ -302,8 +304,12 @@ class MapViewController: UIViewController {
     private func populateButtonFrameDict() {
         
         // profile view
-        buttonFrameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: view.frame.width * 0.13, height: view.frame.width * 0.13)
-        buttonFrameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.77) / 2, y: 50, width: view.frame.width * 0.77, height: view.frame.width * 0.77)
+        buttonFrameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: 50, height: 50)
+        buttonFrameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.85) / 2, y: 50, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
+        
+        // profile view shadow
+        buttonFrameDict["profileViewShadowClosed"] = CGRect(x: buttonFrameDict["profileViewClosed"]!.minX + 6, y: buttonFrameDict["profileViewClosed"]!.minY + 7, width: 50, height: 50)
+        buttonFrameDict["profileViewShadowOpen"] = CGRect(x: buttonFrameDict["profileViewOpen"]!.minX + 6, y: buttonFrameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // federation button
         buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)

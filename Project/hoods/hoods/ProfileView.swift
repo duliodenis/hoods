@@ -39,7 +39,7 @@ class ProfileView: UIView {
         }
         
         // subview common properties
-        let subviews = [profileImageView, profileFirstNameLabel, profileLastNameLabel]
+        let subviews = [profileImageView, profileLastNameLabel, profileFirstNameLabel]
         for sub in subviews {
             sub.translatesAutoresizingMaskIntoConstraints = false
             addSubview(sub)
@@ -57,7 +57,6 @@ class ProfileView: UIView {
         
         // activate constraints for state passed in
         if state == .Closed {
-            print("ProfileView:deactivating constraints and activating CLOSED constraints")
             
             // closed profile constraints
             profileConstraints = [
@@ -79,7 +78,6 @@ class ProfileView: UIView {
             
             DataSource.sharedInstance.profileState = .Closed
         } else {
-            print("ProfileView:deactivating constraints and activating OPEN constraints")
             
             // open profile constraints
             profileConstraints = [
@@ -90,12 +88,12 @@ class ProfileView: UIView {
                 
                 profileFirstNameLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 20),
                 profileFirstNameLabel.leftAnchor.constraintEqualToAnchor(profileImageView.rightAnchor, constant: 10),
-                profileFirstNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: -10),
-                profileFirstNameLabel.bottomAnchor.constraintEqualToAnchor(profileImageView.centerYAnchor, constant: 0),
+                profileFirstNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: -5),
+                profileFirstNameLabel.bottomAnchor.constraintEqualToAnchor(profileImageView.centerYAnchor),
                 
-                profileLastNameLabel.topAnchor.constraintEqualToAnchor(profileImageView.centerYAnchor, constant: 0),
+                profileLastNameLabel.topAnchor.constraintEqualToAnchor(profileImageView.centerYAnchor),
                 profileLastNameLabel.leftAnchor.constraintEqualToAnchor(profileImageView.rightAnchor, constant: 10),
-                profileLastNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: -10),
+                profileLastNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: -5),
                 profileLastNameLabel.bottomAnchor.constraintEqualToAnchor(profileImageView.bottomAnchor, constant: -20)
             ]
             
