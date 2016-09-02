@@ -17,30 +17,38 @@ class DataSource {
     var locationManager = CLLocationManager()
     var lastHoodName: String?
     var lastPolygonRenderer: MKPolygonRenderer?
+    var lastPlacemark: CLPlacemark?
     var calloutRepresentedObjectTitle = ""
-    var subLocality = "Manhattan"
+    var area: String?
     
     func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String? {
         
-        // if your coords are not in the last polygon...
+        // if your coords are not in the last hood polygon
         if stillInTheHood(currentLocation) == false {
             
-            // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
-            lastHoodName = fullHoodCheck(currentLocation)
-            
-            // if full hood check failed, send notification to set scanningHoods to false
-            if lastHoodName == nil {
+            // if last area is a supported area
+            if areaForGeoJSON() != "" {
+                                
+                // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
+                lastHoodName = hoodCheck(currentLocation)
+                
+                // if in a supported area, but hood check failed, stop scanning
+                if lastHoodName == "" {
+                    NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
+                }
+                
+            // else last area is not a supported area
+            } else {
                 NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
             }
         }
         return lastHoodName
     }
     
-    private func fullHoodCheck(currentLocation: CLLocationCoordinate2D) -> String {
+    private func hoodCheck(currentLocation: CLLocationCoordinate2D) -> String {
         
         // set file path to geoJSON for current subLocality
-        let filePath = NSBundle.mainBundle().pathForResource(geoJSON(), ofType: "geojson")!
-        print("geoJSON used: \(geoJSON())")
+        let filePath = NSBundle.mainBundle().pathForResource(areaForGeoJSON(), ofType: "geojson")!
         
         // convert GeoJSON to NSData
         let data = NSData(contentsOfFile: filePath)
@@ -49,7 +57,7 @@ class DataSource {
             
             if let hoods = json["features"] as? [[String: AnyObject]] {
                 
-                // iterate through all hoods
+                // iterate through all hoods in the GeoJSON file
                 for hood in hoods {
                     
                     var coords = [CLLocationCoordinate2D]()
@@ -121,9 +129,29 @@ class DataSource {
         return false
     }
     
-    private func geoJSON() -> String {
+    func updateArea() {
         
-        switch subLocality {
+        // if the locality is SF, set the area singleton to it
+        if let locality = lastPlacemark!.locality {
+            if locality == "San Francisco" {
+                DataSource.sharedInstance.area = locality
+                
+            // else if it's not SF, set the area to the subLocality
+            } else {
+                if let subLocality = lastPlacemark!.subLocality {
+                    DataSource.sharedInstance.area = subLocality
+                }
+            }
+        }
+    }
+    
+    private func areaForGeoJSON() -> String {
+        
+        // if the user location was found in an area, return appropriate GeoJSON file name
+        if area != nil {
+            switch area! {
+            case "Manhattan":
+                return "manhattan"
             case "Brooklyn":
                 return "nyc"
             case "Queens":
@@ -135,7 +163,11 @@ class DataSource {
             case "San Francisco":
                 return "sanFrancisco"
             default:
-                return "manhattan"
+                return ""
+            }
         }
+        
+        // if the user location is not found in any area, return ""
+        return ""
     }
 }
