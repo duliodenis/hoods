@@ -280,18 +280,18 @@ extension MapViewController: CLLocationManagerDelegate {
                         
                         // update the area singleton
                         DataSource.sharedInstance.updateArea()
+                        
+                        // use hood check to try and set current hood label
+                        let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)!
+                        
+                        // if hood check failed, set label to Hoods
+                        if newLocation != "" {
+                            self.feedView.currentHoodLabel.text = newLocation
+                        } else {
+                            self.feedView.currentHoodLabel.text = "Hoods"
+                        }
                     }
                 })
-                
-                // use hood check to try and set current hood label
-                let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)
-                
-                // if hood check failed, set label to Hoods
-                if newLocation != nil {
-                    feedView.currentHoodLabel.text = newLocation
-                } else {
-                    feedView.currentHoodLabel.text = "Hoods"
-                }
             }
         }
     }

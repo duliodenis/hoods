@@ -32,7 +32,12 @@ class DataSource {
                 // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
                 lastHoodName = hoodCheck(currentLocation)
                 
-            // else last area is not a supported area, so stop hood scanning
+                // if in a supported area, but hood check failed, stop scanning
+                if lastHoodName == "" {
+                    NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
+                }
+                
+            // else last area is not a supported area
             } else {
                 NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
             }
