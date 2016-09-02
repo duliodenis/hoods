@@ -16,7 +16,10 @@ class MapViewController: UIViewController {
     @IBOutlet var mapboxView: MGLMapView!
     private var hoodScanning = false
     private var feedView = FeedView()
+    private var tap = UITapGestureRecognizer()
     private var feedPan = UIPanGestureRecognizer()
+    private var profileView = ProfileView()
+    private var profileButton = UIButton()
     private var federationButton = FederationButton()
     private var federationButtonShadow = UIView()
     private var buttonFrameDict = [String:CGRect]()
@@ -44,8 +47,11 @@ class MapViewController: UIViewController {
         
         populateButtonFrameDict()
         
+        addTapGesture()
+        addProfile()
         addFederationButton()
-        addFeedViewAndPanGesture()
+        addFeedView()
+        addPanGesture()
     }
 
     override func didReceiveMemoryWarning() {
@@ -92,18 +98,11 @@ class MapViewController: UIViewController {
     
 // MARK: Feed
     
-    private func addFeedViewAndPanGesture() {
+    private func addFeedView() {
         
-        // feed
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
         feedView.currentHoodLabel.text = "Hoods"
-        
-        // pan
-        feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panDetected(_:)))
-        feedPan.delegate = self
-        
         view.addSubview(feedView)
-        mapboxView.addGestureRecognizer(feedPan)
     }
     
     private func feedAnimationTo(topOrBottom: String) {
@@ -128,6 +127,80 @@ class MapViewController: UIViewController {
                 }, completion: { (Bool) -> Void in
             })
         default: break
+        }
+    }
+    
+// MARK: Profile
+    
+    private func addProfile() {
+        
+        // add the profile view with profile frame CLOSED
+        profileView = ProfileView(frame: buttonFrameDict["profileViewClosed"]!)
+        
+        // set the profile corner radius to half its width
+        profileView.layer.cornerRadius = profileView.frame.width / 2
+        
+        // add the profile view to the map view
+        mapboxView.addSubview(profileView)
+        
+        
+        // set the profile button frame to CLOSED
+        profileButton.frame = buttonFrameDict["profileViewClosed"]!
+        
+        // set the profile button target to didPressProfileButton:
+        profileButton.addTarget(self, action: #selector(MapViewController.profileButtonTapped(_:)), forControlEvents: .TouchUpInside)
+        
+        // add the profile button to the map view
+        mapboxView.addSubview(profileButton)
+        
+        // activate constraints for closed profile
+        if DataSource.sharedInstance.profileState == nil {
+            profileView.activateConstraintsForState(.Closed)
+        }
+    }
+    
+    @objc private func profileButtonTapped(sender: UIButton) {
+        toggleProfileSizeForState(.Open)
+    }
+    
+    private func toggleProfileSizeForState(desiredState: ProfileState) {
+        
+        if desiredState == .Open {
+            
+            // lock the map
+            mapboxView.allowsScrolling = false
+            mapboxView.allowsZooming = false
+            
+            UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseOut, animations: {
+                
+                // set the profile frame to OPEN
+                self.profileView.frame = self.buttonFrameDict["profileViewOpen"]!
+                
+                // activate the profile subview constraints for OPENED state
+                self.profileView.activateConstraintsForState(.Open)
+                
+                // set the profile button frame to 0
+                self.profileButton.frame = CGRectZero
+                }, completion: { (Bool) in
+            })
+            
+        } else { // desiredState == .ProfileStateClosed
+            UIView.animateWithDuration(0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseInOut, animations: {
+                
+                // set the profile frame to CLOSED
+                self.profileView.frame = self.buttonFrameDict["profileViewClosed"]!
+                
+                // activate the profile subview constraints for CLOSED state
+                self.profileView.activateConstraintsForState(.Closed)
+                
+                // set the profile button frame to profile frame CLOSED
+                self.profileButton.frame = self.buttonFrameDict["profileViewClosed"]!
+                }, completion: { (Bool) in
+                    
+                    // unlock the map
+                    self.mapboxView.allowsScrolling = true
+                    self.mapboxView.allowsZooming = true
+            })
         }
     }
     
@@ -175,7 +248,33 @@ class MapViewController: UIViewController {
     
 // MARK: Touches
     
-    func panDetected(sender: UIPanGestureRecognizer) {
+    private func addTapGesture() {
+        
+        tap.delegate = self
+        tap.addTarget(self, action: #selector(tapFired))
+        tap.delaysTouchesBegan = true
+        tap.cancelsTouchesInView = true
+        mapboxView.addGestureRecognizer(tap)
+    }
+    
+    private func addPanGesture() {
+        
+        feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panFired(_:)))
+        feedPan.delegate = self
+        mapboxView.addGestureRecognizer(feedPan)
+    }
+    
+    @objc private func tapFired(sender: UITapGestureRecognizer) {
+        
+        // if profile is open and tap is outside profile, toggle profile size
+        if DataSource.sharedInstance.profileState == .Open {
+            if !profileView.frame.contains(sender.locationInView(mapboxView)) {
+                toggleProfileSizeForState(.Closed)
+            }
+        }
+    }
+    
+    @objc private func panFired(sender: UIPanGestureRecognizer) {
         
         let translation = sender.translationInView(mapboxView)
         let touchLocation = sender.locationInView(mapboxView)
@@ -201,8 +300,16 @@ class MapViewController: UIViewController {
 // MARK: Miscellaneous
     
     private func populateButtonFrameDict() {
+        
+        // profile view
+        buttonFrameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: view.frame.width * 0.13, height: view.frame.width * 0.13)
+        buttonFrameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.77) / 2, y: 50, width: view.frame.width * 0.77, height: view.frame.width * 0.77)
+        
+        // federation button
         buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
         buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        
+        // federation button shadow
         buttonFrameDict["federationButtonShadowNormal"] = CGRect(x: buttonFrameDict["federationButtonNormal"]!.minX + 4, y: buttonFrameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
         buttonFrameDict["federationButtonShadowTapped"] = CGRect(x: buttonFrameDict["federationButtonTapped"]!.minX + 3, y: buttonFrameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
     }
@@ -330,6 +437,7 @@ extension MapViewController: MGLMapViewDelegate {
 }
 
 extension UIView {
+    
     func animateCornerRadiusOf(viewToAnimate: UIView, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval) {
         let animation = CABasicAnimation(keyPath: "cornerRadius")
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)

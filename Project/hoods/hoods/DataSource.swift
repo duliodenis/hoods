@@ -10,6 +10,11 @@ import UIKit
 import Mapbox
 import MapKit
 
+enum ProfileState {
+    case Closed
+    case Open
+}
+
 class DataSource {
     static let sharedInstance = DataSource()
     private init() {}
@@ -20,6 +25,7 @@ class DataSource {
     var lastPlacemark: CLPlacemark?
     var calloutRepresentedObjectTitle = ""
     var area: String?
+    var profileState: ProfileState?
     
     func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String? {
         
