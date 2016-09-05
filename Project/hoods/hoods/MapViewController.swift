@@ -12,6 +12,7 @@ import MapKit
 
 class MapViewController: UIViewController {
     
+    private var progressView: UIProgressView!
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
     private var hoodScanning = false
@@ -28,11 +29,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // listen for "ApplicationDidBecomeActive" notification from app delegate
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: "ApplicationDidBecomeActive", object: nil)
-        
-        // listen for "NotInAHood" notification from data source
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
+        setUpNotificationCenter()
 
         // Mapbox view
         mapboxView.delegate = self
@@ -49,8 +46,8 @@ class MapViewController: UIViewController {
         setCameraToManhattan()
         
         addTapGesture()
-        addProfile()
         addFederationButton()
+        addProfile()
         addFeedView()
         addPanGesture()
     }
@@ -63,6 +60,7 @@ class MapViewController: UIViewController {
 // MARK: Camera
     
     private func moveCameraTo(coord: CLLocationCoordinate2D, distance: CLLocationDistance, zoom: Double, pitch: CGFloat, duration: NSTimeInterval, animatedCenterChange: Bool) {
+        print("move camera to: \(coord)")
         
         // if the camera is not already on the coords passed in, move camera
         if mapboxView.centerCoordinate.latitude != coord.latitude && mapboxView.centerCoordinate.longitude != coord.longitude {
@@ -236,12 +234,12 @@ class MapViewController: UIViewController {
         
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
-        UIView.animateWithDuration(0.2, animations: {
+        UIView.animateWithDuration(0.1, animations: {
             self.federationButton.backgroundColor = UIColor.blackColor()
             self.federationButton.frame = self.buttonFrameDict["federationButtonTapped"]!
             self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowTapped"]!
         }) { (Bool) in
-            UIView.animateWithDuration(0.3, animations: {
+            UIView.animateWithDuration(0.2, animations: {
                 self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
                 self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
             })
@@ -311,7 +309,107 @@ class MapViewController: UIViewController {
         }
     }
     
+// MARK: Offline Maps
+    
+    private func startOfflinePackDownload() {
+        
+        let latitude = DataSource.sharedInstance.locationManager.location?.coordinate.latitude
+        let longitude = DataSource.sharedInstance.locationManager.location?.coordinate.longitude
+        
+        // create a region that includes the current viewport and any tiles needed to view it when zoomed further in
+        let region = MGLTilePyramidOfflineRegion(styleURL: mapboxView.styleURL, bounds: MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(latitude! - 0.3, longitude! - 0.3), CLLocationCoordinate2DMake(latitude! + 0.3, longitude! + 0.3)), fromZoomLevel: mapboxView.zoomLevel, toZoomLevel: 10)
+        
+        // store some data for identification purposes alongside the downloaded resources
+        let userInfo = ["name": "My Offline Pack"]
+        let context = NSKeyedArchiver.archivedDataWithRootObject(userInfo)
+        
+        // create and register an offline pack with the shared offline storage object
+        MGLOfflineStorage.sharedOfflineStorage().addPackForRegion(region, withContext: context) { (pack, error) in
+            guard error == nil else {
+                
+                // the pack couldn't be created for some reason
+                print("error: \(error?.localizedFailureReason)")
+                return
+            }
+            
+            // start downloading
+            pack!.resume()
+        }
+    }
+    
+    @objc private func offlinePackProgressDidChange(notification: NSNotification) {
+        
+        // get the offline pack this notifiction is regarding,
+        // and the associated user info for the pack; in this case, 'name = My Offline Pack'
+        if let pack = notification.object as? MGLOfflinePack,
+            userInfo = NSKeyedUnarchiver.unarchiveObjectWithData(pack.context) as? [String:String] {
+            
+            let progress = pack.progress
+            
+            // or notification.userInfo![MGLOfflinePackProgressUserInfoKey]!.MGLOfflinePackProgressValue
+            let completedResources = progress.countOfResourcesCompleted
+            let expectedResources = progress.countOfResourcesExpected
+            
+            // calculate current progress percentage
+            let progressPercentage = Float(completedResources) / Float(expectedResources)
+            
+            // setup the progress bar
+            if progressView == nil {
+                
+                progressView = UIProgressView(progressViewStyle: .Default)
+                
+                let frame = view.bounds.size
+                progressView.frame = CGRect(x: frame.width / 4, y: frame.height * 0.75, width: frame.width / 2, height: 10)
+                view.addSubview(progressView)
+            }
+            
+            progressView.progress = progressPercentage
+            
+            // if this pack has finished, print its size and its resource count
+            if completedResources == expectedResources {
+                let byteCount = NSByteCountFormatter.stringFromByteCount(Int64(pack.progress.countOfBytesCompleted), countStyle: NSByteCountFormatterCountStyle.Memory)
+                print("Offline pack '\(userInfo["name"])' completed: \(byteCount), \(completedResources) resources")
+            } else {
+                
+                // otherwise, print download/verification progress
+                print("Offline pack '\(userInfo["name"])' has \(completedResources) of \(expectedResources) resources - \(progressPercentage * 100)%")
+            }
+        }
+    }
+    
+    @objc private func offlinePackDidReceiveError(notification: NSNotification) {
+        if let pack = notification.object as? MGLOfflinePack,
+            userInfo = NSKeyedUnarchiver.unarchiveObjectWithData(pack.context) as? [String:String],
+            error = notification.userInfo?[MGLOfflinePackErrorUserInfoKey] as? NSError {
+            
+            print("Offline pack '\(userInfo["name"])' received error: \(error.localizedFailureReason)")
+        }
+    }
+    
+    @objc private func offlinePackDidReceiveMaximumAllowedMapboxTiles(notification: NSNotification) {
+        if let pack = notification.object as? MGLOfflinePack,
+            userInfo = NSKeyedUnarchiver.unarchiveObjectWithData(pack.context) as? [String:String],
+            maximumCount = notification.userInfo?[MGLOfflinePackMaximumCountUserInfoKey]?.unsignedLongLongValue {
+            
+            print("Offline pack '\(userInfo["name"])' reached limit of \(maximumCount) tiles")
+        }
+    }
+    
 // MARK: Miscellaneous
+    
+    private func setUpNotificationCenter() {
+        
+        // listen for "ApplicationDidBecomeActive" notification from app delegate
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: "ApplicationDidBecomeActive", object: nil)
+        
+        // listen for "NotInAHood" notification from data source
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
+        
+        // Setup offline pack notification handlers.
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackProgressDidChange), name: MGLOfflinePackProgressChangedNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackDidReceiveError), name: MGLOfflinePackErrorNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackDidReceiveMaximumAllowedMapboxTiles), name: MGLOfflinePackMaximumMapboxTilesReachedNotification, object: nil)
+    }
     
     private func populateButtonFrameDict() {
         
@@ -397,9 +495,6 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // if location is available
             if DataSource.sharedInstance.locationManager.location != nil {
-                
-                DataSource.sharedInstance.locationManager.startUpdatingLocation()
-                DataSource.sharedInstance.locationManager.startUpdatingHeading()
                 
                 // update the area singleton
                 let geocoder = CLGeocoder()
