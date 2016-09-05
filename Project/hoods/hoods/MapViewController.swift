@@ -15,6 +15,7 @@ class MapViewController: UIViewController {
     private var progressView: UIProgressView!
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
+    private var locationAuthChosenAndInitialCameraSet: Bool?
     private var hoodScanning = false
     private var feedView = FeedView()
     private var tap = UITapGestureRecognizer()
@@ -43,8 +44,6 @@ class MapViewController: UIViewController {
 
         populateButtonFrameDict()
         
-        setCameraToManhattan()
-        
         addTapGesture()
         addFederationButton()
         addProfile()
@@ -60,7 +59,6 @@ class MapViewController: UIViewController {
 // MARK: Camera
     
     private func moveCameraTo(coord: CLLocationCoordinate2D, distance: CLLocationDistance, zoom: Double, pitch: CGFloat, duration: NSTimeInterval, animatedCenterChange: Bool) {
-        print("move camera to: \(coord)")
         
         // if the camera is not already on the coords passed in, move camera
         if mapboxView.centerCoordinate.latitude != coord.latitude && mapboxView.centerCoordinate.longitude != coord.longitude {
@@ -76,7 +74,10 @@ class MapViewController: UIViewController {
         // if location available, start far out and then zoom into location at an angle over 3s
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
             
-            print("using location manager location coordinate")
+            // only set to true once
+            if locationAuthChosenAndInitialCameraSet == nil {
+                locationAuthChosenAndInitialCameraSet = true
+            }
             
             // start far out at a 50° angle
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
@@ -86,7 +87,14 @@ class MapViewController: UIViewController {
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
+            
+            // only set to true once
+            if locationAuthChosenAndInitialCameraSet == nil {
+                locationAuthChosenAndInitialCameraSet = true
+            }
+
             moveCameraTo(CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            
             moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
         }
     }
@@ -478,13 +486,8 @@ extension MapViewController: CLLocationManagerDelegate {
             // move camera into your location
             attemptToMoveCameraToUserLocation()
             
-            // notify the app delegate to release the hole
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
-            
         } else if status == .Denied {
             
-            // notify the app delegate to release the hole
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
             setCameraToManhattan()
         }
     }
@@ -526,6 +529,17 @@ extension MapViewController: CLLocationManagerDelegate {
 // MARK: MGLMapViewDelegate
 
 extension MapViewController: MGLMapViewDelegate {
+    
+    func mapViewDidFinishRenderingMap(mapView: MGLMapView, fullyRendered: Bool) {
+        
+        if locationAuthChosenAndInitialCameraSet == true {
+            
+            // notify the app delegate to release the hole
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
+            
+            locationAuthChosenAndInitialCameraSet = false
+        }
+    }
     
     func mapView(mapView: MGLMapView, annotationCanShowCallout annotation: MGLAnnotation) -> Bool {
         return true

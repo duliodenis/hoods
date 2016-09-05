@@ -34,7 +34,7 @@ class DataSource {
             
             // if last area is a supported area
             if areaForGeoJSON() != "" {
-                print("area: \(area)")
+                print("area: \(area!)")
                                 
                 // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
                 lastHoodName = hoodCheck(currentLocation)
