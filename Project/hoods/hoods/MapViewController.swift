@@ -12,11 +12,17 @@ import MapKit
 
 class MapViewController: UIViewController {
     
+    private var progressView: UIProgressView!
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
+    private var locationAuthChosenAndInitialCameraSet: Bool?
     private var hoodScanning = false
     private var feedView = FeedView()
+    private var tap = UITapGestureRecognizer()
     private var feedPan = UIPanGestureRecognizer()
+    private var profileView = ProfileView()
+    private var profileViewShadow = UIView()
+    private var profileButton = UIButton()
     private var federationButton = FederationButton()
     private var federationButtonShadow = UIView()
     private var buttonFrameDict = [String:CGRect]()
@@ -24,11 +30,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // listen for "ApplicationDidBecomeActive" notification from app delegate
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: "ApplicationDidBecomeActive", object: nil)
-        
-        // listen for "NotInAHood" notification from data source
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
+        setUpNotificationCenter()
 
         // Mapbox view
         mapboxView.delegate = self
@@ -39,13 +41,14 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.delegate = self
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
-        DataSource.sharedInstance.locationManager.startUpdatingLocation()
-        DataSource.sharedInstance.locationManager.startUpdatingHeading()
-        
+
         populateButtonFrameDict()
         
+        addTapGesture()
         addFederationButton()
-        addFeedViewAndPanGesture()
+        addProfile()
+        addFeedView()
+        addPanGesture()
     }
 
     override func didReceiveMemoryWarning() {
@@ -71,6 +74,11 @@ class MapViewController: UIViewController {
         // if location available, start far out and then zoom into location at an angle over 3s
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
             
+            // only set to true once
+            if locationAuthChosenAndInitialCameraSet == nil {
+                locationAuthChosenAndInitialCameraSet = true
+            }
+            
             // start far out at a 50° angle
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
@@ -79,7 +87,14 @@ class MapViewController: UIViewController {
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
+            
+            // only set to true once
+            if locationAuthChosenAndInitialCameraSet == nil {
+                locationAuthChosenAndInitialCameraSet = true
+            }
+
             moveCameraTo(CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            
             moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
         }
     }
@@ -92,18 +107,11 @@ class MapViewController: UIViewController {
     
 // MARK: Feed
     
-    private func addFeedViewAndPanGesture() {
+    private func addFeedView() {
         
-        // feed
         feedView = FeedView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
         feedView.currentHoodLabel.text = "Hoods"
-        
-        // pan
-        feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panDetected(_:)))
-        feedPan.delegate = self
-        
         view.addSubview(feedView)
-        mapboxView.addGestureRecognizer(feedPan)
     }
     
     private func feedAnimationTo(topOrBottom: String) {
@@ -131,6 +139,81 @@ class MapViewController: UIViewController {
         }
     }
     
+// MARK: Profile
+    
+    private func addProfile() {
+        
+        // add the profile view with profile frame CLOSED
+        profileView = ProfileView(frame: buttonFrameDict["profileViewClosed"]!)
+        profileView.layer.cornerRadius = profileView.frame.width / 2
+
+        // add the profile view shadow
+        profileViewShadow = UIView(frame: buttonFrameDict["profileViewShadowClosed"]!)
+        profileViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        profileViewShadow.layer.cornerRadius = profileViewShadow.frame.width / 2
+        profileViewShadow.layer.masksToBounds = true
+        
+        // set the profile button frame to CLOSED
+        profileButton.frame = buttonFrameDict["profileViewClosed"]!
+        profileButton.addTarget(self, action: #selector(MapViewController.profileButtonTapped(_:)), forControlEvents: .TouchUpInside)
+        
+        mapboxView.addSubview(profileViewShadow)
+        mapboxView.addSubview(profileView)
+        mapboxView.addSubview(profileButton)
+        
+        // activate constraints for closed profile
+        if DataSource.sharedInstance.profileState == nil {
+            profileView.activateConstraintsForState(.Closed)
+        }
+    }
+    
+    @objc private func profileButtonTapped(sender: UIButton) {
+        toggleProfileSizeForState(.Open)
+    }
+    
+    private func toggleProfileSizeForState(desiredState: ProfileState) {
+        
+        if desiredState == .Open {
+            
+            // lock the map
+            mapboxView.allowsScrolling = false
+            mapboxView.allowsZooming = false
+            
+            UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseOut, animations: {
+                
+                // set the profile frame and its shadow to OPEN
+                self.profileView.frame = self.buttonFrameDict["profileViewOpen"]!
+                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowOpen"]!
+                
+                // activate the profile subview constraints for OPENED state
+                self.profileView.activateConstraintsForState(.Open)
+                
+                // set the profile button frame to 0
+                self.profileButton.frame = CGRectZero
+                }, completion: { (Bool) in
+            })
+            
+        } else { // desiredState == .ProfileStateClosed
+            UIView.animateWithDuration(0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseInOut, animations: {
+                
+                // set the profile frame to CLOSED
+                self.profileView.frame = self.buttonFrameDict["profileViewClosed"]!
+                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowClosed"]!
+                
+                // activate the profile subview constraints for CLOSED state
+                self.profileView.activateConstraintsForState(.Closed)
+                
+                // set the profile button frame to profile frame CLOSED
+                self.profileButton.frame = self.buttonFrameDict["profileViewClosed"]!
+                }, completion: { (Bool) in
+                    
+                    // unlock the map
+                    self.mapboxView.allowsScrolling = true
+                    self.mapboxView.allowsZooming = true
+            })
+        }
+    }
+    
 // MARK: Federation Button
     
     func addFederationButton() {
@@ -152,14 +235,19 @@ class MapViewController: UIViewController {
     
     @objc private func federationButtonTapped(sender: UIButton) {
         
+        // close profile
+        if DataSource.sharedInstance.profileState == .Open {
+            toggleProfileSizeForState(.Closed)
+        }
+        
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
-        UIView.animateWithDuration(0.2, animations: {
+        UIView.animateWithDuration(0.1, animations: {
             self.federationButton.backgroundColor = UIColor.blackColor()
             self.federationButton.frame = self.buttonFrameDict["federationButtonTapped"]!
             self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowTapped"]!
         }) { (Bool) in
-            UIView.animateWithDuration(0.3, animations: {
+            UIView.animateWithDuration(0.2, animations: {
                 self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
                 self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
             })
@@ -175,7 +263,33 @@ class MapViewController: UIViewController {
     
 // MARK: Touches
     
-    func panDetected(sender: UIPanGestureRecognizer) {
+    private func addTapGesture() {
+        
+        tap.delegate = self
+        tap.addTarget(self, action: #selector(tapFired))
+        tap.delaysTouchesBegan = true
+        tap.cancelsTouchesInView = true
+        mapboxView.addGestureRecognizer(tap)
+    }
+    
+    private func addPanGesture() {
+        
+        feedPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.panFired(_:)))
+        feedPan.delegate = self
+        mapboxView.addGestureRecognizer(feedPan)
+    }
+    
+    @objc private func tapFired(sender: UITapGestureRecognizer) {
+        
+        // if profile is open and tap is outside profile, toggle profile size
+        if DataSource.sharedInstance.profileState == .Open {
+            if !profileView.frame.contains(sender.locationInView(mapboxView)) {
+                toggleProfileSizeForState(.Closed)
+            }
+        }
+    }
+    
+    @objc private func panFired(sender: UIPanGestureRecognizer) {
         
         let translation = sender.translationInView(mapboxView)
         let touchLocation = sender.locationInView(mapboxView)
@@ -190,6 +304,11 @@ class MapViewController: UIViewController {
                 if translation.y <= -12 {
                     feedAnimationTo("top")
                     
+                    // close profile
+                    if DataSource.sharedInstance.profileState == .Open {
+                        toggleProfileSizeForState(.Closed)
+                    }
+                    
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
                     feedAnimationTo("bottom")
@@ -198,11 +317,123 @@ class MapViewController: UIViewController {
         }
     }
     
+// MARK: Offline Maps
+    
+    private func startOfflinePackDownload() {
+        
+        let latitude = DataSource.sharedInstance.locationManager.location?.coordinate.latitude
+        let longitude = DataSource.sharedInstance.locationManager.location?.coordinate.longitude
+        
+        // create a region that includes the current viewport and any tiles needed to view it when zoomed further in
+        let region = MGLTilePyramidOfflineRegion(styleURL: mapboxView.styleURL, bounds: MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(latitude! - 0.3, longitude! - 0.3), CLLocationCoordinate2DMake(latitude! + 0.3, longitude! + 0.3)), fromZoomLevel: mapboxView.zoomLevel, toZoomLevel: 10)
+        
+        // store some data for identification purposes alongside the downloaded resources
+        let userInfo = ["name": "My Offline Pack"]
+        let context = NSKeyedArchiver.archivedDataWithRootObject(userInfo)
+        
+        // create and register an offline pack with the shared offline storage object
+        MGLOfflineStorage.sharedOfflineStorage().addPackForRegion(region, withContext: context) { (pack, error) in
+            guard error == nil else {
+                
+                // the pack couldn't be created for some reason
+                print("error: \(error?.localizedFailureReason)")
+                return
+            }
+            
+            // start downloading
+            pack!.resume()
+        }
+    }
+    
+    @objc private func offlinePackProgressDidChange(notification: NSNotification) {
+        
+        // get the offline pack this notifiction is regarding,
+        // and the associated user info for the pack; in this case, 'name = My Offline Pack'
+        if let pack = notification.object as? MGLOfflinePack,
+            userInfo = NSKeyedUnarchiver.unarchiveObjectWithData(pack.context) as? [String:String] {
+            
+            let progress = pack.progress
+            
+            // or notification.userInfo![MGLOfflinePackProgressUserInfoKey]!.MGLOfflinePackProgressValue
+            let completedResources = progress.countOfResourcesCompleted
+            let expectedResources = progress.countOfResourcesExpected
+            
+            // calculate current progress percentage
+            let progressPercentage = Float(completedResources) / Float(expectedResources)
+            
+            // setup the progress bar
+            if progressView == nil {
+                
+                progressView = UIProgressView(progressViewStyle: .Default)
+                
+                let frame = view.bounds.size
+                progressView.frame = CGRect(x: frame.width / 4, y: frame.height * 0.75, width: frame.width / 2, height: 10)
+                view.addSubview(progressView)
+            }
+            
+            progressView.progress = progressPercentage
+            
+            // if this pack has finished, print its size and its resource count
+            if completedResources == expectedResources {
+                let byteCount = NSByteCountFormatter.stringFromByteCount(Int64(pack.progress.countOfBytesCompleted), countStyle: NSByteCountFormatterCountStyle.Memory)
+                print("Offline pack '\(userInfo["name"])' completed: \(byteCount), \(completedResources) resources")
+            } else {
+                
+                // otherwise, print download/verification progress
+                print("Offline pack '\(userInfo["name"])' has \(completedResources) of \(expectedResources) resources - \(progressPercentage * 100)%")
+            }
+        }
+    }
+    
+    @objc private func offlinePackDidReceiveError(notification: NSNotification) {
+        if let pack = notification.object as? MGLOfflinePack,
+            userInfo = NSKeyedUnarchiver.unarchiveObjectWithData(pack.context) as? [String:String],
+            error = notification.userInfo?[MGLOfflinePackErrorUserInfoKey] as? NSError {
+            
+            print("Offline pack '\(userInfo["name"])' received error: \(error.localizedFailureReason)")
+        }
+    }
+    
+    @objc private func offlinePackDidReceiveMaximumAllowedMapboxTiles(notification: NSNotification) {
+        if let pack = notification.object as? MGLOfflinePack,
+            userInfo = NSKeyedUnarchiver.unarchiveObjectWithData(pack.context) as? [String:String],
+            maximumCount = notification.userInfo?[MGLOfflinePackMaximumCountUserInfoKey]?.unsignedLongLongValue {
+            
+            print("Offline pack '\(userInfo["name"])' reached limit of \(maximumCount) tiles")
+        }
+    }
+    
 // MARK: Miscellaneous
     
+    private func setUpNotificationCenter() {
+        
+        // listen for "ApplicationDidBecomeActive" notification from app delegate
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: "ApplicationDidBecomeActive", object: nil)
+        
+        // listen for "NotInAHood" notification from data source
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(setHoodScanningToFalse), name: "NotInAHood", object: nil)
+        
+        // Setup offline pack notification handlers.
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackProgressDidChange), name: MGLOfflinePackProgressChangedNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackDidReceiveError), name: MGLOfflinePackErrorNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackDidReceiveMaximumAllowedMapboxTiles), name: MGLOfflinePackMaximumMapboxTilesReachedNotification, object: nil)
+    }
+    
     private func populateButtonFrameDict() {
+        
+        // profile view
+        buttonFrameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: 50, height: 50)
+        buttonFrameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.85) / 2, y: 50, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
+        
+        // profile view shadow
+        buttonFrameDict["profileViewShadowClosed"] = CGRect(x: buttonFrameDict["profileViewClosed"]!.minX + 6, y: buttonFrameDict["profileViewClosed"]!.minY + 7, width: 50, height: 50)
+        buttonFrameDict["profileViewShadowOpen"] = CGRect(x: buttonFrameDict["profileViewOpen"]!.minX + 6, y: buttonFrameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
+        
+        // federation button
         buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
         buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        
+        // federation button shadow
         buttonFrameDict["federationButtonShadowNormal"] = CGRect(x: buttonFrameDict["federationButtonNormal"]!.minX + 4, y: buttonFrameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
         buttonFrameDict["federationButtonShadowTapped"] = CGRect(x: buttonFrameDict["federationButtonTapped"]!.minX + 3, y: buttonFrameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
     }
@@ -243,6 +474,9 @@ extension MapViewController: CLLocationManagerDelegate {
         
         if status == .AuthorizedWhenInUse {
             
+            DataSource.sharedInstance.locationManager.startUpdatingLocation()
+            DataSource.sharedInstance.locationManager.startUpdatingHeading()
+            
             // turns on hood checking until it fails and this gets set to false
             hoodScanning = true
             
@@ -252,13 +486,8 @@ extension MapViewController: CLLocationManagerDelegate {
             // move camera into your location
             attemptToMoveCameraToUserLocation()
             
-            // notify the app delegate to release the hole
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
-            
         } else if status == .Denied {
             
-            // notify the app delegate to release the hole
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
             setCameraToManhattan()
         }
     }
@@ -301,6 +530,17 @@ extension MapViewController: CLLocationManagerDelegate {
 
 extension MapViewController: MGLMapViewDelegate {
     
+    func mapViewDidFinishRenderingMap(mapView: MGLMapView, fullyRendered: Bool) {
+        
+        if locationAuthChosenAndInitialCameraSet == true {
+            
+            // notify the app delegate to release the hole
+            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
+            
+            locationAuthChosenAndInitialCameraSet = false
+        }
+    }
+    
     func mapView(mapView: MGLMapView, annotationCanShowCallout annotation: MGLAnnotation) -> Bool {
         return true
     }
@@ -330,6 +570,7 @@ extension MapViewController: MGLMapViewDelegate {
 }
 
 extension UIView {
+    
     func animateCornerRadiusOf(viewToAnimate: UIView, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval) {
         let animation = CABasicAnimation(keyPath: "cornerRadius")
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)

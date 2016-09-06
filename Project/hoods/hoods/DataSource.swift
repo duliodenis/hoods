@@ -10,6 +10,11 @@ import UIKit
 import Mapbox
 import MapKit
 
+enum ProfileState {
+    case Closed
+    case Open
+}
+
 class DataSource {
     static let sharedInstance = DataSource()
     private init() {}
@@ -20,6 +25,7 @@ class DataSource {
     var lastPlacemark: CLPlacemark?
     var calloutRepresentedObjectTitle = ""
     var area: String?
+    var profileState: ProfileState?
     
     func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String? {
         
@@ -28,6 +34,7 @@ class DataSource {
             
             // if last area is a supported area
             if areaForGeoJSON() != "" {
+                print("area: \(area!)")
                                 
                 // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
                 lastHoodName = hoodCheck(currentLocation)
@@ -46,6 +53,8 @@ class DataSource {
     }
     
     private func hoodCheck(currentLocation: CLLocationCoordinate2D) -> String {
+        
+        print("full hood check")
         
         // set file path to geoJSON for current subLocality
         let filePath = NSBundle.mainBundle().pathForResource(areaForGeoJSON(), ofType: "geojson")!
@@ -96,7 +105,7 @@ class DataSource {
                                     print("You are in \(currentNeighborhood).")
                                     return currentNeighborhood
                                 } else {
-                                    print("You are not in \(currentNeighborhood).")
+//                                    print("You are not in \(currentNeighborhood).")
                                 }
                             }
                         }
@@ -122,6 +131,8 @@ class DataSource {
                 
                 // check if your coords are in the last polygon renderer path
                 if CGPathContainsPoint(lastPolygonRenderer!.path, nil, cgPoint, true) {
+                    
+                    print("You're still in the hood.")
                     return true
                 }
             }
