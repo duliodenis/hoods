@@ -12,14 +12,13 @@ import MapKit
 
 class MapViewController: UIViewController {
     
-    private var progressView: UIProgressView!
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
-    private var locationAuthChosenAndInitialCameraSet: Bool?
     private var hoodScanning = false
     private var feedView = FeedView()
     private var tap = UITapGestureRecognizer()
     private var feedPan = UIPanGestureRecognizer()
+    private var buttonHideTimer: Double = 0
     private var profileView = ProfileView()
     private var profileViewShadow = UIView()
     private var profileButton = UIButton()
@@ -74,11 +73,6 @@ class MapViewController: UIViewController {
         // if location available, start far out and then zoom into location at an angle over 3s
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
             
-            // only set to true once
-            if locationAuthChosenAndInitialCameraSet == nil {
-                locationAuthChosenAndInitialCameraSet = true
-            }
-            
             // start far out at a 50° angle
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
@@ -87,22 +81,25 @@ class MapViewController: UIViewController {
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
-            
-            // only set to true once
-            if locationAuthChosenAndInitialCameraSet == nil {
-                locationAuthChosenAndInitialCameraSet = true
-            }
-
-            moveCameraTo(CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
-            
-            moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
+            moveCameraToManhattanAnimated(true)
         }
     }
     
-    private func setCameraToManhattan() {
+    private func moveCameraToManhattanAnimated(animated: Bool) {
         
-        // set camera to manhattan instantly
-        moveCameraTo(manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
+        if animated {
+            
+            // start far out at a 50° angle
+            moveCameraTo(CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            
+            // move into manhattan at a 30° angle over 3 seconds
+            moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
+            
+        } else {
+            
+            // set camera to manhattan instantly
+            moveCameraTo(manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
+        }
     }
     
 // MARK: Feed
@@ -144,17 +141,17 @@ class MapViewController: UIViewController {
     private func addProfile() {
         
         // add the profile view with profile frame CLOSED
-        profileView = ProfileView(frame: buttonFrameDict["profileViewClosed"]!)
+        profileView = ProfileView(frame: buttonFrameDict["profileViewHidden"]!)
         profileView.layer.cornerRadius = profileView.frame.width / 2
 
         // add the profile view shadow
-        profileViewShadow = UIView(frame: buttonFrameDict["profileViewShadowClosed"]!)
+        profileViewShadow = UIView(frame: buttonFrameDict["profileViewShadowHidden"]!)
         profileViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         profileViewShadow.layer.cornerRadius = profileViewShadow.frame.width / 2
         profileViewShadow.layer.masksToBounds = true
         
         // set the profile button frame to CLOSED
-        profileButton.frame = buttonFrameDict["profileViewClosed"]!
+        profileButton.frame = buttonFrameDict["profileViewHidden"]!
         profileButton.addTarget(self, action: #selector(MapViewController.profileButtonTapped(_:)), forControlEvents: .TouchUpInside)
         
         mapboxView.addSubview(profileViewShadow)
@@ -220,11 +217,11 @@ class MapViewController: UIViewController {
         
         // button
         let federationButtonSize = CGSize(width: 50, height: 50)
-        federationButton = FederationButton(frame: buttonFrameDict["federationButtonNormal"]!)
+        federationButton = FederationButton(frame: buttonFrameDict["federationButtonHidden"]!)
         federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), forControlEvents: .TouchUpInside)
         
         // shadow
-        federationButtonShadow = UIView(frame: buttonFrameDict["federationButtonShadowNormal"]!)
+        federationButtonShadow = UIView(frame: buttonFrameDict["federationButtonShadowHidden"]!)
         federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         federationButtonShadow.layer.cornerRadius = federationButtonSize.width / 2
         federationButtonShadow.layer.masksToBounds = true
@@ -360,19 +357,7 @@ class MapViewController: UIViewController {
             
             // calculate current progress percentage
             let progressPercentage = Float(completedResources) / Float(expectedResources)
-            
-            // setup the progress bar
-            if progressView == nil {
-                
-                progressView = UIProgressView(progressViewStyle: .Default)
-                
-                let frame = view.bounds.size
-                progressView.frame = CGRect(x: frame.width / 4, y: frame.height * 0.75, width: frame.width / 2, height: 10)
-                view.addSubview(progressView)
-            }
-            
-            progressView.progress = progressPercentage
-            
+        
             // if this pack has finished, print its size and its resource count
             if completedResources == expectedResources {
                 let byteCount = NSByteCountFormatter.stringFromByteCount(Int64(pack.progress.countOfBytesCompleted), countStyle: NSByteCountFormatterCountStyle.Memory)
@@ -405,6 +390,69 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
+    override func motionEnded(motion: UIEventSubtype, withEvent event: UIEvent?) {
+        
+        // if motion was a shake and location available
+        if motion == .MotionShake {
+            showMapIcons()
+        }
+    }
+    
+    private func showMapIcons() {
+        
+        // add 5 seconds to timer
+        buttonHideTimer = buttonHideTimer + 5
+        
+        // if buttons are not already showing
+        if DataSource.sharedInstance.mapButtonState != .Shown {
+            
+            // animate showing of icons
+            UIView.animateWithDuration(0.6, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .CurveEaseIn, animations: {
+                
+                // set map button state to Shown
+                DataSource.sharedInstance.mapButtonState = .Shown
+                
+                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowClosed"]!
+                self.profileView.frame = self.buttonFrameDict["profileViewClosed"]!
+                self.profileButton.frame = self.buttonFrameDict["profileViewClosed"]!
+                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
+                self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
+                
+                // then hide them
+                }, completion: { finished in
+                    
+                    self.hideMapIcons()
+            })
+        }
+    }
+    
+    private func hideMapIcons() {
+        
+        // delay using timer
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(buttonHideTimer * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+            
+            // animate hiding of icons
+            UIView.animateWithDuration(0.8, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .CurveEaseIn, animations: {
+                
+                if DataSource.sharedInstance.profileState == .Open {
+                    self.toggleProfileSizeForState(.Closed)
+                }
+                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowHidden"]!
+                self.profileView.frame = self.buttonFrameDict["profileViewHidden"]!
+                self.profileButton.frame = self.buttonFrameDict["profileViewHidden"]!
+                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowHidden"]!
+                self.federationButton.frame = self.buttonFrameDict["federationButtonHidden"]!
+                
+                }, completion: { finished in
+                    
+                    self.buttonHideTimer = self.buttonHideTimer - 5
+                    
+                    // set map icon state to Hidden
+                    DataSource.sharedInstance.mapButtonState = .Hidden
+            })
+        }
+    }
+    
     private func setUpNotificationCenter() {
         
         // listen for "ApplicationDidBecomeActive" notification from app delegate
@@ -422,18 +470,22 @@ class MapViewController: UIViewController {
     private func populateButtonFrameDict() {
         
         // profile view
+        buttonFrameDict["profileViewHidden"] = CGRect(x: -50, y: -50, width: 50, height: 50)
         buttonFrameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: 50, height: 50)
         buttonFrameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.85) / 2, y: 50, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // profile view shadow
+        buttonFrameDict["profileViewShadowHidden"] = CGRect(x: buttonFrameDict["profileViewHidden"]!.minX + 6, y: buttonFrameDict["profileViewHidden"]!.minY + 7, width: 50, height: 50)
         buttonFrameDict["profileViewShadowClosed"] = CGRect(x: buttonFrameDict["profileViewClosed"]!.minX + 6, y: buttonFrameDict["profileViewClosed"]!.minY + 7, width: 50, height: 50)
         buttonFrameDict["profileViewShadowOpen"] = CGRect(x: buttonFrameDict["profileViewOpen"]!.minX + 6, y: buttonFrameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // federation button
+        buttonFrameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
         buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
         buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
         
         // federation button shadow
+        buttonFrameDict["federationButtonShadowHidden"] = CGRect(x: buttonFrameDict["federationButtonHidden"]!.minX + 4, y: buttonFrameDict["federationButtonHidden"]!.minY + 5, width: 50, height: 50)
         buttonFrameDict["federationButtonShadowNormal"] = CGRect(x: buttonFrameDict["federationButtonNormal"]!.minX + 4, y: buttonFrameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
         buttonFrameDict["federationButtonShadowTapped"] = CGRect(x: buttonFrameDict["federationButtonTapped"]!.minX + 3, y: buttonFrameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
     }
@@ -488,8 +540,11 @@ extension MapViewController: CLLocationManagerDelegate {
             
         } else if status == .Denied {
             
-            setCameraToManhattan()
+            moveCameraToManhattanAnimated(false)
         }
+        
+        // notify the app delegate to release the hole
+        NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -529,17 +584,6 @@ extension MapViewController: CLLocationManagerDelegate {
 // MARK: MGLMapViewDelegate
 
 extension MapViewController: MGLMapViewDelegate {
-    
-    func mapViewDidFinishRenderingMap(mapView: MGLMapView, fullyRendered: Bool) {
-        
-        if locationAuthChosenAndInitialCameraSet == true {
-            
-            // notify the app delegate to release the hole
-            NSNotificationCenter.defaultCenter().postNotificationName("LocationManagerAuthChanged", object: nil)
-            
-            locationAuthChosenAndInitialCameraSet = false
-        }
-    }
     
     func mapView(mapView: MGLMapView, annotationCanShowCallout annotation: MGLAnnotation) -> Bool {
         return true

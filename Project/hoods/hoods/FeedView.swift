@@ -17,7 +17,7 @@ class FeedView: UIView {
         super.init(frame: frame)
         
         // rounded corners for feed view
-        layer.cornerRadius = frame.size.width * 0.07
+        layer.cornerRadius = frame.size.width / 17
         layer.masksToBounds = true
         
         backgroundColor = UIColor.whiteColor()

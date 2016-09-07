@@ -10,6 +10,11 @@ import UIKit
 import Mapbox
 import MapKit
 
+enum MapButtonState {
+    case Hidden
+    case Shown
+}
+
 enum ProfileState {
     case Closed
     case Open
@@ -25,6 +30,7 @@ class DataSource {
     var lastPlacemark: CLPlacemark?
     var calloutRepresentedObjectTitle = ""
     var area: String?
+    var mapButtonState: MapButtonState?
     var profileState: ProfileState?
     
     func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String? {
