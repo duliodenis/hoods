@@ -15,16 +15,16 @@ class MapViewController: UIViewController {
     private let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
     private var hoodScanning = false
-    private var feedView = FeedView()
     private var tap = UITapGestureRecognizer()
     private var feedPan = UIPanGestureRecognizer()
     private var buttonHideTimer: Double = 0
+    private var feedView = FeedView()
     private var profileView = ProfileView()
     private var profileViewShadow = UIView()
     private var profileButton = UIButton()
     private var federationButton = FederationButton()
     private var federationButtonShadow = UIView()
-    private var buttonFrameDict = [String:CGRect]()
+    private var frameDict = [String:CGRect]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,7 +41,7 @@ class MapViewController: UIViewController {
         DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
 
-        populateButtonFrameDict()
+        populateFrameDict()
         
         addTapGesture()
         addFederationButton()
@@ -77,7 +77,7 @@ class MapViewController: UIViewController {
             moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into your location at a 30° angle over 3 seconds
-            moveCameraTo(centerCoordinate, distance: 4000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
+            moveCameraTo(centerCoordinate, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
@@ -93,7 +93,7 @@ class MapViewController: UIViewController {
             moveCameraTo(CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into manhattan at a 30° angle over 3 seconds
-            moveCameraTo(manhattan, distance: 4000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
+            moveCameraTo(manhattan, distance: 5000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
             
         } else {
             
@@ -111,25 +111,29 @@ class MapViewController: UIViewController {
         view.addSubview(feedView)
     }
     
-    private func feedAnimationTo(topOrBottom: String) {
+    private func feedAnimationTo(topOrBottom: String, sender: UIPanGestureRecognizer) {
         switch topOrBottom {
         case "top":
             
-            self.feedView.animateCornerRadiusOf(self.feedView, fromValue: self.feedView.frame.width * 0.07, toValue: 0.0, duration: 0.5)
+            self.feedView.animateCornerRadiusOf(self.feedView, fromValue: self.feedView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
             
-            // animate the feed's minY to the view's minY
+            // animate the feed to the top
             UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                self.feedView.frame = CGRectMake(0, self.view.frame.origin.y, self.feedView.frame.width, self.feedView.frame.height)
+                
+                self.feedView.frame = self.frameDict["feedViewTop"]!
                 }, completion: { (Bool) -> Void in
                     
             })
         case "bottom":
             
-            self.feedView.animateCornerRadiusOf(feedView, fromValue: 0.0, toValue: feedView.frame.width * 0.07, duration: 0.5)
+            if sender.locationInView(mapboxView).y < frameDict["feedViewBottom"]!.minY {
+                self.feedView.animateCornerRadiusOf(feedView, fromValue: 0.0, toValue: self.feedView.roundedCornerRadius, duration: 0.5)
+            }
             
-            // animate the feed's minY to the view's height - 100
+            // animate the feed's minY to the bottom -100
             UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                self.feedView.frame = CGRectMake(0, self.view.frame.height - 100, self.feedView.frame.width, self.feedView.frame.height)
+                
+                self.feedView.frame = self.frameDict["feedViewBottom"]!
                 }, completion: { (Bool) -> Void in
             })
         default: break
@@ -141,17 +145,17 @@ class MapViewController: UIViewController {
     private func addProfile() {
         
         // add the profile view with profile frame CLOSED
-        profileView = ProfileView(frame: buttonFrameDict["profileViewHidden"]!)
+        profileView = ProfileView(frame: frameDict["profileViewHidden"]!)
         profileView.layer.cornerRadius = profileView.frame.width / 2
 
         // add the profile view shadow
-        profileViewShadow = UIView(frame: buttonFrameDict["profileViewShadowHidden"]!)
+        profileViewShadow = UIView(frame: frameDict["profileViewShadowHidden"]!)
         profileViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         profileViewShadow.layer.cornerRadius = profileViewShadow.frame.width / 2
         profileViewShadow.layer.masksToBounds = true
         
         // set the profile button frame to CLOSED
-        profileButton.frame = buttonFrameDict["profileViewHidden"]!
+        profileButton.frame = frameDict["profileViewHidden"]!
         profileButton.addTarget(self, action: #selector(MapViewController.profileButtonTapped(_:)), forControlEvents: .TouchUpInside)
         
         mapboxView.addSubview(profileViewShadow)
@@ -179,8 +183,8 @@ class MapViewController: UIViewController {
             UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseOut, animations: {
                 
                 // set the profile frame and its shadow to OPEN
-                self.profileView.frame = self.buttonFrameDict["profileViewOpen"]!
-                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowOpen"]!
+                self.profileView.frame = self.frameDict["profileViewOpen"]!
+                self.profileViewShadow.frame = self.frameDict["profileViewShadowOpen"]!
                 
                 // activate the profile subview constraints for OPENED state
                 self.profileView.activateConstraintsForState(.Open)
@@ -194,14 +198,14 @@ class MapViewController: UIViewController {
             UIView.animateWithDuration(0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .CurveEaseInOut, animations: {
                 
                 // set the profile frame to CLOSED
-                self.profileView.frame = self.buttonFrameDict["profileViewClosed"]!
-                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowClosed"]!
+                self.profileView.frame = self.frameDict["profileViewClosed"]!
+                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
                 
                 // activate the profile subview constraints for CLOSED state
                 self.profileView.activateConstraintsForState(.Closed)
                 
                 // set the profile button frame to profile frame CLOSED
-                self.profileButton.frame = self.buttonFrameDict["profileViewClosed"]!
+                self.profileButton.frame = self.frameDict["profileViewClosed"]!
                 }, completion: { (Bool) in
                     
                     // unlock the map
@@ -217,11 +221,11 @@ class MapViewController: UIViewController {
         
         // button
         let federationButtonSize = CGSize(width: 50, height: 50)
-        federationButton = FederationButton(frame: buttonFrameDict["federationButtonHidden"]!)
+        federationButton = FederationButton(frame: frameDict["federationButtonHidden"]!)
         federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), forControlEvents: .TouchUpInside)
         
         // shadow
-        federationButtonShadow = UIView(frame: buttonFrameDict["federationButtonShadowHidden"]!)
+        federationButtonShadow = UIView(frame: frameDict["federationButtonShadowHidden"]!)
         federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         federationButtonShadow.layer.cornerRadius = federationButtonSize.width / 2
         federationButtonShadow.layer.masksToBounds = true
@@ -241,12 +245,12 @@ class MapViewController: UIViewController {
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
         UIView.animateWithDuration(0.1, animations: {
             self.federationButton.backgroundColor = UIColor.blackColor()
-            self.federationButton.frame = self.buttonFrameDict["federationButtonTapped"]!
-            self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowTapped"]!
+            self.federationButton.frame = self.frameDict["federationButtonTapped"]!
+            self.federationButtonShadow.frame = self.frameDict["federationButtonShadowTapped"]!
         }) { (Bool) in
             UIView.animateWithDuration(0.2, animations: {
-                self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
-                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
+                self.federationButton.frame = self.frameDict["federationButtonNormal"]!
+                self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
             })
         }
         
@@ -299,7 +303,7 @@ class MapViewController: UIViewController {
                 
                 // pan gesture is going up at least 12
                 if translation.y <= -12 {
-                    feedAnimationTo("top")
+                    feedAnimationTo("top", sender: sender)
                     
                     // close profile
                     if DataSource.sharedInstance.profileState == .Open {
@@ -308,7 +312,7 @@ class MapViewController: UIViewController {
                     
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
-                    feedAnimationTo("bottom")
+                    feedAnimationTo("bottom", sender: sender)
                 }
             }
         }
@@ -412,11 +416,11 @@ class MapViewController: UIViewController {
                 // set map button state to Shown
                 DataSource.sharedInstance.mapButtonState = .Shown
                 
-                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowClosed"]!
-                self.profileView.frame = self.buttonFrameDict["profileViewClosed"]!
-                self.profileButton.frame = self.buttonFrameDict["profileViewClosed"]!
-                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowNormal"]!
-                self.federationButton.frame = self.buttonFrameDict["federationButtonNormal"]!
+                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
+                self.profileView.frame = self.frameDict["profileViewClosed"]!
+                self.profileButton.frame = self.frameDict["profileViewClosed"]!
+                self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
+                self.federationButton.frame = self.frameDict["federationButtonNormal"]!
                 
                 // then hide them
                 }, completion: { finished in
@@ -437,11 +441,11 @@ class MapViewController: UIViewController {
                 if DataSource.sharedInstance.profileState == .Open {
                     self.toggleProfileSizeForState(.Closed)
                 }
-                self.profileViewShadow.frame = self.buttonFrameDict["profileViewShadowHidden"]!
-                self.profileView.frame = self.buttonFrameDict["profileViewHidden"]!
-                self.profileButton.frame = self.buttonFrameDict["profileViewHidden"]!
-                self.federationButtonShadow.frame = self.buttonFrameDict["federationButtonShadowHidden"]!
-                self.federationButton.frame = self.buttonFrameDict["federationButtonHidden"]!
+                self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
+                self.profileView.frame = self.frameDict["profileViewHidden"]!
+                self.profileButton.frame = self.frameDict["profileViewHidden"]!
+                self.federationButtonShadow.frame = self.frameDict["federationButtonShadowHidden"]!
+                self.federationButton.frame = self.frameDict["federationButtonHidden"]!
                 
                 }, completion: { finished in
                     
@@ -467,27 +471,31 @@ class MapViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(offlinePackDidReceiveMaximumAllowedMapboxTiles), name: MGLOfflinePackMaximumMapboxTilesReachedNotification, object: nil)
     }
     
-    private func populateButtonFrameDict() {
+    private func populateFrameDict() {
+        
+        // feed view
+        frameDict["feedViewTop"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["feedViewBottom"] = CGRect(x: 0, y: self.view.frame.height - 120, width: self.view.frame.width, height: self.view.frame.height)
         
         // profile view
-        buttonFrameDict["profileViewHidden"] = CGRect(x: -50, y: -50, width: 50, height: 50)
-        buttonFrameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: 50, height: 50)
-        buttonFrameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.85) / 2, y: 50, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
+        frameDict["profileViewHidden"] = CGRect(x: -50, y: -50, width: 50, height: 50)
+        frameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: 50, height: 50)
+        frameDict["profileViewOpen"] = CGRect(x: view.frame.midX - (view.frame.width * 0.85) / 2, y: 50, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // profile view shadow
-        buttonFrameDict["profileViewShadowHidden"] = CGRect(x: buttonFrameDict["profileViewHidden"]!.minX + 6, y: buttonFrameDict["profileViewHidden"]!.minY + 7, width: 50, height: 50)
-        buttonFrameDict["profileViewShadowClosed"] = CGRect(x: buttonFrameDict["profileViewClosed"]!.minX + 6, y: buttonFrameDict["profileViewClosed"]!.minY + 7, width: 50, height: 50)
-        buttonFrameDict["profileViewShadowOpen"] = CGRect(x: buttonFrameDict["profileViewOpen"]!.minX + 6, y: buttonFrameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
+        frameDict["profileViewShadowHidden"] = CGRect(x: frameDict["profileViewHidden"]!.minX + 6, y: frameDict["profileViewHidden"]!.minY + 7, width: 50, height: 50)
+        frameDict["profileViewShadowClosed"] = CGRect(x: frameDict["profileViewClosed"]!.minX + 6, y: frameDict["profileViewClosed"]!.minY + 7, width: 50, height: 50)
+        frameDict["profileViewShadowOpen"] = CGRect(x: frameDict["profileViewOpen"]!.minX + 6, y: frameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // federation button
-        buttonFrameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
-        buttonFrameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
-        buttonFrameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
+        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
+        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
         
         // federation button shadow
-        buttonFrameDict["federationButtonShadowHidden"] = CGRect(x: buttonFrameDict["federationButtonHidden"]!.minX + 4, y: buttonFrameDict["federationButtonHidden"]!.minY + 5, width: 50, height: 50)
-        buttonFrameDict["federationButtonShadowNormal"] = CGRect(x: buttonFrameDict["federationButtonNormal"]!.minX + 4, y: buttonFrameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
-        buttonFrameDict["federationButtonShadowTapped"] = CGRect(x: buttonFrameDict["federationButtonTapped"]!.minX + 3, y: buttonFrameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
+        frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: 50, height: 50)
+        frameDict["federationButtonShadowNormal"] = CGRect(x: frameDict["federationButtonNormal"]!.minX + 4, y: frameDict["federationButtonNormal"]!.minY + 5, width: 50, height: 50)
+        frameDict["federationButtonShadowTapped"] = CGRect(x: frameDict["federationButtonTapped"]!.minX + 3, y: frameDict["federationButtonTapped"]!.minY + 4, width: 50, height: 50)
     }
     
     @objc private func setHoodScanningToFalse() {

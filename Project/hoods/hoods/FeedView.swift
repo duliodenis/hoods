@@ -10,6 +10,7 @@ import UIKit
 
 class FeedView: UIView {
     
+    var roundedCornerRadius = CGFloat()
     let currentHoodLabel = UILabel()
     let vPlaceholder = UIView()
     
@@ -17,7 +18,8 @@ class FeedView: UIView {
         super.init(frame: frame)
         
         // rounded corners for feed view
-        layer.cornerRadius = frame.size.width / 17
+        roundedCornerRadius = frame.size.width / 20
+        layer.cornerRadius = roundedCornerRadius
         layer.masksToBounds = true
         
         backgroundColor = UIColor.whiteColor()
