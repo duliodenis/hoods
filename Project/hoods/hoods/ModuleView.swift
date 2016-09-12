@@ -1,5 +1,5 @@
 //
-//  FeedView.swift
+//  ModuleView.swift
 //  hoods
 //
 //  Created by Andrew Carvajal on 8/10/16.
@@ -8,8 +8,9 @@
 
 import UIKit
 
-class FeedView: UIView {
+class ModuleView: UIView {
     
+    var roundedCornerRadius = CGFloat()
     let currentHoodLabel = UILabel()
     let vPlaceholder = UIView()
     
@@ -17,7 +18,8 @@ class FeedView: UIView {
         super.init(frame: frame)
         
         // rounded corners for feed view
-        layer.cornerRadius = frame.size.width * 0.07
+        roundedCornerRadius = frame.size.width / 20
+        layer.cornerRadius = roundedCornerRadius
         layer.masksToBounds = true
         
         backgroundColor = UIColor.whiteColor()
