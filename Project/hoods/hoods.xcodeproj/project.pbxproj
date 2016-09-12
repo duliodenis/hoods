@@ -22,7 +22,7 @@
 		49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A11D5BE137009FADF3 /* Annotation.swift */; };
 		49FB28A41D5BE186009FADF3 /* CalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */; };
 		49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A51D5BE1DD009FADF3 /* DataSource.swift */; };
-		49FB28A81D5C2016009FADF3 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A71D5C2016009FADF3 /* FeedView.swift */; };
+		49FB28A81D5C2016009FADF3 /* ModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A71D5C2016009FADF3 /* ModuleView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +43,7 @@
 		49FB28A11D5BE137009FADF3 /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalloutViewController.swift; sourceTree = "<group>"; };
 		49FB28A51D5BE1DD009FADF3 /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
-		49FB28A71D5C2016009FADF3 /* FeedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		49FB28A71D5C2016009FADF3 /* ModuleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleView.swift; sourceTree = "<group>"; };
 		6F7607D53EF5103EC6EA5FAA /* Pods-hoods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.debug.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.debug.xcconfig"; sourceTree = "<group>"; };
 		7E15E638073E00E6010B3855 /* Pods-hoods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.release.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -105,7 +105,7 @@
 			children = (
 				49FB28881D5B9D58009FADF3 /* Main.storyboard */,
 				49FB288D1D5B9D58009FADF3 /* LaunchScreen.storyboard */,
-				49FB28A71D5C2016009FADF3 /* FeedView.swift */,
+				49FB28A71D5C2016009FADF3 /* ModuleView.swift */,
 				4942DC031D799FF000A871E7 /* ProfileView.swift */,
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 			);
@@ -298,7 +298,7 @@
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,
 				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,
-				49FB28A81D5C2016009FADF3 /* FeedView.swift in Sources */,
+				49FB28A81D5C2016009FADF3 /* ModuleView.swift in Sources */,
 				49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
