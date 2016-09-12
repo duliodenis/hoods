@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */; };
+		4907FE6C1D87168200629BF0 /* ModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4907FE6B1D87168200629BF0 /* ModuleView.swift */; };
+		4907FE6E1D8716AC00629BF0 /* HoodModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4907FE6D1D8716AC00629BF0 /* HoodModule.swift */; };
 		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
 		490CAD451D715662003E9B34 /* manhattan.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD441D715662003E9B34 /* manhattan.geojson */; };
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
@@ -22,11 +24,13 @@
 		49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A11D5BE137009FADF3 /* Annotation.swift */; };
 		49FB28A41D5BE186009FADF3 /* CalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */; };
 		49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A51D5BE1DD009FADF3 /* DataSource.swift */; };
-		49FB28A81D5C2016009FADF3 /* ModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A71D5C2016009FADF3 /* ModuleView.swift */; };
+		49FB28A81D5C2016009FADF3 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A71D5C2016009FADF3 /* DashboardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hoods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4907FE6B1D87168200629BF0 /* ModuleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleView.swift; sourceTree = "<group>"; };
+		4907FE6D1D8716AC00629BF0 /* HoodModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoodModule.swift; sourceTree = "<group>"; };
 		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
 		490CAD441D715662003E9B34 /* manhattan.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manhattan.geojson; sourceTree = "<group>"; };
 		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
@@ -43,7 +47,7 @@
 		49FB28A11D5BE137009FADF3 /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalloutViewController.swift; sourceTree = "<group>"; };
 		49FB28A51D5BE1DD009FADF3 /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
-		49FB28A71D5C2016009FADF3 /* ModuleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleView.swift; sourceTree = "<group>"; };
+		49FB28A71D5C2016009FADF3 /* DashboardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		6F7607D53EF5103EC6EA5FAA /* Pods-hoods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.debug.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.debug.xcconfig"; sourceTree = "<group>"; };
 		7E15E638073E00E6010B3855 /* Pods-hoods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.release.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,6 +64,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4907FE661D87149200629BF0 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				4907FE6D1D8716AC00629BF0 /* HoodModule.swift */,
+			);
+			name = Modules;
+			sourceTree = "<group>";
+		};
 		49C143F41D6F6AE300305EE7 /* GeoJSON */ = {
 			isa = PBXGroup;
 			children = (
@@ -103,11 +115,13 @@
 		49FB28981D5B9DB3009FADF3 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				49FB28881D5B9D58009FADF3 /* Main.storyboard */,
 				49FB288D1D5B9D58009FADF3 /* LaunchScreen.storyboard */,
-				49FB28A71D5C2016009FADF3 /* ModuleView.swift */,
+				49FB28881D5B9D58009FADF3 /* Main.storyboard */,
 				4942DC031D799FF000A871E7 /* ProfileView.swift */,
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
+				49FB28A71D5C2016009FADF3 /* DashboardView.swift */,
+				4907FE6B1D87168200629BF0 /* ModuleView.swift */,
+				4907FE661D87149200629BF0 /* Modules */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -298,8 +312,10 @@
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,
 				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,
-				49FB28A81D5C2016009FADF3 /* ModuleView.swift in Sources */,
+				49FB28A81D5C2016009FADF3 /* DashboardView.swift in Sources */,
+				4907FE6C1D87168200629BF0 /* ModuleView.swift in Sources */,
 				49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */,
+				4907FE6E1D8716AC00629BF0 /* HoodModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
