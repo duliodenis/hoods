@@ -39,9 +39,8 @@ class DataSource {
         if stillInTheHood(currentLocation) == false {
             
             // if last area is a supported area
-            if areaForGeoJSON() != "" {
-                print("area: \(area!)")
-                                
+            if geoJSONForArea() != "" {
+                
                 // check through all hood polygons for your coords and update last hood name (last polygon gets updated too)
                 lastHoodName = hoodCheck(currentLocation)
                 
@@ -63,7 +62,7 @@ class DataSource {
         print("full hood check")
         
         // set file path to geoJSON for current subLocality
-        let filePath = NSBundle.mainBundle().pathForResource(areaForGeoJSON(), ofType: "geojson")!
+        let filePath = NSBundle.mainBundle().pathForResource(geoJSONForArea(), ofType: "geojson")!
         
         // convert GeoJSON to NSData
         let data = NSData(contentsOfFile: filePath)
@@ -162,7 +161,7 @@ class DataSource {
         }
     }
     
-    private func areaForGeoJSON() -> String {
+    private func geoJSONForArea() -> String {
         
         // if the user location was found in an area, return appropriate GeoJSON file name
         if area != nil {

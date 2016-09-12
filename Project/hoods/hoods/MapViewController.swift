@@ -282,9 +282,14 @@ class MapViewController: UIViewController {
     
     @objc private func tapFired(sender: UITapGestureRecognizer) {
         
-        // if profile is open and tap is outside profile, toggle profile size
+        // if profile is open
         if DataSource.sharedInstance.profileState == .Open {
+            
+            // if tap is outside profile
             if !profileView.frame.contains(sender.locationInView(mapboxView)) {
+                
+                // hide map icons and close profile
+                hideMapIcons()
                 toggleProfileSizeForState(.Closed)
             }
         }
@@ -435,25 +440,29 @@ class MapViewController: UIViewController {
         // delay using timer
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(buttonHideTimer * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
             
-            // animate hiding of icons
-            UIView.animateWithDuration(0.8, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .CurveEaseIn, animations: {
+            // if profile is not open, proceed with hiding of icons
+            if DataSource.sharedInstance.profileState != .Open {
                 
-                if DataSource.sharedInstance.profileState == .Open {
-                    self.toggleProfileSizeForState(.Closed)
-                }
-                self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
-                self.profileView.frame = self.frameDict["profileViewHidden"]!
-                self.profileButton.frame = self.frameDict["profileViewHidden"]!
-                self.federationButtonShadow.frame = self.frameDict["federationButtonShadowHidden"]!
-                self.federationButton.frame = self.frameDict["federationButtonHidden"]!
-                
-                }, completion: { finished in
+                // animate hiding of icons
+                UIView.animateWithDuration(0.8, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .CurveEaseIn, animations: {
                     
-                    self.buttonHideTimer = self.buttonHideTimer - 5
+                    if DataSource.sharedInstance.profileState == .Open {
+                        self.toggleProfileSizeForState(.Closed)
+                    }
+                    self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
+                    self.profileView.frame = self.frameDict["profileViewHidden"]!
+                    self.profileButton.frame = self.frameDict["profileViewHidden"]!
+                    self.federationButtonShadow.frame = self.frameDict["federationButtonShadowHidden"]!
+                    self.federationButton.frame = self.frameDict["federationButtonHidden"]!
                     
-                    // set map icon state to Hidden
-                    DataSource.sharedInstance.mapButtonState = .Hidden
-            })
+                    }, completion: { finished in
+                        
+                        self.buttonHideTimer = self.buttonHideTimer - 5
+                        
+                        // set map icon state to Hidden
+                        DataSource.sharedInstance.mapButtonState = .Hidden
+                })
+            }
         }
     }
     
