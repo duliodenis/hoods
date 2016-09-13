@@ -18,7 +18,7 @@ class MapViewController: UIViewController {
     private var tap = UITapGestureRecognizer()
     private var feedPan = UIPanGestureRecognizer()
     private var buttonHideTimer: Double = 0
-    private var moduleView = ModuleView()
+    private var dashboardView = DashboardView()
     private var profileView = ProfileView()
     private var profileViewShadow = UIView()
     private var profileButton = UIButton()
@@ -46,7 +46,7 @@ class MapViewController: UIViewController {
         addTapGesture()
         addFederationButton()
         addProfile()
-        addModuleView()
+        addDashboardView()
         addPanGesture()
     }
 
@@ -104,36 +104,36 @@ class MapViewController: UIViewController {
     
 // MARK: Feed
     
-    private func addModuleView() {
+    private func addDashboardView() {
         
-        moduleView = ModuleView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
-        moduleView.currentHoodLabel.text = "Hoods"
-        view.addSubview(moduleView)
+        dashboardView = DashboardView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
+        dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+        view.addSubview(dashboardView)
     }
     
     private func feedAnimationTo(topOrBottom: String, sender: UIPanGestureRecognizer) {
         switch topOrBottom {
         case "top":
             
-            self.moduleView.animateCornerRadiusOf(self.moduleView, fromValue: self.moduleView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
+            self.dashboardView.animateCornerRadiusOf(self.dashboardView, fromValue: self.dashboardView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
             
             // animate the feed to the top
             UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                 
-                self.moduleView.frame = self.frameDict["feedViewTop"]!
+                self.dashboardView.frame = self.frameDict["feedViewTop"]!
                 }, completion: { (Bool) -> Void in
                     
             })
         case "bottom":
             
             if sender.locationInView(mapboxView).y < frameDict["feedViewBottom"]!.minY {
-                self.moduleView.animateCornerRadiusOf(moduleView, fromValue: 0.0, toValue: self.moduleView.roundedCornerRadius, duration: 0.5)
+                self.dashboardView.animateCornerRadiusOf(dashboardView, fromValue: 0.0, toValue: self.dashboardView.roundedCornerRadius, duration: 0.5)
             }
             
             // animate the feed's minY to the bottom -100
             UIView.animateWithDuration(0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                 
-                self.moduleView.frame = self.frameDict["feedViewBottom"]!
+                self.dashboardView.frame = self.frameDict["feedViewBottom"]!
                 }, completion: { (Bool) -> Void in
             })
         default: break
@@ -301,7 +301,7 @@ class MapViewController: UIViewController {
         let touchLocation = sender.locationInView(mapboxView)
         
         // pan gesture is inside feed view
-        if moduleView.frame.contains(touchLocation) {
+        if dashboardView.frame.contains(touchLocation) {
             
             // pan gesture just ended
             if feedPan.state == .Changed {
@@ -526,7 +526,7 @@ extension MapViewController: UIGestureRecognizerDelegate {
         if gestureRecognizer == feedPan {
             
             // if touch is not in feed, let gesture pass through to map
-            if !moduleView.frame.contains(touch.locationInView(view)) {
+            if !dashboardView.frame.contains(touch.locationInView(view)) {
                 return false
             }
         }
@@ -587,9 +587,9 @@ extension MapViewController: CLLocationManagerDelegate {
                         
                         // if hood check failed, set label to Hoods
                         if newLocation != "" {
-                            self.moduleView.currentHoodLabel.text = newLocation
+                            self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
                         } else {
-                            self.moduleView.currentHoodLabel.text = "Hoods"
+                            self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
                         }
                     }
                 })
