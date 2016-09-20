@@ -20,7 +20,7 @@ class ModuleView: UIView {
         layer.cornerRadius = roundedCornerRadius
         layer.masksToBounds = true
         
-        backgroundColor = UIColor.whiteColor()
+        backgroundColor = UIColor.white
     }
     
     required init?(coder aDecoder: NSCoder) {

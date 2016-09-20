@@ -21,7 +21,7 @@ class DashboardView: UIView {
         layer.cornerRadius = roundedCornerRadius
         layer.masksToBounds = true
         
-        backgroundColor = UIColor.whiteColor()
+        backgroundColor = UIColor.white
                 
         let views = [hoodModule]
         
@@ -31,12 +31,12 @@ class DashboardView: UIView {
         }
         
         let constraints: [NSLayoutConstraint] = [
-            hoodModule.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor),
-            hoodModule.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
-            hoodModule.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),
-            hoodModule.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 50),
+            hoodModule.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            hoodModule.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            hoodModule.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            hoodModule.bottomAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 50),
         ]
-        NSLayoutConstraint.activateConstraints(constraints)
+        NSLayoutConstraint.activate(constraints)
     }
     
     required init?(coder aDecoder: NSCoder) {

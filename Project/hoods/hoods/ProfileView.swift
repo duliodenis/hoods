@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FBSDKLoginKit
 
 class ProfileView: UIView {
     
@@ -14,13 +15,14 @@ class ProfileView: UIView {
     let profileImageView = UIImageView()
     let profileFirstNameLabel = UILabel()
     let profileLastNameLabel = UILabel()
+    var fbLoginButton = FBSDKLoginButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         // profile properties
         layer.masksToBounds = true
-        backgroundColor = UIColor.whiteColor()
+        backgroundColor = UIColor.white
         
         // subview specific properties
         profileImageView.image = cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
@@ -33,16 +35,16 @@ class ProfileView: UIView {
         let labels = [profileFirstNameLabel, profileLastNameLabel]
         for label in labels {
             label.numberOfLines = 2
-            label.textAlignment = .Left
-            label.font = UIFont.systemFontOfSize(100)
+            label.textAlignment = .left
+            label.font = UIFont.boldSystemFont(ofSize: 100)
             label.adjustsFontSizeToFitWidth = true
         }
         
         // subview common properties
-        let subviews = [profileImageView, profileLastNameLabel, profileFirstNameLabel]
+        let subviews = [profileImageView, profileLastNameLabel, profileFirstNameLabel, fbLoginButton] as [Any]
         for sub in subviews {
-            sub.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(sub)
+            (sub as! UIView).translatesAutoresizingMaskIntoConstraints = false
+            addSubview(sub as! UIView)
         }
     }
     
@@ -50,63 +52,74 @@ class ProfileView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func activateConstraintsForState(state: ProfileState) {
+    func activateConstraintsForState(_ state: ProfileState) {
         
         // deactivate constraints
-        NSLayoutConstraint.deactivateConstraints(profileConstraints)
+        NSLayoutConstraint.deactivate(profileConstraints)
         
         // activate constraints for state passed in
-        if state == .Closed {
+        if state == .closed {
             
             // closed profile constraints
             profileConstraints = [
-                profileImageView.centerXAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerXAnchor),
-                profileImageView.centerYAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerYAnchor),
-                profileImageView.widthAnchor.constraintEqualToConstant(frame.width - 4),
-                profileImageView.heightAnchor.constraintEqualToConstant(frame.width - 4),
                 
-                profileFirstNameLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 10),
-                profileFirstNameLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: 10),
-                profileFirstNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: 100),
-                profileFirstNameLabel.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerYAnchor, constant: 0),
+                profileImageView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+                profileImageView.centerYAnchor.constraint(equalTo: layoutMarginsGuide.centerYAnchor),
+                profileImageView.widthAnchor.constraint(equalToConstant: frame.width - 4),
+                profileImageView.heightAnchor.constraint(equalToConstant: frame.height - 4),
                 
-                profileLastNameLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerYAnchor, constant: 0),
-                profileLastNameLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: 10),
-                profileLastNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: 100),
-                profileLastNameLabel.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.bottomAnchor, constant: -10)
+                profileFirstNameLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 10),
+                profileFirstNameLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: 10),
+                profileFirstNameLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: 100),
+                profileFirstNameLabel.bottomAnchor.constraint(equalTo: profileImageView.centerYAnchor),
+                
+                profileLastNameLabel.topAnchor.constraint(equalTo: profileImageView.centerYAnchor),
+                profileLastNameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 10),
+                profileLastNameLabel.rightAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 100),
+                profileLastNameLabel.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+                
+                fbLoginButton.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+                fbLoginButton.leftAnchor.constraint(equalTo: profileImageView.leftAnchor),
+                fbLoginButton.rightAnchor.constraint(equalTo: profileLastNameLabel.rightAnchor),
+                fbLoginButton.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
             ]
             
-            DataSource.sharedInstance.profileState = .Closed
+            DataSource.sharedInstance.profileState = .closed
         } else {
             
             // open profile constraints
             profileConstraints = [
-                profileImageView.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 10),
-                profileImageView.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor, constant: 10),
-                profileImageView.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerXAnchor, constant: -10),
-                profileImageView.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.centerYAnchor, constant: -10),
+                profileImageView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 10),
+                profileImageView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 10),
+                profileImageView.widthAnchor.constraint(equalToConstant: frame.width / 3),
+                profileImageView.heightAnchor.constraint(equalToConstant: frame.width / 3),
                 
-                profileFirstNameLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 20),
-                profileFirstNameLabel.leftAnchor.constraintEqualToAnchor(profileImageView.rightAnchor, constant: 10),
-                profileFirstNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: -5),
-                profileFirstNameLabel.bottomAnchor.constraintEqualToAnchor(profileImageView.centerYAnchor),
+                profileFirstNameLabel.topAnchor.constraint(equalTo: profileImageView.topAnchor, constant: 10),
+                profileFirstNameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 10),
+                profileFirstNameLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: -5),
+                profileFirstNameLabel.bottomAnchor.constraint(equalTo: profileImageView.centerYAnchor),
                 
-                profileLastNameLabel.topAnchor.constraintEqualToAnchor(profileImageView.centerYAnchor),
-                profileLastNameLabel.leftAnchor.constraintEqualToAnchor(profileImageView.rightAnchor, constant: 10),
-                profileLastNameLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor, constant: -5),
-                profileLastNameLabel.bottomAnchor.constraintEqualToAnchor(profileImageView.bottomAnchor, constant: -20)
+                profileLastNameLabel.topAnchor.constraint(equalTo: profileImageView.centerYAnchor),
+                profileLastNameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 10),
+                profileLastNameLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: -5),
+                profileLastNameLabel.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: -10),
+                
+                fbLoginButton.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+                fbLoginButton.leftAnchor.constraint(equalTo: profileImageView.leftAnchor),
+                fbLoginButton.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: -10),
+                fbLoginButton.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 35)
             ]
             
-            DataSource.sharedInstance.profileState = .Open
+            DataSource.sharedInstance.profileState = .open
         }
         
         // activate constraints
-        NSLayoutConstraint.activateConstraints(profileConstraints)
+        NSLayoutConstraint.activate(profileConstraints)
     }
     
-    private func cropToBounds(image: UIImage, width: Double, height: Double) -> UIImage {
+    fileprivate func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {
         
-        let contextImage = UIImage(CGImage: image.CGImage!)
+        let contextImage = UIImage(cgImage: image.cgImage!)
         let contextSize = contextImage.size
         
         var posX: CGFloat = 0.0
@@ -126,13 +139,13 @@ class ProfileView: UIView {
             cgWidth = contextSize.width
             cgHeight = contextSize.width
         }
-        let rect: CGRect = CGRectMake(posX, posY, cgWidth, cgHeight)
+        let rect: CGRect = CGRect(x: posX, y: posY, width: cgWidth, height: cgHeight)
         
         // create bitmap image from context using the rect
-        let imageRef: CGImageRef = CGImageCreateWithImageInRect(contextImage.CGImage, rect)!
+        let imageRef: CGImage = contextImage.cgImage!.cropping(to: rect)!
         
         // create a new image based on the imageRef and rotate back to the original orientation
-        let image = UIImage(CGImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
+        let image = UIImage(cgImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
         
         return image
     }
