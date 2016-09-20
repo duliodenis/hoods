@@ -16,9 +16,9 @@ class HoodModule: ModuleView {
         super.init(frame: frame)
         
         currentHoodLabel.adjustsFontSizeToFitWidth = true
-        currentHoodLabel.font = UIFont.boldSystemFontOfSize(42)
-        currentHoodLabel.setContentHuggingPriority(251, forAxis: .Vertical)
-        currentHoodLabel.textAlignment = .Center
+        currentHoodLabel.font = UIFont.boldSystemFont(ofSize: 42)
+        currentHoodLabel.setContentHuggingPriority(251, for: .vertical)
+        currentHoodLabel.textAlignment = .center
                 
         let views = [currentHoodLabel]
         
@@ -28,12 +28,12 @@ class HoodModule: ModuleView {
         }
         
         let constraints: [NSLayoutConstraint] = [
-            currentHoodLabel.topAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor),
-            currentHoodLabel.leftAnchor.constraintEqualToAnchor(layoutMarginsGuide.leftAnchor),
-            currentHoodLabel.rightAnchor.constraintEqualToAnchor(layoutMarginsGuide.rightAnchor),
-            currentHoodLabel.bottomAnchor.constraintEqualToAnchor(layoutMarginsGuide.topAnchor, constant: 50),
+            currentHoodLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            currentHoodLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            currentHoodLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            currentHoodLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 50),
         ]
-        NSLayoutConstraint.activateConstraints(constraints)
+        NSLayoutConstraint.activate(constraints)
     }
     
     required init?(coder aDecoder: NSCoder) {

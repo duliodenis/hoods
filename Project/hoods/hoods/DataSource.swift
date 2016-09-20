@@ -11,18 +11,19 @@ import Mapbox
 import MapKit
 
 enum MapButtonState {
-    case Hidden
-    case Shown
+    case hidden
+    case hiding
+    case shown
 }
 
 enum ProfileState {
-    case Closed
-    case Open
+    case closed
+    case open
 }
 
 class DataSource {
     static let sharedInstance = DataSource()
-    private init() {}
+    fileprivate init() {}
     
     var locationManager = CLLocationManager()
     var lastHoodName: String?
@@ -33,7 +34,7 @@ class DataSource {
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
     
-    func currentHoodName(currentLocation: CLLocationCoordinate2D) -> String? {
+    func currentHoodName(_ currentLocation: CLLocationCoordinate2D) -> String? {
         
         // if your coords are not in the last hood polygon
         if stillInTheHood(currentLocation) == false {
@@ -46,30 +47,30 @@ class DataSource {
                 
                 // if in a supported area, but hood check failed, stop scanning
                 if lastHoodName == "" {
-                    NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
                 }
                 
             // else last area is not a supported area
             } else {
-                NSNotificationCenter.defaultCenter().postNotificationName("NotInAHood", object: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
             }
         }
         return lastHoodName
     }
     
-    private func hoodCheck(currentLocation: CLLocationCoordinate2D) -> String {
+    fileprivate func hoodCheck(_ currentLocation: CLLocationCoordinate2D) -> String {
         
         print("full hood check")
         
-        // set file path to geoJSON for current subLocality
-        let filePath = NSBundle.mainBundle().pathForResource(geoJSONForArea(), ofType: "geojson")!
+        // set file path to geoJSON for current area
+        let filePath = Bundle.main.path(forResource: geoJSONForArea(), ofType: "geojson")!
         
         // convert GeoJSON to NSData
-        let data = NSData(contentsOfFile: filePath)
+        let data = try? Data(contentsOf: URL(fileURLWithPath: filePath))
         do {
-            let json = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments)
+            let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String:AnyObject]
             
-            if let hoods = json["features"] as? [[String: AnyObject]] {
+            if let hoods = json?["features"] as? [[String: AnyObject]] {
                 
                 // iterate through all hoods in the GeoJSON file
                 for hood in hoods {
@@ -99,18 +100,15 @@ class DataSource {
                                 
                                 // CLLCoordinate2D -> MKMapPoint -> check if CGPoint is inside polygon renderer's CGPath
                                 let mapPoint = MKMapPointForCoordinate(currentLocation)
-                                let cgPoint = polygonRenderer.pointForMapPoint(mapPoint)
+                                let cgPoint = polygonRenderer.point(for: mapPoint)
                                 
-                                if CGPathContainsPoint(polygonRenderer.path, nil, cgPoint, true) {
-                                    
+                                if polygonRenderer.path.contains(cgPoint) {
                                     // update the name and polygon renderer
                                     lastPolygonRenderer = polygonRenderer
                                     lastHoodName = currentNeighborhood
                                     
                                     print("You are in \(currentNeighborhood).")
                                     return currentNeighborhood
-                                } else {
-//                                    print("You are not in \(currentNeighborhood).")
                                 }
                             }
                         }
@@ -123,7 +121,7 @@ class DataSource {
         return ""
     }
     
-    private func stillInTheHood(currentLocation: CLLocationCoordinate2D) -> Bool {
+    fileprivate func stillInTheHood(_ currentLocation: CLLocationCoordinate2D) -> Bool {
         
         // if gps is working
         if locationManager.location != nil {
@@ -132,11 +130,10 @@ class DataSource {
             if lastPolygonRenderer != nil {
                 
                 let mapPoint = MKMapPointForCoordinate(currentLocation)
-                let cgPoint = lastPolygonRenderer!.pointForMapPoint(mapPoint)
+                let cgPoint = lastPolygonRenderer!.point(for: mapPoint)
                 
                 // check if your coords are in the last polygon renderer path
-                if CGPathContainsPoint(lastPolygonRenderer!.path, nil, cgPoint, true) {
-                    
+                if lastPolygonRenderer!.path.contains(cgPoint) {
                     print("You're still in the hood.")
                     return true
                 }
@@ -161,7 +158,7 @@ class DataSource {
         }
     }
     
-    private func geoJSONForArea() -> String {
+    fileprivate func geoJSONForArea() -> String {
         
         // if the user location was found in an area, return appropriate GeoJSON file name
         if area != nil {

@@ -15,11 +15,11 @@ class FederationButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        setTitle("Λ", forState: .Normal)
-        titleLabel!.font = UIFont.systemFontOfSize(23)
+        setTitle("Λ", for: UIControlState())
+        titleLabel!.font = UIFont.systemFont(ofSize: 23)
         titleLabel!.adjustsFontSizeToFitWidth = true
-        tintColor = UIColor.whiteColor()
-        backgroundColor = UIColor.blackColor()
+        tintColor = UIColor.white
+        backgroundColor = UIColor.black
         layer.cornerRadius = frame.width / 2
         layer.masksToBounds = true
     }

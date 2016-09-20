@@ -19,9 +19,9 @@ class CalloutViewController: UIView, MGLCalloutView {
     // store the represented object's title
     required init(representedObject: MGLAnnotation) {
         self.representedObject = representedObject
-        mainBody = UIButton(type: .System)
+        mainBody = UIButton(type: .system)
         
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
         
         addSubview(self.mainBody)
         DataSource.sharedInstance.calloutRepresentedObjectTitle = representedObject.title!!
@@ -34,10 +34,10 @@ class CalloutViewController: UIView, MGLCalloutView {
     
     // MARK: MGLCalloutView API
     
-    func presentCalloutFromRect(rect: CGRect, inView view: UIView, constrainedToView constrainedView: UIView, animated: Bool) {
+    func presentCallout(from rect: CGRect, in view: UIView, constrainedTo constrainedView: UIView, animated: Bool) {
         
         // if representedObject has no title or is the user location annotation, return
-        if !representedObject.respondsToSelector(Selector("title")) || representedObject.respondsToSelector(Selector("heading")) {
+        if !representedObject.responds(to: #selector(getter: MGLAnnotation.title)) || representedObject.responds(to: #selector(getter: MGLMapCamera.heading)) {
             return
         }
         
@@ -46,24 +46,24 @@ class CalloutViewController: UIView, MGLCalloutView {
         if isCalloutTappable() {
             
             // Handle taps and eventually try to send them to the delegate (usually the map view)
-            mainBody.addTarget(self, action: #selector(CalloutViewController.calloutTapped), forControlEvents: .TouchUpInside)
+            mainBody.addTarget(self, action: #selector(CalloutViewController.calloutTapped), for: .touchUpInside)
         } else {
             
             // Disable tapping and highlighting
-            mainBody.userInteractionEnabled = false
+            mainBody.isUserInteractionEnabled = false
         }
         
-        NSNotificationCenter.defaultCenter().postNotificationName("AnnotationTapped", object: nil)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "AnnotationTapped"), object: nil)
     }
     
-    func dismissCalloutAnimated(animated: Bool) {}
+    func dismissCallout(animated: Bool) {}
     
     
     // MARK: Callout interaction handlers
     
     func isCalloutTappable() -> Bool {
         if let delegate = delegate {
-            if delegate.respondsToSelector(#selector(MGLCalloutViewDelegate.calloutViewShouldHighlight(_:))) {
+            if delegate.responds(to: #selector(MGLCalloutViewDelegate.calloutViewShouldHighlight(_:))) {
                 return delegate.calloutViewShouldHighlight!(self)
             }
         }
@@ -71,7 +71,7 @@ class CalloutViewController: UIView, MGLCalloutView {
     }
     
     func calloutTapped() {
-        if isCalloutTappable() && delegate!.respondsToSelector(#selector(MGLCalloutViewDelegate.calloutViewTapped(_:))) {
+        if isCalloutTappable() && delegate!.responds(to: #selector(MGLCalloutViewDelegate.calloutViewTapped(_:))) {
             delegate!.calloutViewTapped!(self)
         }
     }
