@@ -431,9 +431,7 @@ class MapViewController: UIViewController {
 // MARK: Miscellaneous
     
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
-        
-        print("mapButtonState: \(DataSource.sharedInstance.mapButtonState)")
-        
+                
         // if motion was a shake and location available
         if motion == .motionShake {
             showMapIcons()
@@ -617,11 +615,14 @@ extension MapViewController: CLLocationManagerDelegate {
                         DataSource.sharedInstance.updateArea()
                         
                         // use hood check to try and set current hood label
-                        let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate)!
-                        
-                        // if hood check failed, set label to Hoods
-                        if newLocation != "" {
-                            self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+                        if let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate) {
+                            
+                            // hood check succeeded but returned blank name
+                            if newLocation != "" {
+                                self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+                            } else {
+                                self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                            }
                         } else {
                             self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
                         }

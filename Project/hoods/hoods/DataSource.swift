@@ -9,6 +9,7 @@
 import UIKit
 import Mapbox
 import MapKit
+import FBSDKLoginKit
 
 enum MapButtonState {
     case hidden
@@ -33,6 +34,7 @@ class DataSource {
     var area: String?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
+    var profileDict = [String:String]()
     
     func currentHoodName(_ currentLocation: CLLocationCoordinate2D) -> String? {
         
@@ -182,5 +184,34 @@ class DataSource {
         
         // if the user location is not found in any area, return ""
         return ""
+    }
+    
+    func fetchProfile() {
+        
+        // if logged in
+        if FBSDKAccessToken.current() != nil {
+            
+            // request these
+            let parameters = ["fields": "email, first_name, last_name,  picture.type(large)"]
+
+            FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
+                
+                if error != nil {
+                    print(error)
+                } else {
+                    
+                    guard let resultNew = result as? [String:Any] else { return }
+                    
+                    self.profileDict["firstName"] = resultNew["first_name"] as? String
+                    self.profileDict["lastName"] = resultNew["last_name"] as? String
+                    self.profileDict["email"] = resultNew["email"] as? String
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
+                }
+            })
+            
+        } else {
+            print("current access token was nil")
+        }
     }
 }

@@ -20,6 +20,8 @@ class ProfileView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(updateProfile), name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
+        
         // profile properties
         layer.masksToBounds = true
         backgroundColor = UIColor.white
@@ -28,9 +30,10 @@ class ProfileView: UIView {
         profileImageView.image = cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
+                
+        fbLoginButton.readPermissions = ["public_profile", "user_friends"]
         
-        profileFirstNameLabel.text = "Andrew"
-        profileLastNameLabel.text = "Carvajal"
+        DataSource.sharedInstance.fetchProfile()
         
         let labels = [profileFirstNameLabel, profileLastNameLabel]
         for label in labels {
@@ -53,6 +56,8 @@ class ProfileView: UIView {
     }
     
     func activateConstraintsForState(_ state: ProfileState) {
+        
+        updateProfile()
         
         // deactivate constraints
         NSLayoutConstraint.deactivate(profileConstraints)
@@ -115,6 +120,11 @@ class ProfileView: UIView {
         
         // activate constraints
         NSLayoutConstraint.activate(profileConstraints)
+    }
+    
+    @objc fileprivate func updateProfile() {
+        profileFirstNameLabel.text = DataSource.sharedInstance.profileDict["firstName"]
+        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"]
     }
     
     fileprivate func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {
