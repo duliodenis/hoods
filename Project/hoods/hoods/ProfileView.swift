@@ -123,8 +123,22 @@ class ProfileView: UIView {
     }
     
     @objc fileprivate func updateProfile() {
-        profileFirstNameLabel.text = DataSource.sharedInstance.profileDict["firstName"]
-        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"]
+        
+        profileFirstNameLabel.text = DataSource.sharedInstance.profileDict["firstName"] 
+        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"] 
+        downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
+    }
+    
+    func downloadImage(url: URL) {
+        
+        // use passed in url to get image and set it to profile image view
+        DataSource.sharedInstance.getDataFromURL(url: url) { (data, response, error) in
+            DispatchQueue.main.sync() { () -> Void in
+                guard let data = data, error == nil else { return }
+                print(response?.suggestedFilename ?? url.lastPathComponent)
+                self.profileImageView.image = UIImage(data: data)
+            }
+        }
     }
     
     fileprivate func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {

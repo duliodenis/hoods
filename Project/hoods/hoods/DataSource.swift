@@ -190,12 +190,11 @@ class DataSource {
         
         // if logged in
         if FBSDKAccessToken.current() != nil {
-            
+                        
             // request these
             let parameters = ["fields": "email, first_name, last_name,  picture.type(large)"]
 
             FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
-                
                 if error != nil {
                     print(error)
                 } else {
@@ -213,5 +212,11 @@ class DataSource {
         } else {
             print("current access token was nil")
         }
+    }
+    
+    func getDataFromURL(url: URL, completion: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            completion(data, response, error)
+        }.resume()
     }
 }
