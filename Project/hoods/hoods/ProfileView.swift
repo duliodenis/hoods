@@ -27,7 +27,7 @@ class ProfileView: UIView {
         backgroundColor = UIColor.white
         
         // subview specific properties
-        profileImageView.image = cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
+        profileImageView.image = DataSource.sharedInstance.cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
                 
@@ -125,13 +125,17 @@ class ProfileView: UIView {
     @objc fileprivate func updateProfile() {
         
         profileFirstNameLabel.text = DataSource.sharedInstance.profileDict["firstName"] 
-        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"] 
-        downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
+        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"]
+        if FBSDKAccessToken.current() != nil {
+            downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
+        } else {
+            profileImageView.image = UIImage(named: "yuge")
+        }
     }
     
     func downloadImage(url: URL) {
         
-        // use passed in url to get image and set it to profile image view
+        // use passed in url to asynchronously get image and set it to profile image view
         DataSource.sharedInstance.getDataFromURL(url: url) { (data, response, error) in
             DispatchQueue.main.sync() { () -> Void in
                 guard let data = data, error == nil else { return }
@@ -139,39 +143,6 @@ class ProfileView: UIView {
                 self.profileImageView.image = UIImage(data: data)
             }
         }
-    }
-    
-    fileprivate func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {
-        
-        let contextImage = UIImage(cgImage: image.cgImage!)
-        let contextSize = contextImage.size
-        
-        var posX: CGFloat = 0.0
-        var posY: CGFloat = 0.0
-        var cgWidth = CGFloat(width)
-        var cgHeight = CGFloat(height)
-        
-        // see what size is longer and create the center off of that
-        if contextSize.width > contextSize.height {
-            posX = (contextSize.width - contextSize.height) / 2
-            posY = 0
-            cgWidth = contextSize.height
-            cgHeight = contextSize.height
-        } else {
-            posX = 0
-            posY = (contextSize.height - contextSize.width) / 2
-            cgWidth = contextSize.width
-            cgHeight = contextSize.width
-        }
-        let rect: CGRect = CGRect(x: posX, y: posY, width: cgWidth, height: cgHeight)
-        
-        // create bitmap image from context using the rect
-        let imageRef: CGImage = contextImage.cgImage!.cropping(to: rect)!
-        
-        // create a new image based on the imageRef and rotate back to the original orientation
-        let image = UIImage(cgImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
-        
-        return image
     }
     
     /*
