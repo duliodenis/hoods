@@ -9,6 +9,7 @@
 import UIKit
 import Mapbox
 import MapKit
+import FBSDKLoginKit
 
 enum MapButtonState {
     case hidden
@@ -33,6 +34,7 @@ class DataSource {
     var area: String?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
+    var profileDict = [String:String]()
     
     func currentHoodName(_ currentLocation: CLLocationCoordinate2D) -> String? {
         
@@ -182,5 +184,72 @@ class DataSource {
         
         // if the user location is not found in any area, return ""
         return ""
+    }
+    
+    func fetchProfile() {
+        
+        // if logged in
+        if FBSDKAccessToken.current() != nil {
+                        
+            // request these
+            let parameters = ["fields": "email, first_name, last_name,  picture.type(large)"]
+
+            FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
+                if error != nil {
+                    print(error)
+                } else {
+                    
+                    guard let resultNew = result as? [String:Any] else { return }
+                    
+                    self.profileDict["firstName"] = resultNew["first_name"] as? String
+                    self.profileDict["lastName"] = resultNew["last_name"] as? String
+                    self.profileDict["email"] = resultNew["email"] as? String
+                    
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
+                }
+            })
+            
+        } else {
+            print("current access token was nil")
+        }
+    }
+    
+    func getDataFromURL(url: URL, completion: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            completion(data, response, error)
+        }.resume()
+    }
+    
+    func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {
+        
+        let contextImage = UIImage(cgImage: image.cgImage!)
+        let contextSize = contextImage.size
+        
+        var posX: CGFloat = 0.0
+        var posY: CGFloat = 0.0
+        var cgWidth = CGFloat(width)
+        var cgHeight = CGFloat(height)
+        
+        // see what size is longer and create the center off of that
+        if contextSize.width > contextSize.height {
+            posX = (contextSize.width - contextSize.height) / 2
+            posY = 0
+            cgWidth = contextSize.height
+            cgHeight = contextSize.height
+        } else {
+            posX = 0
+            posY = (contextSize.height - contextSize.width) / 2
+            cgWidth = contextSize.width
+            cgHeight = contextSize.width
+        }
+        let rect: CGRect = CGRect(x: posX, y: posY, width: cgWidth, height: cgHeight)
+        
+        // create bitmap image from context using the rect
+        let imageRef: CGImage = contextImage.cgImage!.cropping(to: rect)!
+        
+        // create a new image based on the imageRef and rotate back to the original orientation
+        let image = UIImage(cgImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
+        
+        return image
     }
 }

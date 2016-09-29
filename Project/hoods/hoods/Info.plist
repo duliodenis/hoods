@@ -75,6 +75,10 @@
 	<string>Hoods</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>fb-messenger-platform-20150305</string>
+		<string>fb-messenger-platform-20150218</string>
+		<string>fb-messenger-platform-20150128</string>
+		<string>fb</string>
 		<string>fb-messenger-api20140430</string>
 		<string>fbapi20160328</string>
 		<string>fbapi20150629</string>

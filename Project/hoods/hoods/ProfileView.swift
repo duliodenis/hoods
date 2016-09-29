@@ -20,17 +20,20 @@ class ProfileView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(updateProfile), name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
+        
         // profile properties
         layer.masksToBounds = true
         backgroundColor = UIColor.white
         
         // subview specific properties
-        profileImageView.image = cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
+        profileImageView.image = DataSource.sharedInstance.cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
+                
+        fbLoginButton.readPermissions = ["public_profile", "user_friends"]
         
-        profileFirstNameLabel.text = "Andrew"
-        profileLastNameLabel.text = "Carvajal"
+        DataSource.sharedInstance.fetchProfile()
         
         let labels = [profileFirstNameLabel, profileLastNameLabel]
         for label in labels {
@@ -53,6 +56,8 @@ class ProfileView: UIView {
     }
     
     func activateConstraintsForState(_ state: ProfileState) {
+        
+        updateProfile()
         
         // deactivate constraints
         NSLayoutConstraint.deactivate(profileConstraints)
@@ -117,37 +122,27 @@ class ProfileView: UIView {
         NSLayoutConstraint.activate(profileConstraints)
     }
     
-    fileprivate func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {
+    @objc fileprivate func updateProfile() {
         
-        let contextImage = UIImage(cgImage: image.cgImage!)
-        let contextSize = contextImage.size
-        
-        var posX: CGFloat = 0.0
-        var posY: CGFloat = 0.0
-        var cgWidth = CGFloat(width)
-        var cgHeight = CGFloat(height)
-        
-        // see what size is longer and create the center off of that
-        if contextSize.width > contextSize.height {
-            posX = (contextSize.width - contextSize.height) / 2
-            posY = 0
-            cgWidth = contextSize.height
-            cgHeight = contextSize.height
+        profileFirstNameLabel.text = DataSource.sharedInstance.profileDict["firstName"] 
+        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"]
+        if FBSDKAccessToken.current() != nil {
+            downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
         } else {
-            posX = 0
-            posY = (contextSize.height - contextSize.width) / 2
-            cgWidth = contextSize.width
-            cgHeight = contextSize.width
+            profileImageView.image = UIImage(named: "yuge")
         }
-        let rect: CGRect = CGRect(x: posX, y: posY, width: cgWidth, height: cgHeight)
+    }
+    
+    func downloadImage(url: URL) {
         
-        // create bitmap image from context using the rect
-        let imageRef: CGImage = contextImage.cgImage!.cropping(to: rect)!
-        
-        // create a new image based on the imageRef and rotate back to the original orientation
-        let image = UIImage(cgImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
-        
-        return image
+        // use passed in url to asynchronously get image and set it to profile image view
+        DataSource.sharedInstance.getDataFromURL(url: url) { (data, response, error) in
+            DispatchQueue.main.sync() { () -> Void in
+                guard let data = data, error == nil else { return }
+                print(response?.suggestedFilename ?? url.lastPathComponent)
+                self.profileImageView.image = UIImage(data: data)
+            }
+        }
     }
     
     /*
