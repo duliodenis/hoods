@@ -15,6 +15,7 @@
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
 		4942DC041D799FF000A871E7 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4942DC031D799FF000A871E7 /* ProfileView.swift */; };
 		49986BC41D672C6F00B8A312 /* nyc.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49986BC31D672C6E00B8A312 /* nyc.geojson */; };
+		49E1F2901D9AE2F400F5B8E4 /* SearchModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E1F28F1D9AE2F400F5B8E4 /* SearchModule.swift */; };
 		49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28841D5B9D58009FADF3 /* AppDelegate.swift */; };
 		49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49FB28881D5B9D58009FADF3 /* Main.storyboard */; };
 		49FB288C1D5B9D58009FADF3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49FB288B1D5B9D58009FADF3 /* Assets.xcassets */; };
@@ -37,6 +38,7 @@
 		4942DC031D799FF000A871E7 /* ProfileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		49986BC31D672C6E00B8A312 /* nyc.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nyc.geojson; sourceTree = "<group>"; };
 		49E1F28E1D9AE13000F5B8E4 /* hoods.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = hoods.entitlements; sourceTree = "<group>"; };
+		49E1F28F1D9AE2F400F5B8E4 /* SearchModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchModule.swift; sourceTree = "<group>"; };
 		49FB28811D5B9D58009FADF3 /* hoods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hoods.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49FB28841D5B9D58009FADF3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49FB28891D5B9D58009FADF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 		4907FE661D87149200629BF0 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				49E1F28F1D9AE2F400F5B8E4 /* SearchModule.swift */,
 				4907FE6D1D8716AC00629BF0 /* HoodModule.swift */,
 			);
 			name = Modules;
@@ -316,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4942DC041D799FF000A871E7 /* ProfileView.swift in Sources */,
+				49E1F2901D9AE2F400F5B8E4 /* SearchModule.swift in Sources */,
 				49FB28A01D5BDDF5009FADF3 /* MapViewController.swift in Sources */,
 				49FB28A41D5BE186009FADF3 /* CalloutViewController.swift in Sources */,
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,

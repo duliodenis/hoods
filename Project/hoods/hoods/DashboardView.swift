@@ -11,6 +11,7 @@ import UIKit
 class DashboardView: UIView {
     
     var roundedCornerRadius = CGFloat()
+    var searchModule = SearchModule()
     var hoodModule = HoodModule()
     
     override init(frame: CGRect) {
@@ -23,7 +24,7 @@ class DashboardView: UIView {
         
         backgroundColor = UIColor.white
                 
-        let views = [hoodModule]
+        let views: [ModuleView] = [searchModule, hoodModule]
         
         for view in views {
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -31,10 +32,15 @@ class DashboardView: UIView {
         }
         
         let constraints: [NSLayoutConstraint] = [
-            hoodModule.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            searchModule.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            searchModule.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            searchModule.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            searchModule.bottomAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 50),
+            
+            hoodModule.topAnchor.constraint(equalTo: searchModule.bottomAnchor),
             hoodModule.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
             hoodModule.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            hoodModule.bottomAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 50),
+            hoodModule.bottomAnchor.constraint(equalTo: searchModule.bottomAnchor, constant: 50),
         ]
         NSLayoutConstraint.activate(constraints)
     }

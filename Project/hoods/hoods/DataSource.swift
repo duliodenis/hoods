@@ -35,6 +35,7 @@ class DataSource {
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
     var profileDict = [String:String]()
+    var keyboardHeight: CGFloat = 0
     
     func currentHoodName(_ currentLocation: CLLocationCoordinate2D) -> String? {
         

@@ -15,6 +15,8 @@ class HoodModule: ModuleView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        layer.cornerRadius = 0
+        
         currentHoodLabel.adjustsFontSizeToFitWidth = true
         currentHoodLabel.font = UIFont.boldSystemFont(ofSize: 42)
         currentHoodLabel.setContentHuggingPriority(251, for: .vertical)

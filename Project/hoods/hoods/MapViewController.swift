@@ -10,7 +10,7 @@ import UIKit
 import Mapbox
 import MapKit
 
-class MapViewController: UIViewController {
+class MapViewController: UIViewController, UISearchBarDelegate {
     
     fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
@@ -19,6 +19,7 @@ class MapViewController: UIViewController {
     fileprivate var dashboardPan = UIPanGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
     fileprivate var dashboardView = DashboardView()
+    let dashboardMinimizedHeight: CGFloat = 120
     fileprivate var profileView = ProfileView()
     fileprivate var profileViewShadow = UIView()
     fileprivate var profileButton = UIButton()
@@ -47,6 +48,7 @@ class MapViewController: UIViewController {
         addFederationButton()
         addProfile()
         addDashboardView()
+        dashboardView.searchModule.searchBar.delegate = self
         addDashboardPanGestureToMap()
     }
 
@@ -106,35 +108,48 @@ class MapViewController: UIViewController {
     
     fileprivate func addDashboardView() {
         
-        dashboardView = DashboardView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
+        dashboardView = DashboardView(frame: CGRect(x: 0, y: view.frame.maxY - dashboardMinimizedHeight, width: view.frame.width, height: view.frame.height))
         dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
         view.addSubview(dashboardView)
     }
     
-    fileprivate func dashboardAnimationTo(_ topOrBottom: String, sender: UIPanGestureRecognizer) {
-        switch topOrBottom {
-        case "top":
+    fileprivate func moveDashboardTo(_ location: String, sender: UIPanGestureRecognizer) {
+        switch location {
+        case "full":
             
             self.dashboardView.animateCornerRadiusOf(self.dashboardView, fromValue: self.dashboardView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
             
             // animate the dashboard to the top
             UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
                 
-                self.dashboardView.frame = self.frameDict["dashboardViewTop"]!
+                self.dashboardView.frame = self.frameDict["dashboardViewFull"]!
                 }, completion: { (Bool) -> Void in
-                    
             })
-        case "bottom":
+        case "minimized":
             
-            if sender.location(in: mapboxView).y < frameDict["dashboardViewBottom"]!.minY {
-                self.dashboardView.animateCornerRadiusOf(dashboardView, fromValue: 0.0, toValue: self.dashboardView.roundedCornerRadius, duration: 0.5)
+            if sender.location(in: mapboxView).y < frameDict["dashboardViewMinimized"]!.minY {
+                
+                // if corner radius is not already rounded, round it
+                if self.dashboardView.layer.cornerRadius != self.dashboardView.roundedCornerRadius {
+                    self.dashboardView.animateCornerRadiusOf(dashboardView, fromValue: 0.0, toValue: self.dashboardView.roundedCornerRadius, duration: 0.5)
+                }
             }
             
-            // animate the dashboard's minY to the bottom -100
+            // hide keyboard
+            dashboardView.searchModule.searchBar.resignFirstResponder()
+            
+            // move the dashboard's minY to minimized -100
             UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
                 
-                self.dashboardView.frame = self.frameDict["dashboardViewBottom"]!
+                self.dashboardView.frame = self.frameDict["dashboardViewMinimized"]!
                 }, completion: { (Bool) -> Void in
+            })
+        case "searching":
+            
+            UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { 
+                
+                self.dashboardView.frame = self.frameDict["dashboardViewSearching"]!
+                }, completion: { (Bool) in
             })
         default: break
         }
@@ -324,6 +339,9 @@ class MapViewController: UIViewController {
                 toggleProfileSizeForState(.closed)
             }
         }
+        
+        dashboardView.searchModule.searchBar.resignFirstResponder()
+        moveDashboardTo("minimized", sender: UIPanGestureRecognizer())
     }
     
     @objc fileprivate func dashboardPanFired(_ sender: UIPanGestureRecognizer) {
@@ -339,7 +357,7 @@ class MapViewController: UIViewController {
                 
                 // pan gesture is going up at least 12
                 if translation.y <= -12 {
-                    dashboardAnimationTo("top", sender: sender)
+                    moveDashboardTo("full", sender: sender)
                     
                     // close profile
                     if DataSource.sharedInstance.profileState == .open {
@@ -348,7 +366,7 @@ class MapViewController: UIViewController {
                     
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
-                    dashboardAnimationTo("bottom", sender: sender)
+                    moveDashboardTo("minimized", sender: sender)
                 }
             }
         }
@@ -502,17 +520,21 @@ class MapViewController: UIViewController {
         // listen for "NotInAHood" notification from data source
         NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "NotInAHood"), object: nil)
         
-        // Setup offline pack notification handlers.
+        // setup offline pack notification handlers.
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackProgressDidChange), name: NSNotification.Name.MGLOfflinePackProgressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackDidReceiveError), name: NSNotification.Name.MGLOfflinePackError, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackDidReceiveMaximumAllowedMapboxTiles), name: NSNotification.Name.MGLOfflinePackMaximumMapboxTilesReached, object: nil)
+        
+        // get keyboard height
+        NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.keyboardWillChangeFrame(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
     }
     
     fileprivate func populateFrameDict() {
         
         // dashboard view
-        frameDict["dashboardViewTop"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)
-        frameDict["dashboardViewBottom"] = CGRect(x: 0, y: self.view.frame.height - 120, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["dashboardViewFull"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["dashboardViewMinimized"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["dashboardViewSearching"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight - DataSource.sharedInstance.keyboardHeight, width: self.view.frame.width, height: self.view.frame.height)
         
         // profile view
         frameDict["profileViewHidden"] = CGRect(x: -50, y: -50, width: 50, height: 50)
@@ -525,9 +547,9 @@ class MapViewController: UIViewController {
         frameDict["profileViewShadowOpen"] = CGRect(x: frameDict["profileViewOpen"]!.minX + 6, y: frameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // federation button
-        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
-        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
-        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - dashboardMinimizedHeight - 50 - 20, width: 50, height: 50)
+        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - dashboardMinimizedHeight - 50 - 20, width: 50, height: 50)
+        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - dashboardMinimizedHeight - 50 - 20 + 3, width: 50, height: 50)
         
         // federation button shadow
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: 50, height: 50)
@@ -541,6 +563,15 @@ class MapViewController: UIViewController {
     
     override var prefersStatusBarHidden : Bool {
         return true
+    }
+    
+    func keyboardWillChangeFrame(_ notification: NSNotification) {
+        if let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            let keyboardHeight = keyboardFrame.size.height
+            DataSource.sharedInstance.keyboardHeight = keyboardHeight
+            populateFrameDict()
+            moveDashboardTo("searching", sender: UIPanGestureRecognizer())
+        }
     }
 }
 
