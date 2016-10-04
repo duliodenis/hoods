@@ -51,6 +51,12 @@ class MapViewController: UIViewController, UISearchBarDelegate {
         dashboardView.searchModule.searchBar.delegate = self
         addDashboardPanGestureToMap()
     }
+    
+    func appDidBecomeActive() {
+        attemptToMoveCameraToUserLocation()
+        attemptToUpdateHoodLabel()
+        moveDashboardTo("minimized", sender: UIPanGestureRecognizer())
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -448,8 +454,24 @@ class MapViewController: UIViewController, UISearchBarDelegate {
     
 // MARK: Miscellaneous
     
+    func attemptToUpdateHoodLabel() {
+        
+        // use hood check to try and set current hood label
+        if let newLocation = DataSource.sharedInstance.currentHoodName((DataSource.sharedInstance.locationManager.location?.coordinate)!) {
+            
+            // hood check succeeded but returned blank name
+            if newLocation != "" {
+                self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+            } else {
+                self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+            }
+        } else {
+            self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+        }
+    }
+    
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
-                
+        
         // if motion was a shake and location available
         if motion == .motionShake {
             showMapIcons()
@@ -515,7 +537,7 @@ class MapViewController: UIViewController, UISearchBarDelegate {
     fileprivate func setUpNotificationCenter() {
         
         // listen for "ApplicationDidBecomeActive" notification from app delegate
-        NotificationCenter.default.addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: NSNotification.Name(rawValue: "ApplicationDidBecomeActive"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name(rawValue: "ApplicationDidBecomeActive"), object: nil)
         
         // listen for "NotInAHood" notification from data source
         NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "NotInAHood"), object: nil)
@@ -645,18 +667,7 @@ extension MapViewController: CLLocationManagerDelegate {
                         // update the area singleton
                         DataSource.sharedInstance.updateArea()
                         
-                        // use hood check to try and set current hood label
-                        if let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate) {
-                            
-                            // hood check succeeded but returned blank name
-                            if newLocation != "" {
-                                self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
-                            } else {
-                                self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
-                            }
-                        } else {
-                            self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
-                        }
+                        self.attemptToUpdateHoodLabel()
                     }
                 })
             }
