@@ -11,6 +11,8 @@ import FBSDKLoginKit
 
 class ProfileView: UIView {
     
+    var openRoundedCornerRadius = CGFloat()
+    var closedRoundedCornerRadius = CGFloat()
     var profileConstraints = [NSLayoutConstraint]()
     let profileImageView = UIImageView()
     let profileFirstNameLabel = UILabel()
@@ -23,6 +25,9 @@ class ProfileView: UIView {
         NotificationCenter.default.addObserver(self, selector: #selector(updateProfile), name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
         
         // profile properties
+        openRoundedCornerRadius = frame.size.width / 20
+        closedRoundedCornerRadius = frame.size.width / 2
+        layer.cornerRadius = closedRoundedCornerRadius
         layer.masksToBounds = true
         backgroundColor = UIColor.white
         

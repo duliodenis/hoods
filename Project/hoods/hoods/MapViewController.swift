@@ -12,20 +12,36 @@ import MapKit
 
 class MapViewController: UIViewController {
     
-    fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
-    @IBOutlet var mapboxView: MGLMapView!
-    fileprivate var hoodScanning = false
+    // gestures
     fileprivate var tap = UITapGestureRecognizer()
     fileprivate var dashboardPan = UIPanGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
+    
+    // map
+    fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
+    @IBOutlet var mapboxView: MGLMapView!
+    
+    // dashboard
     fileprivate var dashboardView = DashboardView()
+    let dashboardMinimizedHeight: CGFloat = 120
+    let padding: CGFloat = 20
+    
+    // search
+    fileprivate var searchResultsView = SearchResultsView()
+    
+    // profile
     fileprivate var profileView = ProfileView()
     fileprivate var profileViewShadow = UIView()
     fileprivate var profileButton = UIButton()
+    
+    // federation button
     fileprivate var federationButton = FederationButton()
     fileprivate var federationButtonShadow = UIView()
-    fileprivate var frameDict = [String:CGRect]()
     
+    // misc
+    fileprivate var frameDict = [String:CGRect]()
+    fileprivate var hoodScanning = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -46,8 +62,19 @@ class MapViewController: UIViewController {
         addTapGesture()
         addFederationButton()
         addProfile()
+        addSearchResultsView()
         addDashboardView()
+        dashboardView.searchModule.searchBar.delegate = self
         addDashboardPanGestureToMap()
+        
+        attemptToMoveCameraToUserLocation()
+    }
+    
+    func appDidBecomeActive() {
+        attemptToMoveCameraToUserLocation()
+        attemptToUpdateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
+        moveDashboardTo(.minimized, sender: UIPanGestureRecognizer())
+        moveSearchResultsViewTo(.minimized)
     }
 
     override func didReceiveMemoryWarning() {
@@ -106,35 +133,90 @@ class MapViewController: UIViewController {
     
     fileprivate func addDashboardView() {
         
-        dashboardView = DashboardView(frame: CGRect(x: 0, y: view.frame.maxY - 120, width: view.frame.width, height: view.frame.height))
+        dashboardView = DashboardView(frame: CGRect(x: 0, y: view.frame.maxY - dashboardMinimizedHeight, width: view.frame.width, height: view.frame.height))
         dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
         view.addSubview(dashboardView)
     }
     
-    fileprivate func dashboardAnimationTo(_ topOrBottom: String, sender: UIPanGestureRecognizer) {
-        switch topOrBottom {
-        case "top":
+    fileprivate func moveDashboardTo(_ state: DashboardState, sender: UIPanGestureRecognizer) {
+        switch state {
+        case .full:
             
-            self.dashboardView.animateCornerRadiusOf(self.dashboardView, fromValue: self.dashboardView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
+            if DataSource.sharedInstance.dashboardState != .full {
+                self.dashboardView.animateCornerRadiusOf(self.dashboardView, fromValue: self.dashboardView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
+            }
             
             // animate the dashboard to the top
             UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
                 
-                self.dashboardView.frame = self.frameDict["dashboardViewTop"]!
+                self.dashboardView.frame = self.frameDict["dashboardViewFull"]!
                 }, completion: { (Bool) -> Void in
                     
+                    // update state
+                    DataSource.sharedInstance.dashboardState = .full
             })
-        case "bottom":
+        case .minimized:
             
-            if sender.location(in: mapboxView).y < frameDict["dashboardViewBottom"]!.minY {
+            if DataSource.sharedInstance.dashboardState != .minimized {
                 self.dashboardView.animateCornerRadiusOf(dashboardView, fromValue: 0.0, toValue: self.dashboardView.roundedCornerRadius, duration: 0.5)
             }
             
-            // animate the dashboard's minY to the bottom -100
+            // hide keyboard
+            dashboardView.searchModule.searchBar.resignFirstResponder()
+            
+            // move the dashboard's minY to minimized -100
             UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
                 
-                self.dashboardView.frame = self.frameDict["dashboardViewBottom"]!
+                self.dashboardView.frame = self.frameDict["dashboardViewMinimized"]!
                 }, completion: { (Bool) -> Void in
+                    
+                    // update state
+                    DataSource.sharedInstance.dashboardState = .minimized
+            })
+        case .searching:
+            
+            UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { 
+                
+                self.dashboardView.frame = self.frameDict["dashboardViewSearching"]!
+                }, completion: { (Bool) in
+                    
+                    // update state
+                    DataSource.sharedInstance.dashboardState = .searching
+            })
+        }
+    }
+    
+// MARK: Search Results
+    
+    fileprivate func addSearchResultsView() {
+        searchResultsView = SearchResultsView(frame: frameDict["searchResultsViewMinimized"]!)
+        view.addSubview(searchResultsView)
+    }
+    
+    fileprivate func moveSearchResultsViewTo(_ state: DashboardState) {
+        switch state {
+        case .minimized:
+            
+            if DataSource.sharedInstance.dashboardState != .minimized {
+                self.searchResultsView.animateCornerRadiusOf(searchResultsView, fromValue: 0.0, toValue: self.searchResultsView.roundedCornerRadius, duration: 0.5)
+            }
+
+            
+            UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
+                
+                self.searchResultsView.frame = self.frameDict["searchResultsViewMinimized"]!
+                }, completion: { (Bool) -> Void in
+            })
+        case .searching:
+            
+            UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
+                
+                self.searchResultsView.frame = self.frameDict["searchResultsViewSearching"]!
+                }, completion: { (Bool) -> Void in
+                    
+                    if DataSource.sharedInstance.dashboardState != .searching {
+                        self.searchResultsView.animateCornerRadiusOf(self.searchResultsView, fromValue: self.searchResultsView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
+                    }
             })
         default: break
         }
@@ -146,7 +228,6 @@ class MapViewController: UIViewController {
         
         // add the profile view with profile frame CLOSED
         profileView = ProfileView(frame: frameDict["profileViewHidden"]!)
-        profileView.layer.cornerRadius = profileView.frame.width / 2
 
         // add the profile view shadow
         profileViewShadow = UIView(frame: frameDict["profileViewShadowHidden"]!)
@@ -181,6 +262,8 @@ class MapViewController: UIViewController {
         // if the pan was not in the profile pic and the profile was not closed already
         if !profileView.profileImageView.frame.contains(sender.location(in: profileView)) || DataSource.sharedInstance.profileState != .closed {
             toggleProfileSizeForState(.closed)
+            
+            self.profileView.layer.cornerRadius = self.profileView.closedRoundedCornerRadius
         }
     }
     
@@ -188,6 +271,7 @@ class MapViewController: UIViewController {
         
         if DataSource.sharedInstance.mapButtonState != .hiding {
             toggleProfileSizeForState(.open)
+            self.profileView.animateCornerRadiusOf(self.profileView, fromValue: self.profileView.openRoundedCornerRadius, toValue: 0.0, duration: 0)
         }
     }
     
@@ -288,6 +372,8 @@ class MapViewController: UIViewController {
         // if location is available
         if DataSource.sharedInstance.locationManager.location != nil {
             
+            DataSource.sharedInstance.hoodState = .currentHood
+            
             // zoom to location
             attemptToMoveCameraToUserLocation()
         }
@@ -313,6 +399,19 @@ class MapViewController: UIViewController {
     
     @objc fileprivate func tapFired(_ sender: UITapGestureRecognizer) {
         
+    // map behavior
+        
+        // get address of touch location
+        let tappedLocation = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
+        
+        // update hood state
+        DataSource.sharedInstance.hoodState = .otherHood
+        
+        // update hood module
+        attemptToUpdateHoodLabel(with: tappedLocation, fromTap: false)
+        
+    // profile behavior
+        
         // if profile is open
         if DataSource.sharedInstance.profileState == .open {
             
@@ -324,6 +423,11 @@ class MapViewController: UIViewController {
                 toggleProfileSizeForState(.closed)
             }
         }
+        
+    // dashboard behavior
+        
+        dashboardView.searchModule.searchBar.resignFirstResponder()
+        moveDashboardTo(.minimized, sender: UIPanGestureRecognizer())
     }
     
     @objc fileprivate func dashboardPanFired(_ sender: UIPanGestureRecognizer) {
@@ -339,7 +443,7 @@ class MapViewController: UIViewController {
                 
                 // pan gesture is going up at least 12
                 if translation.y <= -12 {
-                    dashboardAnimationTo("top", sender: sender)
+                    moveDashboardTo(.full, sender: sender)
                     
                     // close profile
                     if DataSource.sharedInstance.profileState == .open {
@@ -348,7 +452,8 @@ class MapViewController: UIViewController {
                     
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
-                    dashboardAnimationTo("bottom", sender: sender)
+                    moveDashboardTo(.minimized, sender: sender)
+                    moveSearchResultsViewTo(.minimized)
                 }
             }
         }
@@ -430,8 +535,40 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
-    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+    func attemptToUpdateHoodLabel(with location: CLLocationCoordinate2D, fromTap: Bool) {
+        
+        // use hood check to try and set current hood label
+        if DataSource.sharedInstance.locationManager.location != nil {
+            
+            if fromTap == true {
+                if let newLocation = DataSource.sharedInstance.tappedHoodName(location) {
+                    
+                    // hood check succeeded but returned blank name
+                    if newLocation != "" {
+                        self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+                    } else {
+                        self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                    }
+                } else {
+                    self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                }
+            }
+            if let newLocation = DataSource.sharedInstance.lastVisitedHoodName(location) {
                 
+                // hood check succeeded but returned blank name
+                if newLocation != "" {
+                    self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+                } else {
+                    self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                }
+            } else {
+                self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+            }
+        }
+    }
+    
+    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+        
         // if motion was a shake and location available
         if motion == .motionShake {
             showMapIcons()
@@ -466,7 +603,7 @@ class MapViewController: UIViewController {
     fileprivate func hideMapIcons() {
         
         // delay using timer
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(7 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)) {
             
             // if profile is not open, proceed with hiding of icons
             if DataSource.sharedInstance.profileState != .open {
@@ -497,22 +634,30 @@ class MapViewController: UIViewController {
     fileprivate func setUpNotificationCenter() {
         
         // listen for "ApplicationDidBecomeActive" notification from app delegate
-        NotificationCenter.default.addObserver(self, selector: #selector(attemptToMoveCameraToUserLocation), name: NSNotification.Name(rawValue: "ApplicationDidBecomeActive"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name(rawValue: "ApplicationDidBecomeActive"), object: nil)
         
         // listen for "NotInAHood" notification from data source
         NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "NotInAHood"), object: nil)
         
-        // Setup offline pack notification handlers.
+        // setup offline pack notification handlers.
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackProgressDidChange), name: NSNotification.Name.MGLOfflinePackProgressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackDidReceiveError), name: NSNotification.Name.MGLOfflinePackError, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackDidReceiveMaximumAllowedMapboxTiles), name: NSNotification.Name.MGLOfflinePackMaximumMapboxTilesReached, object: nil)
+        
+        // get keyboard height
+        NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.keyboardWillChangeFrame(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
     }
     
     fileprivate func populateFrameDict() {
         
         // dashboard view
-        frameDict["dashboardViewTop"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)
-        frameDict["dashboardViewBottom"] = CGRect(x: 0, y: self.view.frame.height - 120, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["dashboardViewFull"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["dashboardViewMinimized"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["dashboardViewSearching"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight - DataSource.sharedInstance.keyboardHeight, width: self.view.frame.width, height: self.view.frame.height)
+        
+        // search view
+        frameDict["searchResultsViewMinimized"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["searchResultsViewSearching"] = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
         
         // profile view
         frameDict["profileViewHidden"] = CGRect(x: -50, y: -50, width: 50, height: 50)
@@ -525,9 +670,9 @@ class MapViewController: UIViewController {
         frameDict["profileViewShadowOpen"] = CGRect(x: frameDict["profileViewOpen"]!.minX + 6, y: frameDict["profileViewOpen"]!.minY + 9, width: view.frame.width * 0.85, height: view.frame.width * 0.85)
         
         // federation button
-        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
-        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20, width: 50, height: 50)
-        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - 20, y: view.frame.height - 120 - 50 - 20 + 3, width: 50, height: 50)
+        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + 50, y: view.frame.height - dashboardMinimizedHeight - 50 - padding, width: 50, height: 50)
+        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - 50 - padding, y: view.frame.height - dashboardMinimizedHeight - 50 - padding, width: 50, height: 50)
+        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - 50 - padding, y: view.frame.height - dashboardMinimizedHeight - 50 - padding + 3, width: 50, height: 50)
         
         // federation button shadow
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: 50, height: 50)
@@ -541,6 +686,15 @@ class MapViewController: UIViewController {
     
     override var prefersStatusBarHidden : Bool {
         return true
+    }
+    
+    func keyboardWillChangeFrame(_ notification: NSNotification) {
+        if let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            let keyboardHeight = keyboardFrame.size.height
+            DataSource.sharedInstance.keyboardHeight = keyboardHeight
+            populateFrameDict()
+            moveDashboardTo(.searching, sender: UIPanGestureRecognizer())
+        }
     }
 }
 
@@ -580,9 +734,6 @@ extension MapViewController: CLLocationManagerDelegate {
             // only show user location if status is authorized when in use
             mapboxView.showsUserLocation = true
             
-            // move camera into your location
-            attemptToMoveCameraToUserLocation()
-            
         } else if status == .denied {
             
             moveCameraToManhattanAnimated(false)
@@ -614,17 +765,12 @@ extension MapViewController: CLLocationManagerDelegate {
                         // update the area singleton
                         DataSource.sharedInstance.updateArea()
                         
-                        // use hood check to try and set current hood label
-                        if let newLocation = DataSource.sharedInstance.currentHoodName(locations[0].coordinate) {
+                        if DataSource.sharedInstance.hoodState != .otherHood {
                             
-                            // hood check succeeded but returned blank name
-                            if newLocation != "" {
-                                self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
-                            } else {
-                                self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
-                            }
-                        } else {
-                            self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                            DataSource.sharedInstance.hoodState = .currentHood
+                            
+                            // update the hood label
+                            self.attemptToUpdateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
                         }
                     }
                 })
@@ -662,6 +808,13 @@ extension MapViewController: MGLMapViewDelegate {
             return CalloutViewController(representedObject: annotation)
         }
         return nil
+    }
+}
+
+extension MapViewController: UISearchBarDelegate {
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        moveSearchResultsViewTo(.searching)
     }
 }
 
