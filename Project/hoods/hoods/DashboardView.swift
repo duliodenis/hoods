@@ -17,6 +17,8 @@ class DashboardView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        DataSource.sharedInstance.dashboardState = .minimized
+        
         // rounded corners for feed view
         roundedCornerRadius = frame.size.width / 20
         layer.cornerRadius = roundedCornerRadius

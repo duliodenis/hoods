@@ -9,7 +9,7 @@
 import UIKit
 
 class SearchModule: ModuleView {
-    
+
     var searchBar = UISearchBar()
     
     override init(frame: CGRect) {
@@ -19,7 +19,7 @@ class SearchModule: ModuleView {
         
         searchBar.sizeToFit()
         searchBar.searchBarStyle = .minimal
-        searchBar.placeholder = "search an address or hood"
+        searchBar.placeholder = "Search an address or hood"
         
         let views = [searchBar]
         
