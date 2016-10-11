@@ -83,7 +83,7 @@ class DataSource {
             // get file name from location area
             lastTappedHoodName = fullHoodCheck(location, in: lastTappedArea!)
         } else {
-            print("Not a supported hood")
+            print("You just tapped an unsupported hood.")
         }
         return lastTappedHoodName
     }
