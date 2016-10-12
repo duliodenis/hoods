@@ -58,19 +58,23 @@ class DataSource {
         if stillInTheHood(location) == false {
             
             // if last area is a supported area
-            if geoJSONFile(for: lastVisitedArea!) != "" {
+            if lastVisitedArea != nil {
                 
-                // check through all hood polygons for your coords and update last hood name (last polygon renderer gets updated too)
-                lastVisitedHoodName = fullHoodCheck(location, in: lastVisitedArea!)
-                
-                // if in a supported area, but hood check failed, stop scanning
-                if lastVisitedHoodName == "" {
+                // if geoJSON file found for last visited area
+                if geoJSONFile(for: lastVisitedArea!) != "" {
+                    
+                    // check through all hood polygons for your coords and update last hood name (last polygon renderer gets updated too)
+                    lastVisitedHoodName = fullHoodCheck(location, in: lastVisitedArea!)
+                    
+                    // if in a supported area, but hood check failed, stop scanning
+                    if lastVisitedHoodName == "" {
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
+                    }
+                    
+                    // else last area is not a supported area
+                } else {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
                 }
-                
-            // else last area is not a supported area
-            } else {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
             }
         }
         return lastVisitedHoodName

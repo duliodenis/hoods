@@ -123,12 +123,6 @@
 			children = (
 				49FB288D1D5B9D58009FADF3 /* LaunchScreen.storyboard */,
 				49FB28881D5B9D58009FADF3 /* Main.storyboard */,
-				4942DC031D799FF000A871E7 /* ProfileView.swift */,
-				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
-				49FB28A71D5C2016009FADF3 /* DashboardView.swift */,
-				49CB83761DA3E3DD00A99C98 /* SearchResultsView.swift */,
-				4907FE6B1D87168200629BF0 /* ModuleView.swift */,
-				4907FE661D87149200629BF0 /* Modules */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -137,8 +131,14 @@
 			isa = PBXGroup;
 			children = (
 				49FB289F1D5BDDF5009FADF3 /* MapViewController.swift */,
+				49FB28A71D5C2016009FADF3 /* DashboardView.swift */,
+				49CB83761DA3E3DD00A99C98 /* SearchResultsView.swift */,
+				4942DC031D799FF000A871E7 /* ProfileView.swift */,
+				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 				49FB28A11D5BE137009FADF3 /* Annotation.swift */,
 				49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */,
+				4907FE6B1D87168200629BF0 /* ModuleView.swift */,
+				4907FE661D87149200629BF0 /* Modules */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
