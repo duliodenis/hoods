@@ -1,55 +1,30 @@
 # Hoods
 
-Hoods is a geofencing real-time social network. This is the White Label product.
+*NYC and San Francisco*
 
-##Local ads
+## The Goal
 
-Activated when you enter the hood the business is in
+The solution for hosting, organizing, finding and enhancing parties
 
-Types of ads:
+## The App
 
-Picture
+A map-based mobile app using Facebook accounts with hood chat, public/private party hosting with video story/chat, group live location with video story/chat, and Apple Wallet pass for party entrance.
 
-Gif
-
-Video
-
-
-## Feature List
-
-Full version
-
-1. Mapbox-powered map with hoods, subways, geofencing detection, etc
-2. Hood name
-3. Hood weather
-4. Top five posts collection view
-5. Hood feed with upvotes/downvotes
-6. Party hosting (public/private) with live annotation visible to others
-7. Party feed (comments, posts and story) with upvotes/downvotes
-8. Tiered local ads shown in hood (pic/gif/video)
-9. Ranking system to gain abilities: host a party, etc
-
-MVP
-
-1. Mapbox-powered map with hoods, subways, geofencing detection, etc
-2. Hood name
-3. Hood weather
-4. Top five posts collection view
-5. Hood feed with upvotes/downvotes
-6. Communicate with your Facebook friends in your Hood
-
-App Update for Parties
-
-1. Party hosting (public/private) with live annotation visible to others
-2. Party feed (comments, posts and story) with upvotes/downvotes
-3. Ranking system to gain abilities: host a party, etc
+## MVP
+1. map view with neighborhoods, parties, POIs, group locations, group icon, federation button, profile, search
+2. party view with name, description, host, friends going, date, cover, amenities, uber, directions, rsvp, story, chat
+3. my profile view with pics, history, trophies, wallet pass/ticket
+4. profile view with pics, history, trophies, friend request, report
+5. group view with story, friends, chat
+6. hood view with friends, chat, weather
+7. calendar view
 
 ## Mockup
 
-![](Design/HoodsMockup.png?raw=true)
+Coming soon.
 
 ## Tagline
-Gather
+It's party time.
 
 Network  | Account
 ------------- | -------------
@@ -57,7 +32,7 @@ Andrew | andrew@yugetech.com
 Dulio | dulio@yugetech.com
 Twitter | [@yugeafterparty](https://twitter.com/yugeafterparty)
 App Website | [yugeafter.party](http://yugeafter.party)
-AppStore | Hoods - Chat in your Hood
+AppStore | Hoods - It's Party Time - Host, Organize, and Join Parties in your Area
 
 
 ### Support or Contact
