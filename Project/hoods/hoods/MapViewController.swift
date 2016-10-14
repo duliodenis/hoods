@@ -400,7 +400,7 @@ class MapViewController: UIViewController {
 
         dashboardPan = UIPanGestureRecognizer(target: self, action: #selector(MapViewController.dashboardPanFired(_:)))
         dashboardPan.delegate = self
-        mapboxView.addGestureRecognizer(dashboardPan)
+        view.addGestureRecognizer(dashboardPan)
     }
     
     @objc fileprivate func tapFired(_ sender: UITapGestureRecognizer) {
@@ -432,6 +432,7 @@ class MapViewController: UIViewController {
         
     // dashboard behavior
         
+        // hide keyboard and minimized dashboard
         dashboardView.searchModule.searchBar.resignFirstResponder()
         moveDashboardTo(.minimized, sender: UIPanGestureRecognizer())
     }
@@ -458,6 +459,9 @@ class MapViewController: UIViewController {
                     
                     // hide keyboard
                     dashboardView.searchModule.searchBar.resignFirstResponder()
+                    
+                    // hide search results view
+                    moveSearchResultsViewTo(.minimized)
 
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
@@ -665,7 +669,7 @@ class MapViewController: UIViewController {
         frameDict["dashboardViewSearching"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight - DataSource.sharedInstance.keyboardHeight, width: self.view.frame.width, height: self.view.frame.height)
         
         // search view
-        frameDict["searchResultsViewMinimized"] = CGRect(x: 0, y: self.view.frame.height - dashboardMinimizedHeight, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["searchResultsViewMinimized"] = CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: self.view.frame.height)
         frameDict["searchResultsViewSearching"] = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
         
         // profile view
@@ -717,7 +721,7 @@ extension MapViewController: UIGestureRecognizerDelegate {
         if gestureRecognizer == dashboardPan {
             
             // if touch is not in dashboard, let gesture pass through to map
-            if !dashboardView.frame.contains(touch.location(in: view)) {
+            if !dashboardView.frame.contains(touch.location(in: view)) && !searchResultsView.frame.contains(touch.location(in: view)) {
                 return false
             }
         }
