@@ -64,8 +64,9 @@ class MapViewController: UIViewController {
         addProfile()
         addSearchResultsView()
         addDashboardView()
-        dashboardView.searchModule.searchBar.delegate = self
         addDashboardPanGestureToMap()
+        
+        dashboardView.searchModule.searchBar.delegate = self
         
         attemptToMoveCameraToUserLocation()
     }
@@ -142,21 +143,23 @@ class MapViewController: UIViewController {
         switch state {
         case .full:
             
-            if DataSource.sharedInstance.dashboardState != .full {
-                self.dashboardView.animateCornerRadiusOf(self.dashboardView, fromValue: self.dashboardView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
-            }
-            
             // animate the dashboard to the top
             UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
                 
                 self.dashboardView.frame = self.frameDict["dashboardViewFull"]!
                 }, completion: { (Bool) -> Void in
                     
-                    // update state
+                    // sharpen dashboard corners
+                    if DataSource.sharedInstance.dashboardState != .full {
+                        self.dashboardView.animateCornerRadiusOf(self.dashboardView, fromValue: self.dashboardView.roundedCornerRadius, toValue: 0.0, duration: 1)
+                    }
+                    
+                    // update state last
                     DataSource.sharedInstance.dashboardState = .full
             })
         case .minimized:
             
+            // round dashboard corners
             if DataSource.sharedInstance.dashboardState != .minimized {
                 self.dashboardView.animateCornerRadiusOf(dashboardView, fromValue: 0.0, toValue: self.dashboardView.roundedCornerRadius, duration: 0.5)
             }
@@ -170,7 +173,7 @@ class MapViewController: UIViewController {
                 self.dashboardView.frame = self.frameDict["dashboardViewMinimized"]!
                 }, completion: { (Bool) -> Void in
                     
-                    // update state
+                    // update state last
                     DataSource.sharedInstance.dashboardState = .minimized
             })
         case .searching:
@@ -197,6 +200,7 @@ class MapViewController: UIViewController {
         switch state {
         case .minimized:
             
+            // round search results corners
             if DataSource.sharedInstance.dashboardState != .minimized {
                 self.searchResultsView.animateCornerRadiusOf(searchResultsView, fromValue: 0.0, toValue: self.searchResultsView.roundedCornerRadius, duration: 0.5)
             }
@@ -207,6 +211,7 @@ class MapViewController: UIViewController {
                 self.searchResultsView.frame = self.frameDict["searchResultsViewMinimized"]!
                 }, completion: { (Bool) -> Void in
             })
+            
         case .searching:
             
             UIView.animate(withDuration: 0.426, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: { () -> Void in
@@ -214,6 +219,7 @@ class MapViewController: UIViewController {
                 self.searchResultsView.frame = self.frameDict["searchResultsViewSearching"]!
                 }, completion: { (Bool) -> Void in
                     
+                    // sharpen search results corners
                     if DataSource.sharedInstance.dashboardState != .searching {
                         self.searchResultsView.animateCornerRadiusOf(self.searchResultsView, fromValue: self.searchResultsView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
                     }
@@ -337,7 +343,7 @@ class MapViewController: UIViewController {
         // button
         let federationButtonSize = CGSize(width: 50, height: 50)
         federationButton = FederationButton(frame: frameDict["federationButtonHidden"]!)
-        federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), for: .touchUpInside)
+        federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), for: .touchDown)
         
         // shadow
         federationButtonShadow = UIView(frame: frameDict["federationButtonShadowHidden"]!)
@@ -351,23 +357,23 @@ class MapViewController: UIViewController {
     
     @objc fileprivate func federationButtonTapped(_ sender: UIButton) {
         
-        // close profile
-        if DataSource.sharedInstance.profileState == .open {
-            toggleProfileSizeForState(.closed)
-        }
-        
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
         UIView.animate(withDuration: 0.1, animations: {
             self.federationButton.backgroundColor = UIColor.black
             self.federationButton.frame = self.frameDict["federationButtonTapped"]!
             self.federationButtonShadow.frame = self.frameDict["federationButtonShadowTapped"]!
-        }, completion: { (Bool) in
-            UIView.animate(withDuration: 0.2, animations: {
-                self.federationButton.frame = self.frameDict["federationButtonNormal"]!
-                self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
-            })
-        }) 
+            }, completion: { (Bool) in
+                UIView.animate(withDuration: 0.2, animations: {
+                    self.federationButton.frame = self.frameDict["federationButtonNormal"]!
+                    self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
+                })
+        })
+        
+        // close profile
+        if DataSource.sharedInstance.profileState == .open {
+            toggleProfileSizeForState(.closed)
+        }
         
         // if location is available
         if DataSource.sharedInstance.locationManager.location != nil {
@@ -450,6 +456,9 @@ class MapViewController: UIViewController {
                         toggleProfileSizeForState(.closed)
                     }
                     
+                    // hide keyboard
+                    dashboardView.searchModule.searchBar.resignFirstResponder()
+
                 // pan gesture is going down at least 12
                 } else if translation.y >= 12 {
                     moveDashboardTo(.minimized, sender: sender)

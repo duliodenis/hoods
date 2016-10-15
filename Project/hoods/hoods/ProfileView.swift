@@ -144,7 +144,7 @@ class ProfileView: UIView {
         DataSource.sharedInstance.getDataFromURL(url: url) { (data, response, error) in
             DispatchQueue.main.sync() { () -> Void in
                 guard let data = data, error == nil else { return }
-                print(response?.suggestedFilename ?? url.lastPathComponent)
+//                print(response?.suggestedFilename ?? url.lastPathComponent)
                 self.profileImageView.image = UIImage(data: data)
             }
         }
