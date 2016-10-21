@@ -16,7 +16,6 @@ class SearchResultsView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        // rounded corners for search view
         roundedCornerRadius = frame.size.width / 20
         layer.cornerRadius = roundedCornerRadius
         layer.masksToBounds = true

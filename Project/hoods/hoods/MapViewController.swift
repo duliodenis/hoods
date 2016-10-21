@@ -21,9 +21,12 @@ class MapViewController: UIViewController {
     fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
     
+    // hood
+    fileprivate var hoodView = HoodView()
+    
     // dashboard
     fileprivate var dashboardView = DashboardView()
-    let dashboardMinimizedHeight: CGFloat = 120
+    let dashboardMinimizedHeight: CGFloat = 70
     let padding: CGFloat = 20
     
     // search
@@ -63,6 +66,7 @@ class MapViewController: UIViewController {
         addFederationButton()
         addProfile()
         addSearchResultsView()
+        addHoodView()
         addDashboardView()
         addDashboardPanGestureToMap()
         
@@ -130,12 +134,20 @@ class MapViewController: UIViewController {
         }
     }
     
+// MARK: Hood View
+    
+    fileprivate func addHoodView() {
+        
+        hoodView = HoodView(frame: frameDict["hoodView"]!)
+        hoodView.currentHoodLabel.text = "Hoods"
+        view.addSubview(hoodView)
+    }
+    
 // MARK: Dashboard
     
     fileprivate func addDashboardView() {
         
-        dashboardView = DashboardView(frame: CGRect(x: 0, y: view.frame.maxY - dashboardMinimizedHeight, width: view.frame.width, height: view.frame.height))
-        dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+        dashboardView = DashboardView(frame: frameDict["dashboardViewMinimized"]!)
         view.addSubview(dashboardView)
     }
     
@@ -202,6 +214,7 @@ class MapViewController: UIViewController {
             
             // round search results corners
             if DataSource.sharedInstance.dashboardState != .minimized {
+                self.hoodView.animateCornerRadiusOf(hoodView, fromValue: 0.0, toValue: self.hoodView.roundedCornerRadius, duration: 0.5)
                 self.searchResultsView.animateCornerRadiusOf(searchResultsView, fromValue: 0.0, toValue: self.searchResultsView.roundedCornerRadius, duration: 0.5)
             }
 
@@ -221,6 +234,7 @@ class MapViewController: UIViewController {
                     
                     // sharpen search results corners
                     if DataSource.sharedInstance.dashboardState != .searching {
+                        self.hoodView.animateCornerRadiusOf(self.hoodView, fromValue: self.hoodView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
                         self.searchResultsView.animateCornerRadiusOf(self.searchResultsView, fromValue: self.searchResultsView.roundedCornerRadius, toValue: 0.0, duration: 0.5)
                     }
             })
@@ -558,24 +572,24 @@ class MapViewController: UIViewController {
                     
                     // hood check succeeded but returned blank name
                     if newLocation != "" {
-                        self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+                        self.hoodView.currentHoodLabel.text = newLocation
                     } else {
-                        self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                        self.hoodView.currentHoodLabel.text = "Hoods"
                     }
                 } else {
-                    self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                    self.hoodView.currentHoodLabel.text = "Hoods"
                 }
             }
             if let newLocation = DataSource.sharedInstance.lastVisitedHoodName(location) {
                 
                 // hood check succeeded but returned blank name
                 if newLocation != "" {
-                    self.dashboardView.hoodModule.currentHoodLabel.text = newLocation
+                    self.hoodView.currentHoodLabel.text = newLocation
                 } else {
-                    self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                    self.hoodView.currentHoodLabel.text = "Hoods"
                 }
             } else {
-                self.dashboardView.hoodModule.currentHoodLabel.text = "Hoods"
+                self.hoodView.currentHoodLabel.text = "Hoods"
             }
         }
     }
@@ -629,6 +643,7 @@ class MapViewController: UIViewController {
                     if DataSource.sharedInstance.profileState == .open {
                         self.toggleProfileSizeForState(.closed)
                     }
+                    
                     self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
                     self.profileView.frame = self.frameDict["profileViewHidden"]!
                     self.profileButton.frame = self.frameDict["profileViewHidden"]!
@@ -661,7 +676,13 @@ class MapViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.keyboardWillChangeFrame(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
     }
     
+// MARK: Frame Dict
+    
     fileprivate func populateFrameDict() {
+        
+        // hood view
+        
+        frameDict["hoodView"] = CGRect(x: 0, y: -padding, width: self.view.frame.width, height: dashboardMinimizedHeight + padding)
         
         // dashboard view
         frameDict["dashboardViewFull"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)
@@ -670,11 +691,11 @@ class MapViewController: UIViewController {
         
         // search view
         frameDict["searchResultsViewMinimized"] = CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: self.view.frame.height)
-        frameDict["searchResultsViewSearching"] = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+        frameDict["searchResultsViewSearching"] = CGRect(x: 0, y: frameDict["hoodView"]!.maxY, width: self.view.frame.width, height: self.view.frame.height)
         
         // profile view
-        frameDict["profileViewHidden"] = CGRect(x: -50, y: -50, width: 50, height: 50)
-        frameDict["profileViewClosed"] = CGRect(x: 15, y: 15, width: 50, height: 50)
+        frameDict["profileViewHidden"] = CGRect(x: -60, y: frameDict["hoodView"]!.maxY - 60, width: 50, height: 50)
+        frameDict["profileViewClosed"] = CGRect(x: 15, y: frameDict["hoodView"]!.maxY + 15, width: 50, height: 50)
         frameDict["profileViewOpen"] = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
         
         // profile view shadow

@@ -19,7 +19,7 @@ class SearchModule: ModuleView {
         
         searchBar.sizeToFit()
         searchBar.searchBarStyle = .minimal
-        searchBar.placeholder = "Search an address or hood"
+        searchBar.placeholder = "What do you want to see?"
         
         let views = [searchBar]
         

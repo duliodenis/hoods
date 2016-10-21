@@ -12,21 +12,20 @@ class DashboardView: UIView {
     
     var roundedCornerRadius = CGFloat()
     var searchModule = SearchModule()
-    var hoodModule = HoodModule()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         DataSource.sharedInstance.dashboardState = .minimized
         
-        // rounded corners for feed view
+        // rounded corners
         roundedCornerRadius = frame.size.width / 20
         layer.cornerRadius = roundedCornerRadius
         layer.masksToBounds = true
         
         backgroundColor = UIColor.white
                 
-        let views: [ModuleView] = [searchModule, hoodModule]
+        let views: [ModuleView] = [searchModule]
         
         for view in views {
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -37,12 +36,7 @@ class DashboardView: UIView {
             searchModule.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
             searchModule.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
             searchModule.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            searchModule.bottomAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 50),
-            
-            hoodModule.topAnchor.constraint(equalTo: searchModule.bottomAnchor),
-            hoodModule.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
-            hoodModule.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            hoodModule.bottomAnchor.constraint(equalTo: searchModule.bottomAnchor, constant: 50),
+            searchModule.bottomAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 50)
         ]
         NSLayoutConstraint.activate(constraints)
     }
