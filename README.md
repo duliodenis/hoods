@@ -4,27 +4,45 @@
 
 ## The Goal
 
-The solution for hosting, organizing, finding and enhancing parties
+The solution for finding specific content in an area
 
 ## The App
 
-A map-based mobile app using Facebook accounts with hood chat, public/private party hosting with video story/chat, group live location with video story/chat, and Apple Wallet pass for party entrance.
+Sharing of everything with your facebook friends on a map
 
-## MVP
-1. map view with neighborhoods, parties, POIs, group locations, group icon, federation button, profile, search
-2. party view with name, description, host, friends going, date, cover, amenities, uber, directions, rsvp, story, chat
-3. my profile view with pics, history, trophies, wallet pass/ticket
-4. profile view with pics, history, trophies, friend request, report
-5. group view with story, friends, chat
-6. hood view with friends, chat, weather
-7. calendar view
+# Phase One - Gather Media
+Post location-based pics, gifs, and videos to the map with tags.
+See what your facebook friends posted today.
+
+(TBD)
+Post live videos, found animals, etc.
+
+(Phase Two)
+POI Reviews
+
+# Phase Two - Enable Search and Ads
+POIs become available and can be reviewed by you and your facebook friends.
+Long queries with multiple parameters to get specific results:
+"pizza"(tag) in "Lower East Side"(hood) (POIs that sell pizza)
+"lightbulbs"(tag) (POIs that sell lightbulbs near current location)
+"pics"(media) of "pizza"(tag) at "Dominos"(POI) in "St. George, Staten Island"(hood)
+"gifs"(media) of "butts"(tag) in "Times Square"(hood)
+"live video"(media) in "SoHo"(hood)
+"reviews"(media) of "lobster"(tag)
+
+Opportunities for ads:
+Pins that appear for purchased duration and/or appear when nearby
+Multiple formats (priced accordingly): pic/gif/video/party
+Deals
+
+# Phase Three - Events and Parties
+Private/public/sponsored events and parties
 
 ## Mockup
-
 Coming soon.
 
 ## Tagline
-It's party time.
+Everything Google Maps won't show you.
 
 Network  | Account
 ------------- | -------------
@@ -32,7 +50,7 @@ Andrew | andrew@yugetech.com
 Dulio | dulio@yugetech.com
 Twitter | [@yugeafterparty](https://twitter.com/yugeafterparty)
 App Website | [yugeafter.party](http://yugeafter.party)
-AppStore | Hoods - It's Party Time - Host, Organize, and Join Parties in your Area
+AppStore | Hoods - See everything in your neighborhood.
 
 
 ### Support or Contact
