@@ -580,6 +580,7 @@ class MapViewController: UIViewController {
                     self.hoodView.currentHoodLabel.text = "Hoods"
                 }
             }
+            
             if let newLocation = DataSource.sharedInstance.lastVisitedHoodName(location) {
                 
                 // hood check succeeded but returned blank name
@@ -682,7 +683,7 @@ class MapViewController: UIViewController {
         
         // hood view
         
-        frameDict["hoodView"] = CGRect(x: 0, y: -padding, width: self.view.frame.width, height: dashboardMinimizedHeight + padding)
+        frameDict["hoodView"] = CGRect(x: 0, y: -padding, width: self.view.frame.width, height: (dashboardMinimizedHeight * 0.88) + padding)
         
         // dashboard view
         frameDict["dashboardViewFull"] = CGRect(x: 0, y: self.view.frame.origin.y, width: self.view.frame.width, height: self.view.frame.height)

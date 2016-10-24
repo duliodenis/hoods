@@ -42,7 +42,7 @@ class DataSource {
     var lastTappedHoodName: String?
     var lastVisitedPolygonRenderer: MKPolygonRenderer?
     var lastPlacemark: CLPlacemark?
-    var calloutRepresentedObjectTitle = ""
+    var calloutRepresentedObject: MGLAnnotation?
     var lastVisitedArea: String?
     var lastTappedArea: String?
     var hoodState: HoodState?

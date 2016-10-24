@@ -8,6 +8,7 @@
 
 import UIKit
 import FBSDKCoreKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
@@ -45,6 +46,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
         DataSource.sharedInstance.locationManager.requestWhenInUseAuthorization()
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        FIRApp.configure()
 
         return true
     }
