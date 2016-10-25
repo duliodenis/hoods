@@ -19,13 +19,9 @@ Post location-based pics, gifs, and videos to the map with tags.
 
 See what your facebook friends posted today.
 
-(TBD)
+(TBD) Post live videos, found animals, etc.
 
-Post live videos, found animals, etc.
-
-(Phase Two)
-
-POI Reviews
+(Phase Two) POI Reviews
 
 
 # Phase Two - Enable Search and Ads
