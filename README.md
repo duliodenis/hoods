@@ -10,23 +10,23 @@ The solution for finding specific content in an area
 
 ## The App
 
-Sharing of everything with your facebook friends on a map
+Map with facebook friends to share location-based content
 
 
 # Phase One - Gather Media
 
-Post location-based pics, gifs, and videos to the map with tags.
+Posting of location-based pics, gifs, and videos to the map with tags.
 
-See what your facebook friends posted today.
+Ephemeral content from facebook friends appears by default on map.
 
-*(TBD)* Post live videos, found animals, etc.
+*(TBD)* Posting of live videos, found animals, and more location-based content to map.
 
-*(Phase Two)* POI Reviews
+*(Phase Two)* Posting of POI reviews to map.
 
 
 # Phase Two - Enable Search and Ads
 
-POIs become available and can be reviewed by you and your facebook friends.
+POIs become available and can be reviewed.
 
 Long queries with multiple parameters to get specific results:
 
@@ -44,11 +44,13 @@ Long queries with multiple parameters to get specific results:
 
 ## Opportunities for ads:
 
-Pins that appear for purchased duration and/or appear when nearby
+Pins that appear for purchased duration
 
-Multiple formats: **pic**/**gif**/**video**/**party**
+Pins that appear when POI radius is entered
 
 Deals
+
+Multiple ad formats: **pic**/**gif**/**video**/**party**
 
 
 # Phase Three - Events and Parties
