@@ -19,9 +19,9 @@ Post location-based pics, gifs, and videos to the map with tags.
 
 See what your facebook friends posted today.
 
-(TBD) Post live videos, found animals, etc.
+*(TBD)* Post live videos, found animals, etc.
 
-(Phase Two) POI Reviews
+*(Phase Two)* POI Reviews
 
 
 # Phase Two - Enable Search and Ads
@@ -30,23 +30,23 @@ POIs become available and can be reviewed by you and your facebook friends.
 
 Long queries with multiple parameters to get specific results:
 
-"pizza"(tag) in "Lower East Side"(hood) (POIs that sell pizza)
+**"pizza"**(tag) in **"Lower East Side"**(hood) *POIs that sell pizza*
 
-"lightbulbs"(tag) (POIs that sell lightbulbs near current location)
+**"lightbulbs"**(tag) *POIs that sell lightbulbs near current location*
 
-"pics"(media) of "pizza"(tag) at "Dominos"(POI) in "St. George, Staten Island"(hood)
+**"pics"**(media) of **"pizza"**(tag) at **"Dominos"**(POI) in **"St. George, Staten Island"**(hood)
 
-"gifs"(media) of "butts"(tag) in "Times Square"(hood)
+**"gifs"**(media) of **"butts"**(tag) in **"Times Square"**(hood)
 
-"live video"(media) in "SoHo"(hood)
+**"live video"**(media) in **"SoHo"**(hood)
 
-"reviews"(media) of "lobster"(tag)
+**"reviews"**(media) of **"lobster"**(tag)
 
 ## Opportunities for ads:
 
 Pins that appear for purchased duration and/or appear when nearby
 
-Multiple formats: pic/gif/video/party
+Multiple formats: **pic**/**gif**/**video**/**party**
 
 Deals
 
