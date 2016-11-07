@@ -1,71 +1,67 @@
 # Hoods
 
-*NYC and San Francisco*
+New York City
 
+San Francisco
 
 ## The Goal
 
-The solution for finding specific content in an area
+Provide the fastest way of finding location-based media.
 
 
 ## The App
 
-Map with facebook friends to share location-based content
+A map showing friends' location-based media with the ability to search for everyone's public media
 
 
-# Phase One - Gather Media
+# Abilities
 
-Posting of location-based pics, gifs, and videos to the map with tags.
+Post location-based media to the map with tags.
 
-Ephemeral content from facebook friends appears by default on map.
+See ephemeral media from friends on the map.
 
-*(TBD)* Posting of live videos, found animals, and more location-based content to map.
-
-*(Phase Two)* Posting of POI reviews to map.
+Search for specific content with Boolean search.
 
 
-# Phase Two - Enable Search and Ads
+# Structure of a Boolean Search
 
-POIs become available and can be reviewed.
+**media** of **tag** at **POI** in **location** during **time or event** with **person(s)**
+
+
+# Types of Media
+
+**MVP:** picture, gif, video, POI review
+
+**2.0:** party
+
+
+# Boolean Search Examples
 
 Long queries with multiple parameters to get specific results:
 
-**"pizza"**(tag) in **"Lower East Side"**(hood) *POIs that sell pizza*
+**pizza** in **Lower East Side** *POIs that sell pizza*
 
-**"lightbulbs"**(tag) *POIs that sell lightbulbs near current location*
+**lightbulbs** *POIs that sell lightbulbs near current location*
 
-**"pics"**(media) of **"pizza"**(tag) at **"Dominos"**(POI) in **"St. George, Staten Island"**(hood)
+**pics** of **pizza** at **Dominos** in **St. George, Staten Island**
 
-**"gifs"**(media) of **"butts"**(tag) in **"Times Square"**(hood)
+**gifs** of **butts** in **Times Square**
 
-**"live video"**(media) in **"SoHo"**(hood)
+**live video** in **SoHo**
 
-**"reviews"**(media) of **"lobster"**(tag)
+**reviews** of **lobster**
 
-## Opportunities for ads:
+
+## Ads:
 
 Pins that appear for purchased duration
 
-Pins that appear when POI radius is entered
+Pins that appear when radius is entered
 
 Deals
 
-Multiple ad formats: **pic**/**gif**/**video**/**party**
+Ad formats: **pic**/**gif**/**video**/**party**
 
-
-# Phase Three - Events and Parties
-
-Private/public/sponsored events and parties
-
-
-## Mockup
-
-Coming soon.
-
-
-## Tagline
-
-Everything Google Maps won't show you.
 
 Network  | Account
 ------------- | -------------
