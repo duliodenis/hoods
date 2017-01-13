@@ -133,9 +133,9 @@
 			children = (
 				49FB289F1D5BDDF5009FADF3 /* MapViewController.swift */,
 				49AD0FA61DBA393800531AA1 /* HoodView.swift */,
+				4942DC031D799FF000A871E7 /* ProfileView.swift */,
 				49FB28A71D5C2016009FADF3 /* DashboardView.swift */,
 				49CB83761DA3E3DD00A99C98 /* SearchResultsView.swift */,
-				4942DC031D799FF000A871E7 /* ProfileView.swift */,
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 				49FB28A11D5BE137009FADF3 /* Annotation.swift */,
 				49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */,
@@ -198,12 +198,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 49FB28931D5B9D58009FADF3 /* Build configuration list for PBXNativeTarget "hoods" */;
 			buildPhases = (
-				FC77302594D15B8551EAC981 /* 📦 Check Pods Manifest.lock */,
+				FC77302594D15B8551EAC981 /* [CP] Check Pods Manifest.lock */,
 				49FB287D1D5B9D58009FADF3 /* Sources */,
 				49FB287E1D5B9D58009FADF3 /* Frameworks */,
 				49FB287F1D5B9D58009FADF3 /* Resources */,
-				BB8A1191F9419FD62B1FEF11 /* 📦 Embed Pods Frameworks */,
-				E319B62E1CFD91967BFCB7CA /* 📦 Copy Pods Resources */,
+				BB8A1191F9419FD62B1FEF11 /* [CP] Embed Pods Frameworks */,
+				E319B62E1CFD91967BFCB7CA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -273,14 +273,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BB8A1191F9419FD62B1FEF11 /* 📦 Embed Pods Frameworks */ = {
+		BB8A1191F9419FD62B1FEF11 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,14 +288,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-hoods/Pods-hoods-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E319B62E1CFD91967BFCB7CA /* 📦 Copy Pods Resources */ = {
+		E319B62E1CFD91967BFCB7CA /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -303,19 +303,19 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-hoods/Pods-hoods-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FC77302594D15B8551EAC981 /* 📦 Check Pods Manifest.lock */ = {
+		FC77302594D15B8551EAC981 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -458,6 +458,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = hoods/hoods.entitlements;
+				DEVELOPMENT_TEAM = 43B5CQKAZ4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -476,6 +477,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = hoods/hoods.entitlements;
+				DEVELOPMENT_TEAM = 43B5CQKAZ4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

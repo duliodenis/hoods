@@ -8,7 +8,6 @@
 
 import UIKit
 import FBSDKCoreKit
-import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
@@ -47,8 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
-        FIRApp.configure()
-
         return true
     }
 

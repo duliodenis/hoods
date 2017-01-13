@@ -223,7 +223,7 @@ class DataSource {
 
             FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
                 if error != nil {
-                    print(error)
+                    print(error as Any)
                 } else {
                     
                     guard let resultNew = result as? [String:Any] else { return }
@@ -237,7 +237,7 @@ class DataSource {
             })
             
         } else {
-            print("current access token was nil")
+            print("The current access token is nil.")
         }
     }
     

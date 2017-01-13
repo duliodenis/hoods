@@ -6,7 +6,6 @@ use_frameworks!
 
 pod 'Mapbox-iOS-SDK'
 pod 'FBSDKLoginKit'
-pod 'Firebase/Core'
 
 end
 
