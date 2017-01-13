@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */; };
 		4907FE6C1D87168200629BF0 /* ModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4907FE6B1D87168200629BF0 /* ModuleView.swift */; };
+		490BD1A21E298D9B0042FBE7 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490BD1A11E298D9B0042FBE7 /* CameraView.swift */; };
 		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
 		490CAD451D715662003E9B34 /* manhattan.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD441D715662003E9B34 /* manhattan.geojson */; };
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
@@ -16,7 +17,6 @@
 		49986BC41D672C6F00B8A312 /* nyc.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 49986BC31D672C6E00B8A312 /* nyc.geojson */; };
 		49AD0FA51DB6830F00531AA1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 49AD0FA41DB6830F00531AA1 /* GoogleService-Info.plist */; };
 		49AD0FA71DBA393800531AA1 /* HoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AD0FA61DBA393800531AA1 /* HoodView.swift */; };
-		49CB83771DA3E3DD00A99C98 /* SearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49CB83761DA3E3DD00A99C98 /* SearchResultsView.swift */; };
 		49E1F2901D9AE2F400F5B8E4 /* SearchModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E1F28F1D9AE2F400F5B8E4 /* SearchModule.swift */; };
 		49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28841D5B9D58009FADF3 /* AppDelegate.swift */; };
 		49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49FB28881D5B9D58009FADF3 /* Main.storyboard */; };
@@ -27,12 +27,12 @@
 		49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A11D5BE137009FADF3 /* Annotation.swift */; };
 		49FB28A41D5BE186009FADF3 /* CalloutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */; };
 		49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A51D5BE1DD009FADF3 /* DataSource.swift */; };
-		49FB28A81D5C2016009FADF3 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28A71D5C2016009FADF3 /* DashboardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hoods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4907FE6B1D87168200629BF0 /* ModuleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleView.swift; sourceTree = "<group>"; };
+		490BD1A11E298D9B0042FBE7 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
 		490CAD441D715662003E9B34 /* manhattan.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manhattan.geojson; sourceTree = "<group>"; };
 		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
@@ -40,7 +40,6 @@
 		49986BC31D672C6E00B8A312 /* nyc.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nyc.geojson; sourceTree = "<group>"; };
 		49AD0FA41DB6830F00531AA1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		49AD0FA61DBA393800531AA1 /* HoodView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoodView.swift; sourceTree = "<group>"; };
-		49CB83761DA3E3DD00A99C98 /* SearchResultsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultsView.swift; sourceTree = "<group>"; };
 		49E1F28E1D9AE13000F5B8E4 /* hoods.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = hoods.entitlements; sourceTree = "<group>"; };
 		49E1F28F1D9AE2F400F5B8E4 /* SearchModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchModule.swift; sourceTree = "<group>"; };
 		49FB28811D5B9D58009FADF3 /* hoods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hoods.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -54,7 +53,6 @@
 		49FB28A11D5BE137009FADF3 /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalloutViewController.swift; sourceTree = "<group>"; };
 		49FB28A51D5BE1DD009FADF3 /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
-		49FB28A71D5C2016009FADF3 /* DashboardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		6F7607D53EF5103EC6EA5FAA /* Pods-hoods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.debug.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.debug.xcconfig"; sourceTree = "<group>"; };
 		7E15E638073E00E6010B3855 /* Pods-hoods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hoods.release.xcconfig"; path = "Pods/Target Support Files/Pods-hoods/Pods-hoods.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -132,10 +130,9 @@
 			isa = PBXGroup;
 			children = (
 				49FB289F1D5BDDF5009FADF3 /* MapViewController.swift */,
+				490BD1A11E298D9B0042FBE7 /* CameraView.swift */,
 				49AD0FA61DBA393800531AA1 /* HoodView.swift */,
 				4942DC031D799FF000A871E7 /* ProfileView.swift */,
-				49FB28A71D5C2016009FADF3 /* DashboardView.swift */,
-				49CB83761DA3E3DD00A99C98 /* SearchResultsView.swift */,
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 				49FB28A11D5BE137009FADF3 /* Annotation.swift */,
 				49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */,
@@ -329,12 +326,11 @@
 				49E1F2901D9AE2F400F5B8E4 /* SearchModule.swift in Sources */,
 				49FB28A01D5BDDF5009FADF3 /* MapViewController.swift in Sources */,
 				49FB28A41D5BE186009FADF3 /* CalloutViewController.swift in Sources */,
-				49CB83771DA3E3DD00A99C98 /* SearchResultsView.swift in Sources */,
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,
 				49AD0FA71DBA393800531AA1 /* HoodView.swift in Sources */,
 				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
+				490BD1A21E298D9B0042FBE7 /* CameraView.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,
-				49FB28A81D5C2016009FADF3 /* DashboardView.swift in Sources */,
 				4907FE6C1D87168200629BF0 /* ModuleView.swift in Sources */,
 				49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */,
 			);

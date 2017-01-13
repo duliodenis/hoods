@@ -27,12 +27,6 @@ enum ProfileState {
     case open
 }
 
-enum DashboardState {
-    case full
-    case minimized
-    case searching
-}
-
 class DataSource {
     static let sharedInstance = DataSource()
     fileprivate init() {}
@@ -48,9 +42,8 @@ class DataSource {
     var hoodState: HoodState?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
-    var dashboardState: DashboardState?
     var profileDict = [String:String]()
-    var keyboardHeight: CGFloat = 0
+    var viewSize: CGSize?
     
     func lastVisitedHoodName(_ location: CLLocationCoordinate2D) -> String? {
         

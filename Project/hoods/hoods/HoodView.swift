@@ -10,24 +10,19 @@ import UIKit
 
 class HoodView: UIView {
     
-    var roundedCornerRadius = CGFloat()
-    let currentHoodLabel = UILabel()
+    let hoodLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        roundedCornerRadius = frame.size.width / 20
-
-        layer.cornerRadius = frame.size.width / 20
-        layer.masksToBounds = true
-        backgroundColor = UIColor.white
+        backgroundColor = UIColor.clear
         
-        currentHoodLabel.adjustsFontSizeToFitWidth = true
-        currentHoodLabel.font = UIFont.boldSystemFont(ofSize: 42)
-        currentHoodLabel.setContentHuggingPriority(251, for: .vertical)
-        currentHoodLabel.textAlignment = .center
+        hoodLabel.adjustsFontSizeToFitWidth = true
+        hoodLabel.font = UIFont.boldSystemFont(ofSize: 42)
+        hoodLabel.setContentHuggingPriority(251, for: .vertical)
+        hoodLabel.textAlignment = .center
         
-        let views = [currentHoodLabel]
+        let views = [hoodLabel]
         
         for view in views {
             view.translatesAutoresizingMaskIntoConstraints = false
@@ -35,10 +30,10 @@ class HoodView: UIView {
         }
         
         let constraints: [NSLayoutConstraint] = [
-            currentHoodLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: 20),
-            currentHoodLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
-            currentHoodLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            currentHoodLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
+            hoodLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            hoodLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            hoodLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            hoodLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
             ]
         NSLayoutConstraint.activate(constraints)
     }
