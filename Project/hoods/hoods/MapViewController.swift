@@ -72,7 +72,7 @@ class MapViewController: UIViewController {
     
 // MARK: Camera
     
-    fileprivate func moveCameraTo(_ coord: CLLocationCoordinate2D, distance: CLLocationDistance, zoom: Double, pitch: CGFloat, duration: TimeInterval, animatedCenterChange: Bool) {
+    fileprivate func zoom(into coord: CLLocationCoordinate2D, distance: CLLocationDistance, zoom: Double, pitch: CGFloat, duration: TimeInterval, animatedCenterChange: Bool) {
         
         // if the camera is not already on the coords passed in, move camera
         if mapboxView.centerCoordinate.latitude != coord.latitude && mapboxView.centerCoordinate.longitude != coord.longitude {
@@ -89,10 +89,10 @@ class MapViewController: UIViewController {
         if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
             
             // start far out at a 50° angle
-            moveCameraTo(CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            zoom(into: CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into your location at a 30° angle over 3 seconds
-            moveCameraTo(centerCoordinate, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
+            zoom(into: centerCoordinate, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
@@ -105,15 +105,15 @@ class MapViewController: UIViewController {
         if animated {
             
             // start far out at a 50° angle
-            moveCameraTo(CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            zoom(into: CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into manhattan at a 30° angle over 3 seconds
-            moveCameraTo(manhattan, distance: 5000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
+            zoom(into: manhattan, distance: 5000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
             
         } else {
             
             // set camera to manhattan instantly
-            moveCameraTo(manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
+            zoom(into: manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
         }
     }
     
