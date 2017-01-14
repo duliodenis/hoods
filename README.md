@@ -1,4 +1,4 @@
-# Hoods
+# HOODS
 
 
 ## Locations
@@ -15,12 +15,12 @@ Share location-based media such as pics/videos/gifs/POI reviews/parties with you
 Rank said media per hood with love
 
 
+## Support or Contact
+
 Network  | Account
 ------------- | -------------
 Andrew | andrew@yugetech.com
 Dulio | dulio@yugetech.com
 AppStore | Hoods - What's Good In The Hood
 
-
-### Support or Contact
 Visit [Yuge Technologies](http://yugetech.com/) to see more.
