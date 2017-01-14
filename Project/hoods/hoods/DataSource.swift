@@ -106,7 +106,7 @@ class DataSource {
                     var currentNeighborhood = ""
                     
                     if let properties = hood["properties"] as? [String: AnyObject] {
-                        if let neighborhood = properties["neighborhood"] as? String {
+                        if let neighborhood = properties["neighbourhood"] as? String {
                             currentNeighborhood = neighborhood
                         }
                     }
