@@ -61,7 +61,7 @@ class DataSource {
                 if geoJSONFile(for: lastVisitedArea!) != "" {
                     
                     // check through all hood polygons for your coords and update last hood name (last polygon renderer gets updated too)
-                    lastVisitedHoodName = hoodName(for: location, in: lastVisitedArea!)
+                    lastVisitedHoodName = hoodName(for: location, in: lastVisitedArea!, fromTap: false)
                     
                     // if in a supported area, but hood check failed, stop scanning
                     if lastVisitedHoodName == "" {
@@ -82,14 +82,14 @@ class DataSource {
         if geoJSONFile(for: lastTappedArea!) != "" {
             
             // get file name from location area
-            lastTappedHoodName = hoodName(for: location, in: lastTappedArea!)
+            lastTappedHoodName = hoodName(for: location, in: lastTappedArea!, fromTap: true)
         } else {
             print("You just tapped an unsupported hood.")
         }
         return lastTappedHoodName
     }
     
-    fileprivate func hoodName(for location: CLLocationCoordinate2D, in area: String) -> String {
+    fileprivate func hoodName(for location: CLLocationCoordinate2D, in area: String, fromTap: Bool) -> String {
         
         var filePath = ""
         
@@ -134,10 +134,11 @@ class DataSource {
                                 let cgPoint = polygonRenderer.point(for: mapPoint)
                                 
                                 if polygonRenderer.path.contains(cgPoint) {
-                                    // update the name and polygon renderer
-                                    lastVisitedPolygonRenderer = polygonRenderer
-                                    lastVisitedHoodName = currentNeighborhood
                                     
+                                    if !fromTap {
+                                        lastVisitedPolygonRenderer = polygonRenderer
+                                        lastVisitedHoodName = currentNeighborhood
+                                    }
                                     print("You are in \(currentNeighborhood).")
                                     return currentNeighborhood
                                 }
