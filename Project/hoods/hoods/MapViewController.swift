@@ -297,6 +297,8 @@ class MapViewController: UIViewController {
         let tappedLocation = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
         DataSource.sharedInstance.hoodState = .otherHood
         attemptToUpdateHoodLabel(with: tappedLocation, fromTap: false)
+        let mapCam = MGLMapCamera(lookingAtCenter: tappedLocation, fromDistance: 5000, pitch: 30, heading: 0)
+        mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 6000, completionHandler: nil)
         
     // profile behavior
         

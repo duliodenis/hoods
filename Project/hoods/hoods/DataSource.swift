@@ -272,4 +272,42 @@ class DataSource {
         
         return image
     }
+    
+    func centroid(from coords: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D {
+        
+        // get the lowest and highest longitude and latitude
+        var x1Long = coords.first?.longitude
+        var x2Long = coords.first?.longitude
+        var y1Lat = coords.first?.latitude
+        var y2Lat = coords.first?.latitude
+        for coord in coords {
+            if coord.longitude < 0 {
+                if coord.longitude > x1Long! {
+                    x1Long = coord.longitude
+                } else {
+                    x2Long = coord.longitude
+                }
+            } else {
+                if coord.longitude < x1Long! {
+                    x1Long = coord.longitude
+                } else {
+                    x2Long = coord.longitude
+                }
+            }
+            if coord.latitude < 0 {
+                if coord.latitude > y1Lat! {
+                    y1Lat = coord.latitude
+                } else {
+                    y2Lat = coord.latitude
+                }
+            } else {
+                if coord.latitude < y1Lat! {
+                    y1Lat = coord.latitude
+                } else {
+                    y2Lat = coord.latitude
+                }
+            }
+        }
+        return CLLocationCoordinate2D(latitude: y1Lat! + ((y2Lat! - y1Lat!) / 2), longitude: x1Long! + ((x2Long! - x1Long!) / 2))
+    }
 }
