@@ -598,7 +598,7 @@ extension MapViewController: CLLocationManagerDelegate {
                     if error == nil {
                         
                         // update the user location placemark singleton
-                        DataSource.sharedInstance.lastPlacemark = placemarks![0]
+                        DataSource.sharedInstance.lastVisitedPlacemark = placemarks![0]
                         
                         // update the area singleton
                         DataSource.sharedInstance.updateArea()

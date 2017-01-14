@@ -31,18 +31,22 @@ class DataSource {
     static let sharedInstance = DataSource()
     fileprivate init() {}
     
-    var locationManager = CLLocationManager()
-    var lastVisitedHoodName: String?
-    var lastTappedHoodName: String?
-    var lastVisitedPolygonRenderer: MKPolygonRenderer?
-    var lastPlacemark: CLPlacemark?
-    var calloutRepresentedObject: MGLAnnotation?
-    var lastVisitedArea: String?
-    var lastTappedArea: String?
     var hoodState: HoodState?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
-    var profileDict = [String:String]()
+
+    var locationManager = CLLocationManager()
+    
+    var lastVisitedHoodName: String?
+    var lastVisitedArea: String?
+    var lastVisitedPolygonRenderer: MKPolygonRenderer?
+    var lastVisitedPlacemark: CLPlacemark?
+
+    var lastTappedHoodName: String?
+    var lastTappedArea: String?
+
+    var calloutRepresentedObject: MGLAnnotation?
+    var fbProfileDict = [String:String]()
     var viewSize: CGSize?
     
     func lastVisitedHoodName(_ location: CLLocationCoordinate2D) -> String? {
@@ -172,13 +176,13 @@ class DataSource {
     func updateArea() {
         
         // if the locality is SF, set the area singleton to it
-        if let locality = lastPlacemark!.locality {
+        if let locality = lastVisitedPlacemark!.locality {
             if locality == "San Francisco" {
                 DataSource.sharedInstance.lastVisitedArea = locality
                 
             // else if it's not SF, set the area to the subLocality
             } else {
-                if let subLocality = lastPlacemark!.subLocality {
+                if let subLocality = lastVisitedPlacemark!.subLocality {
                     DataSource.sharedInstance.lastVisitedArea = subLocality
                 }
             }
@@ -221,9 +225,9 @@ class DataSource {
                     
                     guard let resultNew = result as? [String:Any] else { return }
                     
-                    self.profileDict["firstName"] = resultNew["first_name"] as? String
-                    self.profileDict["lastName"] = resultNew["last_name"] as? String
-                    self.profileDict["email"] = resultNew["email"] as? String
+                    self.fbProfileDict["firstName"] = resultNew["first_name"] as? String
+                    self.fbProfileDict["lastName"] = resultNew["last_name"] as? String
+                    self.fbProfileDict["email"] = resultNew["email"] as? String
                     
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
                 }
