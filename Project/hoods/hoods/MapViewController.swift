@@ -42,7 +42,7 @@ class MapViewController: UIViewController {
         configureNotificationCenter()
 
         mapboxView.delegate = self
-        mapboxView.tintColor = UIColor.clear
+        mapboxView.tintColor = UIColor.purple
         mapboxView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         DataSource.sharedInstance.locationManager.delegate = self
