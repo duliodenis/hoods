@@ -61,7 +61,7 @@ class DataSource {
                 if geoJSONFile(for: lastVisitedArea!) != "" {
                     
                     // check through all hood polygons for your coords and update last hood name (last polygon renderer gets updated too)
-                    lastVisitedHoodName = fullHoodCheck(location, in: lastVisitedArea!)
+                    lastVisitedHoodName = hoodName(for: location, in: lastVisitedArea!)
                     
                     // if in a supported area, but hood check failed, stop scanning
                     if lastVisitedHoodName == "" {
@@ -82,14 +82,14 @@ class DataSource {
         if geoJSONFile(for: lastTappedArea!) != "" {
             
             // get file name from location area
-            lastTappedHoodName = fullHoodCheck(location, in: lastTappedArea!)
+            lastTappedHoodName = hoodName(for: location, in: lastTappedArea!)
         } else {
             print("You just tapped an unsupported hood.")
         }
         return lastTappedHoodName
     }
     
-    fileprivate func fullHoodCheck(_ location: CLLocationCoordinate2D, in area: String) -> String {
+    fileprivate func hoodName(for location: CLLocationCoordinate2D, in area: String) -> String {
         
         var filePath = ""
         
