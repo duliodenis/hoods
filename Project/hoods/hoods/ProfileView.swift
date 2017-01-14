@@ -32,7 +32,7 @@ class ProfileView: UIView {
         backgroundColor = UIColor.white
         
         // subview specific properties
-        profileImageView.image = DataSource.sharedInstance.cropToBounds(UIImage(named: "yuge")!, width: Double(frame.width), height: Double(frame.height))
+        profileImageView.image = DataSource.sharedInstance.cropToBounds(UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
                 
@@ -134,7 +134,7 @@ class ProfileView: UIView {
         if FBSDKAccessToken.current() != nil {
             downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
         } else {
-            profileImageView.image = UIImage(named: "yuge")
+            profileImageView.image = UIImage(named: "profile_placeholder")
         }
     }
     

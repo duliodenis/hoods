@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
         DataSource.sharedInstance.locationManager.requestWhenInUseAuthorization()
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-
+        
         return true
     }
 

@@ -27,12 +27,6 @@ enum ProfileState {
     case open
 }
 
-enum DashboardState {
-    case full
-    case minimized
-    case searching
-}
-
 class DataSource {
     static let sharedInstance = DataSource()
     fileprivate init() {}
@@ -42,15 +36,14 @@ class DataSource {
     var lastTappedHoodName: String?
     var lastVisitedPolygonRenderer: MKPolygonRenderer?
     var lastPlacemark: CLPlacemark?
-    var calloutRepresentedObjectTitle = ""
+    var calloutRepresentedObject: MGLAnnotation?
     var lastVisitedArea: String?
     var lastTappedArea: String?
     var hoodState: HoodState?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
-    var dashboardState: DashboardState?
     var profileDict = [String:String]()
-    var keyboardHeight: CGFloat = 0
+    var viewSize: CGSize?
     
     func lastVisitedHoodName(_ location: CLLocationCoordinate2D) -> String? {
         
@@ -223,7 +216,7 @@ class DataSource {
 
             FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
                 if error != nil {
-                    print(error)
+                    print(error as Any)
                 } else {
                     
                     guard let resultNew = result as? [String:Any] else { return }
@@ -237,7 +230,7 @@ class DataSource {
             })
             
         } else {
-            print("current access token was nil")
+            print("The current access token is nil.")
         }
     }
     

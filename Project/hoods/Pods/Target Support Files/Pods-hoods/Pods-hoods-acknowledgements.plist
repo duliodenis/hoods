@@ -44,6 +44,8 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</string>
+			<key>License</key>
+			<string>BSD</string>
 			<key>Title</key>
 			<string>Bolts</string>
 			<key>Type</key>
@@ -69,6 +71,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </string>
+			<key>License</key>
+			<string>Facebook Platform License</string>
 			<key>Title</key>
 			<string>FBSDKCoreKit</string>
 			<key>Type</key>
@@ -94,6 +98,8 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </string>
+			<key>License</key>
+			<string>Facebook Platform License</string>
 			<key>Title</key>
 			<string>FBSDKLoginKit</string>
 			<key>Type</key>
@@ -243,7 +249,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Mapbox GL uses portions of CSS Color Parser.
 
 (c) Dean McNamee &lt;dean@gmail.com&gt;, 2012.
-C++ port by Konstantin K&#228;fer &lt;mail@kkaefer.com&gt;, 2014.
+C++ port by Konstantin Käfer &lt;mail@kkaefer.com&gt;, 2014.
 
 https://github.com/deanm/css-color-parser-js
 https://github.com/kkaefer/css-color-parser-cpp
@@ -573,7 +579,7 @@ The externally maintained libraries used by libuv are:
 
 - android-ifaddrs.h, android-ifaddrs.c, copyright Berkeley Software Design
   Inc, Kenneth MacKay and Emergya (Cloud4all, FP7/2007-2013, grant agreement
-  n&#176; 289016). Three clause BSD license.
+  n° 289016). Three clause BSD license.
 
 ===========================================================================
 
@@ -1046,6 +1052,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 </string>
+			<key>License</key>
+			<string>BSD</string>
 			<key>Title</key>
 			<string>Mapbox-iOS-SDK</string>
 			<key>Type</key>

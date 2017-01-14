@@ -1,30 +1,67 @@
 # Hoods
 
-*NYC and San Francisco*
+New York City
+
+San Francisco
 
 ## The Goal
 
-The solution for hosting, organizing, finding and enhancing parties
+Provide the fastest way of finding location-based media.
+
 
 ## The App
 
-A map-based mobile app using Facebook accounts with hood chat, public/private party hosting with video story/chat, group live location with video story/chat, and Apple Wallet pass for party entrance.
+A map showing friends' location-based media with the ability to search for everyone's public media
 
-## MVP
-1. map view with neighborhoods, parties, POIs, group locations, group icon, federation button, profile, search
-2. party view with name, description, host, friends going, date, cover, amenities, uber, directions, rsvp, story, chat
-3. my profile view with pics, history, trophies, wallet pass/ticket
-4. profile view with pics, history, trophies, friend request, report
-5. group view with story, friends, chat
-6. hood view with friends, chat, weather
-7. calendar view
 
-## Mockup
+# Abilities
 
-Coming soon.
+Post location-based media to the map with tags.
 
-## Tagline
-It's party time.
+See ephemeral media from friends on the map.
+
+Search for specific content with Boolean search.
+
+
+# Structure of a Boolean Search
+
+**media** of **tag** at **POI** in **location** during **time or event** with **person(s)**
+
+
+# Types of Media
+
+**MVP:** picture, gif, video, POI review
+
+**2.0:** party
+
+
+# Boolean Search Examples
+
+Long queries with multiple parameters to get specific results:
+
+**pizza** in **Lower East Side** *POIs that sell pizza*
+
+**lightbulbs** *POIs that sell lightbulbs near current location*
+
+**pics** of **pizza** at **Dominos** in **St. George, Staten Island**
+
+**gifs** of **butts** in **Times Square**
+
+**live video** in **SoHo**
+
+**reviews** of **lobster**
+
+
+## Ads:
+
+Pins that appear for purchased duration
+
+Pins that appear when radius is entered
+
+Deals
+
+Ad formats: **pic**/**gif**/**video**/**party**
+
 
 Network  | Account
 ------------- | -------------
@@ -32,7 +69,7 @@ Andrew | andrew@yugetech.com
 Dulio | dulio@yugetech.com
 Twitter | [@yugeafterparty](https://twitter.com/yugeafterparty)
 App Website | [yugeafter.party](http://yugeafter.party)
-AppStore | Hoods - It's Party Time - Host, Organize, and Join Parties in your Area
+AppStore | Hoods - See everything in your neighborhood.
 
 
 ### Support or Contact

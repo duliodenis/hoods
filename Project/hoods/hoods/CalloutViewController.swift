@@ -18,13 +18,17 @@ class CalloutViewController: UIView, MGLCalloutView {
     
     // store the represented object's title
     required init(representedObject: MGLAnnotation) {
+        
+        // set local and data source represented object to one passed in
         self.representedObject = representedObject
+        DataSource.sharedInstance.calloutRepresentedObject = representedObject
+
         mainBody = UIButton(type: .system)
         
+        // init after represented object and button are set up
         super.init(frame: CGRect.zero)
         
         addSubview(self.mainBody)
-        DataSource.sharedInstance.calloutRepresentedObjectTitle = representedObject.title!!
     }
     
     required init?(coder aDecoder: NSCoder) {
