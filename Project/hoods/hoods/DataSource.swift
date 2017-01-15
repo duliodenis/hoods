@@ -12,8 +12,8 @@ import MapKit
 import FBSDKLoginKit
 
 enum HoodState {
-    case currentHood
-    case otherHood
+    case visiting
+    case tapping
 }
 
 enum MapButtonState {
@@ -27,6 +27,11 @@ enum ProfileState {
     case open
 }
 
+enum GeoError: Error {
+    case areaError
+    case hoodError
+}
+
 class DataSource {
     static let sharedInstance = DataSource()
     fileprivate init() {}
@@ -37,64 +42,107 @@ class DataSource {
 
     var locationManager = CLLocationManager()
     
-    var lastVisitedHoodName: String?
-    var lastVisitedArea: String?
-    var lastVisitedPolygonRenderer: MKPolygonRenderer?
-    var lastVisitedPlacemark: CLPlacemark?
+    var visitingHoodName: String?
+    var visitingArea: String?
+    var visitingPlacemark: CLPlacemark?
+    var visitingPolygonRenderer: MKPolygonRenderer?
+    var visitingHoodCoords = [CLLocationCoordinate2D]()
 
-    var lastTappedHoodName: String?
-    var lastTappedArea: String?
+    var tappedHoodName: String?
+    var tappedArea: String?
+    var tappedPlacemark: CLPlacemark?
 
     var calloutRepresentedObject: MGLAnnotation?
     var fbProfileDict = [String:String]()
     var viewSize: CGSize?
     
-    func lastVisitedHoodName(_ location: CLLocationCoordinate2D) -> String? {
+    func updateVisitingArea(with placemark: CLPlacemark) {
         
-        // if your coords are not in the last hood polygon
-        if stillInTheHood(location) == false {
-            
-            // if last area is a supported area
-            if lastVisitedArea != nil {
+        // if locality is SF, set the area singleton to locality...
+        if let locality = placemark.locality {
+            if locality == "San Francisco" {
+                visitingArea = locality
                 
-                // if geoJSON file found for last visited area
-                if geoJSONFile(for: lastVisitedArea!) != "" {
-                    
-                    // check through all hood polygons for your coords and update last hood name (last polygon renderer gets updated too)
-                    lastVisitedHoodName = hoodName(for: location, in: lastVisitedArea!, fromTap: false)
-                    
-                    // if in a supported area, but hood check failed, stop scanning
-                    if lastVisitedHoodName == "" {
-                        NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
-                    }
-                    
-                    // else last area is not a supported area
-                } else {
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "NotInAHood"), object: nil)
+                // else it's not SF, set the area to subLocality
+            } else {
+                if let subLocality = placemark.subLocality {
+                    visitingArea = subLocality
                 }
             }
         }
-        return lastVisitedHoodName
     }
     
-    func tappedHoodName(_ location: CLLocationCoordinate2D) -> String? {
+    func updateTappedArea(with placemark: CLPlacemark) {
         
-        if geoJSONFile(for: lastTappedArea!) != "" {
-            
-            // get file name from location area
-            lastTappedHoodName = hoodName(for: location, in: lastTappedArea!, fromTap: true)
-        } else {
-            print("You just tapped an unsupported hood.")
+        // if locality is SF, set the area singleton to locality...
+        if let locality = tappedPlacemark!.locality {
+            if locality == "San Francisco" {
+                tappedArea = locality
+                
+                // else it's not SF, set the area to subLocality
+            } else {
+                if let subLocality = tappedPlacemark!.subLocality {
+                    tappedArea = subLocality
+                }
+            }
         }
-        return lastTappedHoodName
     }
     
-    fileprivate func hoodName(for location: CLLocationCoordinate2D, in area: String, fromTap: Bool) -> String {
+    func visitingHoodName(for location: CLLocationCoordinate2D) -> String? {
+        if visitingArea != nil {
+            
+            // if coord not found in last hood polygon...
+            if !stillInTheHood(location) {
+                
+                // if found in hood...
+                if let hood = hoodName(for: location, in: visitingArea!, fromTap: false) {
+                    
+                    // update singleton
+                    visitingHoodName = hood
+                    return hood
+                    
+                    // else stop scanning
+                } else {
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "StopScanning"), object: nil)
+                }
+            }
+        }
+        return nil
+    }
+    
+    func tappedHoodName(for coord: CLLocationCoordinate2D) throws -> String? {
         
+        // if this is the first map tap...
+        if tappedArea == nil && visitingArea != nil {
+            
+            // if hood check from visiting area succeeded...
+            if let hoodFromVisitingArea = hoodName(for: coord, in: visitingArea!, fromTap: true) {
+                
+                // update singletons
+                tappedArea = visitingArea!
+                tappedHoodName = hoodFromVisitingArea
+                return hoodFromVisitingArea
+                
+                // else not found in hood, scan tapped area
+            } else {
+                throw GeoError.areaError
+            }
+            
+            // else scan tapped area
+        } else {
+            if let hoodFromTappedArea = hoodName(for: coord, in: tappedArea!, fromTap: true) {
+                return hoodFromTappedArea
+            }
+        }
+        return nil
+    }
+    
+    fileprivate func hoodName(for location: CLLocationCoordinate2D, in area: String, fromTap: Bool) -> String? {
         var filePath = ""
         
         // set file path to geoJSON for area
         filePath = Bundle.main.path(forResource: geoJSONFile(for: area), ofType: "geojson")!
+        print("filepath: \(filePath)")
         
         // convert GeoJSON to NSData
         let data = try? Data(contentsOf: URL(fileURLWithPath: filePath))
@@ -110,7 +158,7 @@ class DataSource {
                     var currentNeighborhood = ""
                     
                     if let properties = hood["properties"] as? [String: AnyObject] {
-                        if let neighborhood = properties["neighbourhood"] as? String {
+                        if let neighborhood = properties["name"] as? String {
                             currentNeighborhood = neighborhood
                         }
                     }
@@ -129,17 +177,20 @@ class DataSource {
                                 let polygon = MKPolygon(coordinates: &coords, count: coords.count)
                                 let polygonRenderer = MKPolygonRenderer(polygon: polygon)
                                 
-                                // CLLCoordinate2D -> MKMapPoint -> check if CGPoint is inside polygon renderer's CGPath
+                                // CLLCoordinate2D -> MKMapPoint -> CGPoint
                                 let mapPoint = MKMapPointForCoordinate(location)
                                 let cgPoint = polygonRenderer.point(for: mapPoint)
                                 
+                                // check if inside polygon renderer's path
                                 if polygonRenderer.path.contains(cgPoint) {
                                     
                                     if !fromTap {
-                                        lastVisitedPolygonRenderer = polygonRenderer
-                                        lastVisitedHoodName = currentNeighborhood
+                                        visitingPolygonRenderer = polygonRenderer
+                                        visitingHoodCoords = coords
+                                        print("You are in \(currentNeighborhood).")
+                                    } else {
+                                        print("You just tapped \(currentNeighborhood).")
                                     }
-                                    print("You are in \(currentNeighborhood).")
                                     return currentNeighborhood
                                 }
                             }
@@ -150,44 +201,28 @@ class DataSource {
         } catch {
             print("error serializing JSON: \(error)")
         }
-        return ""
+        return nil
     }
     
-    fileprivate func stillInTheHood(_ currentLocation: CLLocationCoordinate2D) -> Bool {
+    func stillInTheHood(_ currentLocation: CLLocationCoordinate2D) -> Bool {
         
-        // if gps is working
+        // if location available...
         if locationManager.location != nil {
             
-            // and you have been to a hood
-            if lastVisitedPolygonRenderer != nil {
+            // and you have been to a hood...
+            if visitingPolygonRenderer != nil {
                 
                 let mapPoint = MKMapPointForCoordinate(currentLocation)
-                let cgPoint = lastVisitedPolygonRenderer!.point(for: mapPoint)
+                let cgPoint = visitingPolygonRenderer!.point(for: mapPoint)
                 
                 // check if your coords are in the last polygon renderer path
-                if lastVisitedPolygonRenderer!.path.contains(cgPoint) {
+                if visitingPolygonRenderer!.path.contains(cgPoint) {
                     print("You're still in the hood.")
                     return true
                 }
             }
         }
         return false
-    }
-    
-    func updateArea() {
-        
-        // if the locality is SF, set the area singleton to it
-        if let locality = lastVisitedPlacemark!.locality {
-            if locality == "San Francisco" {
-                DataSource.sharedInstance.lastVisitedArea = locality
-                
-            // else if it's not SF, set the area to the subLocality
-            } else {
-                if let subLocality = lastVisitedPlacemark!.subLocality {
-                    DataSource.sharedInstance.lastVisitedArea = subLocality
-                }
-            }
-        }
     }
     
     fileprivate func geoJSONFile(for area: String) -> String {
@@ -199,11 +234,11 @@ class DataSource {
         case "Brooklyn":
             return "nyc"
         case "Queens":
-            return "nyc"
+            return "queens"
         case "Bronx":
             return "nyc"
         case "Staten Island":
-            return "nyc"
+            return "statenIsland"
         case "San Francisco":
             return "sanFrancisco"
         default:
@@ -221,7 +256,7 @@ class DataSource {
 
             FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
                 if error != nil {
-                    print(error as Any)
+                    print("fb error: \(error as Any)")
                 } else {
                     
                     guard let resultNew = result as? [String:Any] else { return }
