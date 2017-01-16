@@ -25,7 +25,7 @@ class MapViewController: UIViewController {
     @IBOutlet var mapboxView: MGLMapView!
     
     // camera
-    fileprivate var cameraView: CameraView?
+    fileprivate var cameraView: CameraView!
     
     // profile
     fileprivate var profileView = ProfileView()
@@ -62,7 +62,10 @@ class MapViewController: UIViewController {
     
     func appDidBecomeActive() {
         attemptToMoveCameraToUserLocation()
-        attemptToUpdateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
+        
+        if DataSource.sharedInstance.locationManager.location != nil {
+            updateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -94,7 +97,7 @@ class MapViewController: UIViewController {
             // move into your location at a 30° angle over 3 seconds
             zoom(into: centerCoordinate, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
-        // else move camera into manhattan from 50° to 30° over 3 seconds
+            // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
             moveCameraToManhattanAnimated(true)
         }
@@ -120,10 +123,14 @@ class MapViewController: UIViewController {
 // MARK: Hood View
     
     fileprivate func addCameraView() {
-        
         cameraView = CameraView(frame: frameDict["cameraView"]!)
-        cameraView?.hoodView.hoodLabel.text = "Hoods"
         view.addSubview(cameraView!)
+    }
+    
+    fileprivate func updateHoodLabel(with coordinate: CLLocationCoordinate2D) {
+        if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
+            self.cameraView.hoodView.hoodLabel.text = hood
+        }
     }
     
 // MARK: Profile
@@ -207,7 +214,7 @@ class MapViewController: UIViewController {
                 }, completion: { (Bool) in
             })
          
-        // else close it
+            // else close it
         } else {
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: {
                 
@@ -272,10 +279,11 @@ class MapViewController: UIViewController {
         // if location is available
         if DataSource.sharedInstance.locationManager.location != nil {
             
-            DataSource.sharedInstance.hoodState = .currentHood
+            DataSource.sharedInstance.hoodState = .visiting
             
-            // zoom to location
             attemptToMoveCameraToUserLocation()
+        
+            updateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!)
         }
     }
     
@@ -294,11 +302,47 @@ class MapViewController: UIViewController {
         
     // map behavior
         
-        let tappedLocation = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
-        DataSource.sharedInstance.hoodState = .otherHood
-        attemptToUpdateHoodLabel(with: tappedLocation, fromTap: false)
-        let mapCam = MGLMapCamera(lookingAtCenter: tappedLocation, fromDistance: 5000, pitch: 30, heading: 0)
-        mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 6000, completionHandler: nil)
+        // if tap was not in any other view...
+        if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
+            
+            // CGPoint -> CLLocationCoordinate2D -> CLLocation
+            let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
+            let tappedLocation = CLLocation(latitude: tappedLocationCoord.latitude, longitude: tappedLocationCoord.longitude)
+            
+            func flyToHood() {
+                let mapCam = MGLMapCamera(lookingAtCenter: tappedLocationCoord, fromDistance: 5000, pitch: 30, heading: 0)
+                self.mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 6000, completionHandler: nil)
+            }
+            
+            func reverseGeocode() {
+                let geocoder = CLGeocoder()
+                geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
+                    
+                    // update tapped area and placemark singletons
+                    DataSource.sharedInstance.tappedPlacemark = placemarks![0]
+                    DataSource.sharedInstance.updateTappedArea(with: placemarks![0])
+                    
+                    do {
+                        if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
+                            self.cameraView.hoodView.hoodLabel.text = hood
+                            flyToHood()
+                        }
+                    } catch {
+                    }
+                })
+            }
+            // update the label and hood check state
+            do {
+                if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
+                    cameraView.hoodView.hoodLabel.text = hood
+                    flyToHood()
+                } else {
+                    reverseGeocode()
+                }
+            } catch {
+                reverseGeocode()
+            }
+        }
         
     // profile behavior
         
@@ -389,39 +433,6 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
-    func attemptToUpdateHoodLabel(with location: CLLocationCoordinate2D, fromTap: Bool) {
-        
-        // use hood check to try and set current hood label
-        if DataSource.sharedInstance.locationManager.location != nil {
-            
-            if fromTap == true {
-                if let newLocation = DataSource.sharedInstance.tappedHoodName(location) {
-                    
-                    // hood check succeeded but returned blank name
-                    if newLocation != "" {
-                        cameraView?.hoodView.hoodLabel.text = newLocation
-                    } else {
-                        cameraView?.hoodView.hoodLabel.text = "Hoods"
-                    }
-                } else {
-                    cameraView?.hoodView.hoodLabel.text = "Hoods"
-                }
-            }
-            
-            if let newLocation = DataSource.sharedInstance.lastVisitedHoodName(location) {
-                
-                // hood check succeeded but returned blank name
-                if newLocation != "" {
-                    cameraView?.hoodView.hoodLabel.text = newLocation
-                } else {
-                    cameraView?.hoodView.hoodLabel.text = "Hoods"
-                }
-            } else {
-                cameraView?.hoodView.hoodLabel.text = "Hoods"
-            }
-        }
-    }
-    
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         
         // if motion was a shake and location available
@@ -492,8 +503,8 @@ class MapViewController: UIViewController {
         // listen for "ApplicationDidBecomeActive" notification from app delegate
         NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: NSNotification.Name(rawValue: "ApplicationDidBecomeActive"), object: nil)
         
-        // listen for "NotInAHood" notification from data source
-        NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "NotInAHood"), object: nil)
+        // listen for "StopScanning" notification from data source
+        NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "StopScanning"), object: nil)
         
         // setup offline pack notification handlers.
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackProgressDidChange), name: NSNotification.Name.MGLOfflinePackProgressChanged, object: nil)
@@ -547,7 +558,7 @@ extension MapViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
 
         // if touch is not in camera or profile views, let gesture pass through to map
-        if !(cameraView?.frame.contains(touch.location(in: mapboxView)))! && !profileView.frame.contains(touch.location(in: mapboxView)) {
+        if !cameraView!.frame.contains(touch.location(in: mapboxView)) && !profileView.frame.contains(touch.location(in: mapboxView)) {
             return true
         }
         return false
@@ -587,31 +598,32 @@ extension MapViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
+        // update hood state
         if hoodScanning == true {
+            if DataSource.sharedInstance.hoodState != .tapping {
+                DataSource.sharedInstance.hoodState = .visiting
+            }
             
-            // if location is available
+            // if not still in the hood...
             if DataSource.sharedInstance.locationManager.location != nil {
-                
-                // update the area singleton
-                let geocoder = CLGeocoder()
-                geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
-                    if error == nil {
-                        
-                        // update the user location placemark singleton
-                        DataSource.sharedInstance.lastPlacemark = placemarks![0]
-                        
-                        // update the area singleton
-                        DataSource.sharedInstance.updateArea()
-                        
-                        if DataSource.sharedInstance.hoodState != .otherHood {
+                if !DataSource.sharedInstance.stillInTheHood(locations[0].coordinate) {
+
+                    // reverse geocode coord to get the area
+                    let geocoder = CLGeocoder()
+                    geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                        if error == nil {
                             
-                            DataSource.sharedInstance.hoodState = .currentHood
+                            // update the visiting placemark singleton and get the visiting area
+                            let placemark = placemarks![0]
+                            DataSource.sharedInstance.visitingPlacemark = placemark
+                            DataSource.sharedInstance.updateVisitingArea(with: placemark)
                             
-                            // update the hood label
-                            self.attemptToUpdateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
+                            self.updateHoodLabel(with: locations[0].coordinate)
                         }
-                    }
-                })
+                    })
+                } else {
+                    updateHoodLabel(with: locations[0].coordinate)
+                }
             }
         }
     }

@@ -129,8 +129,8 @@ class ProfileView: UIView {
     
     @objc fileprivate func updateProfile() {
         
-        profileFirstNameLabel.text = DataSource.sharedInstance.profileDict["firstName"] 
-        profileLastNameLabel.text = DataSource.sharedInstance.profileDict["lastName"]
+        profileFirstNameLabel.text = DataSource.sharedInstance.fbProfileDict["firstName"]
+        profileLastNameLabel.text = DataSource.sharedInstance.fbProfileDict["lastName"]
         if FBSDKAccessToken.current() != nil {
             downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
         } else {

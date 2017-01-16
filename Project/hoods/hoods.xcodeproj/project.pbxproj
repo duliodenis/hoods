@@ -8,10 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		10C31A7EA0A3C0302658E08B /* Pods_hoods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */; };
-		4907FE6C1D87168200629BF0 /* ModuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4907FE6B1D87168200629BF0 /* ModuleView.swift */; };
 		490BD1A21E298D9B0042FBE7 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490BD1A11E298D9B0042FBE7 /* CameraView.swift */; };
 		490BD1A41E29A5F40042FBE7 /* manhattan.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1A31E29A5F40042FBE7 /* manhattan.geojson */; };
 		490BD1A61E29A6EC0042FBE7 /* nyc.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1A51E29A6EC0042FBE7 /* nyc.geojson */; };
+		490BD1AC1E2C23680042FBE7 /* queens.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1AB1E2C23680042FBE7 /* queens.geojson */; };
+		490BD1AE1E2C236E0042FBE7 /* statenIsland.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */; };
 		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
 		4942DC041D799FF000A871E7 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4942DC031D799FF000A871E7 /* ProfileView.swift */; };
@@ -30,10 +31,11 @@
 
 /* Begin PBXFileReference section */
 		08DC9FD4FA02E6C4F1497806 /* Pods_hoods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hoods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4907FE6B1D87168200629BF0 /* ModuleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModuleView.swift; sourceTree = "<group>"; };
 		490BD1A11E298D9B0042FBE7 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		490BD1A31E29A5F40042FBE7 /* manhattan.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = manhattan.geojson; sourceTree = "<group>"; };
 		490BD1A51E29A6EC0042FBE7 /* nyc.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nyc.geojson; sourceTree = "<group>"; };
+		490BD1AB1E2C23680042FBE7 /* queens.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = queens.geojson; sourceTree = "<group>"; };
+		490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = statenIsland.geojson; sourceTree = "<group>"; };
 		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
 		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
 		4942DC031D799FF000A871E7 /* ProfileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -71,6 +73,8 @@
 			isa = PBXGroup;
 			children = (
 				490BD1A31E29A5F40042FBE7 /* manhattan.geojson */,
+				490BD1AB1E2C23680042FBE7 /* queens.geojson */,
+				490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */,
 				490BD1A51E29A6EC0042FBE7 /* nyc.geojson */,
 				490CAD421D71556D003E9B34 /* sanFrancisco.geojson */,
 			);
@@ -126,7 +130,6 @@
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 				49FB28A11D5BE137009FADF3 /* Annotation.swift */,
 				49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */,
-				4907FE6B1D87168200629BF0 /* ModuleView.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -246,6 +249,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				490BD1A61E29A6EC0042FBE7 /* nyc.geojson in Resources */,
+				490BD1AE1E2C236E0042FBE7 /* statenIsland.geojson in Resources */,
+				490BD1AC1E2C23680042FBE7 /* queens.geojson in Resources */,
 				490BD1A41E29A5F40042FBE7 /* manhattan.geojson in Resources */,
 				49AD0FA51DB6830F00531AA1 /* GoogleService-Info.plist in Resources */,
 				49FB288F1D5B9D58009FADF3 /* LaunchScreen.storyboard in Resources */,
@@ -319,7 +324,6 @@
 				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
 				490BD1A21E298D9B0042FBE7 /* CameraView.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,
-				4907FE6C1D87168200629BF0 /* ModuleView.swift in Sources */,
 				49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

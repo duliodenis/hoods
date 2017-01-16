@@ -21,6 +21,7 @@ class HoodView: UIView {
         hoodLabel.font = UIFont.boldSystemFont(ofSize: 42)
         hoodLabel.setContentHuggingPriority(251, for: .vertical)
         hoodLabel.textAlignment = .center
+        hoodLabel.text = "HOODS"
         
         let views = [hoodLabel]
         
