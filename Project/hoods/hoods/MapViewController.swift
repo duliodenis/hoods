@@ -10,6 +10,10 @@ import UIKit
 import Mapbox
 import MapKit
 
+enum HoodViewError: Error {
+    case badUpdate
+}
+
 class MapViewController: UIViewController {
     
     let padding: CGFloat = 20
@@ -64,7 +68,8 @@ class MapViewController: UIViewController {
         attemptToMoveCameraToUserLocation()
         
         if DataSource.sharedInstance.locationManager.location != nil {
-            updateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!)
+            do { try updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false) }
+            catch {}
         }
     }
 
@@ -127,9 +132,32 @@ class MapViewController: UIViewController {
         view.addSubview(cameraView!)
     }
     
-    fileprivate func updateHoodLabel(with coordinate: CLLocationCoordinate2D) {
-        if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
-            self.cameraView.hoodView.hoodLabel.text = hood
+    fileprivate func updateHoodAndAreaLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) throws {
+        switch fromTap {
+        case true:
+            do {
+                if let hood = try DataSource.sharedInstance.tappedHoodName(for: coordinate) {
+                    cameraView.hoodView.hoodLabel.text = hood
+                } else {
+                    throw HoodViewError.badUpdate
+                }
+            } catch {}
+            if let area = DataSource.sharedInstance.tappedArea {
+                cameraView.hoodView.areaLabel.text = area
+            } else {
+                throw HoodViewError.badUpdate
+            }
+        case false:
+            if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
+                cameraView.hoodView.hoodLabel.text = hood
+            } else {
+                throw HoodViewError.badUpdate
+            }
+            if let area = DataSource.sharedInstance.visitingArea {
+                cameraView.hoodView.areaLabel.text = area
+            } else {
+                throw HoodViewError.badUpdate
+            }
         }
     }
     
@@ -283,7 +311,8 @@ class MapViewController: UIViewController {
             
             attemptToMoveCameraToUserLocation()
         
-            updateHoodLabel(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!)
+            do { try updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false) }
+            catch {}
         }
     }
     
@@ -314,7 +343,7 @@ class MapViewController: UIViewController {
                 self.mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 6000, completionHandler: nil)
             }
             
-            func reverseGeocode() {
+            func reverseGeocodeAndThenUpdateLabels() {
                 let geocoder = CLGeocoder()
                 geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
                     
@@ -322,25 +351,17 @@ class MapViewController: UIViewController {
                     DataSource.sharedInstance.tappedPlacemark = placemarks![0]
                     DataSource.sharedInstance.updateTappedArea(with: placemarks![0])
                     
-                    do {
-                        if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
-                            self.cameraView.hoodView.hoodLabel.text = hood
-                            flyToHood()
-                        }
-                    } catch {
+                    do { try self.updateHoodAndAreaLabels(with: tappedLocation.coordinate, fromTap: true)
+                        flyToHood()
                     }
+                    catch {}
                 })
             }
             // update the label and hood check state
-            do {
-                if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
-                    cameraView.hoodView.hoodLabel.text = hood
-                    flyToHood()
-                } else {
-                    reverseGeocode()
-                }
+            do { try updateHoodAndAreaLabels(with: tappedLocationCoord, fromTap: true)
+                flyToHood()
             } catch {
-                reverseGeocode()
+                reverseGeocodeAndThenUpdateLabels()
             }
         }
         
@@ -618,11 +639,13 @@ extension MapViewController: CLLocationManagerDelegate {
                             DataSource.sharedInstance.visitingPlacemark = placemark
                             DataSource.sharedInstance.updateVisitingArea(with: placemark)
                             
-                            self.updateHoodLabel(with: locations[0].coordinate)
+                            do { try self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false) }
+                            catch {}
                         }
                     })
                 } else {
-                    updateHoodLabel(with: locations[0].coordinate)
+                    do { try updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false) }
+                    catch {}
                 }
             }
         }

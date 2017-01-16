@@ -123,7 +123,7 @@ class DataSource {
                 tappedHoodName = hoodFromVisitingArea
                 return hoodFromVisitingArea
                 
-                // else not found in hood, scan tapped area
+                // else not found in hood from visiting area, most likely tapped area
             } else {
                 throw GeoError.areaError
             }
@@ -132,9 +132,10 @@ class DataSource {
         } else {
             if let hoodFromTappedArea = hoodName(for: coord, in: tappedArea!, fromTap: true) {
                 return hoodFromTappedArea
+            } else {
+                throw GeoError.areaError
             }
         }
-        return nil
     }
     
     fileprivate func hoodName(for location: CLLocationCoordinate2D, in area: String, fromTap: Bool) -> String? {
