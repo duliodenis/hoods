@@ -60,6 +60,7 @@ class HoodView: UIView {
     
     @objc fileprivate func buttonTapped(sender: UIButton) {
         
+        // if hood label showing, hide hood label and show area label for 5 seconds
         if areaLabel.isHidden {
             UIView.animate(withDuration: 0.3, animations: {
                 self.hoodLabel.alpha = 0
@@ -69,19 +70,19 @@ class HoodView: UIView {
                 self.areaLabel.isHidden = false
                 UIView.animate(withDuration: 1, animations: {
                     self.areaLabel.alpha = 1
-                    
-                }, completion: { finished in
-                    UIView.animate(withDuration: 5, delay: 3, options: .curveEaseIn, animations: {
-                        self.areaLabel.alpha = 0
-                        
-                    }, completion: { finished in
-                        
-                        self.areaLabel.isHidden = true
-                        self.hoodLabel.isHidden = false
-                        UIView.animate(withDuration: 1, animations: { 
-                            self.hoodLabel.alpha = 1
-                        })
-                    })
+                })
+            })
+            
+        // else if area label is showing, hide area label and show hood label
+        } else {
+            UIView.animate(withDuration: 0.3, animations: { 
+                self.areaLabel.alpha = 0
+            }, completion: { finished in
+                
+                self.areaLabel.isHidden = true
+                self.hoodLabel.isHidden = false
+                UIView.animate(withDuration: 1, animations: { 
+                    self.hoodLabel.alpha = 1
                 })
             })
         }

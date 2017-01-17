@@ -139,7 +139,6 @@ class MapViewController: UIViewController {
                 cameraView.hoodView.areaLabel.text = area
             }
         case false:
-            print("it was not from a tap")
             if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
             }
@@ -185,12 +184,10 @@ class MapViewController: UIViewController {
     }
     
     @objc fileprivate func profilePanFired(_ sender: UIPanGestureRecognizer) {
-        print("profile pan fired")
         
         // if the pan was not in the profile pic and the profile was not closed already
         if DataSource.sharedInstance.profileState != .closed {
             
-            print("pan was not in profile view OR profile state is not closed")
             toggleProfileSizeForState(.closed)
             
             self.profileView.layer.cornerRadius = self.profileView.closedRoundedCornerRadius
@@ -332,6 +329,8 @@ class MapViewController: UIViewController {
         // if tap was not in any other view...
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
             
+            DataSource.sharedInstance.hoodState = .tapping
+            
             // CGPoint -> CLLocationCoordinate2D -> CLLocation
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
             let tappedLocation = CLLocation(latitude: tappedLocationCoord.latitude, longitude: tappedLocationCoord.longitude)
@@ -356,8 +355,12 @@ class MapViewController: UIViewController {
                         }
                     } catch {
                     }
+                    if let area = DataSource.sharedInstance.tappedArea {
+                        self.cameraView.hoodView.areaLabel.text = area
+                    }
                 })
             }
+            
             // update the label and hood check state
             do {
                 if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
@@ -365,6 +368,9 @@ class MapViewController: UIViewController {
                     flyToHood()
                 } else {
                     reverseGeocode()
+                }
+                if let area = DataSource.sharedInstance.tappedArea {
+                    cameraView.hoodView.areaLabel.text = area
                 }
             } catch {
                 reverseGeocode()
@@ -629,27 +635,27 @@ extension MapViewController: CLLocationManagerDelegate {
         if hoodScanning == true {
             if DataSource.sharedInstance.hoodState != .tapping {
                 DataSource.sharedInstance.hoodState = .visiting
-            }
-            
-            // if not still in the hood...
-            if DataSource.sharedInstance.locationManager.location != nil {
-                if !DataSource.sharedInstance.stillInTheHood(locations[0].coordinate) {
-
-                    // reverse geocode coord to get the area
-                    let geocoder = CLGeocoder()
-                    geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
-                        if error == nil {
-                            
-                            // update the visiting placemark singleton and get the visiting area
-                            let placemark = placemarks![0]
-                            DataSource.sharedInstance.visitingPlacemark = placemark
-                            DataSource.sharedInstance.updateVisitingArea(with: placemark)
-                            
-                            self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
-                        }
-                    })
-                } else {
-                    updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                
+                // if not still in the hood...
+                if DataSource.sharedInstance.locationManager.location != nil {
+                    if !DataSource.sharedInstance.stillInTheHood(locations[0].coordinate) {
+                        
+                        // reverse geocode coord to get the area
+                        let geocoder = CLGeocoder()
+                        geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                            if error == nil {
+                                
+                                // update the visiting placemark singleton and get the visiting area
+                                let placemark = placemarks![0]
+                                DataSource.sharedInstance.visitingPlacemark = placemark
+                                DataSource.sharedInstance.updateVisitingArea(with: placemark)
+                                
+                                self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                            }
+                        })
+                    } else {
+                        updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                    }
                 }
             }
         }
