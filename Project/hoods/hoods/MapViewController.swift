@@ -148,8 +148,11 @@ class MapViewController: UIViewController {
                 cameraView.hoodView.areaLabel.text = area
             }
         case false:
+            print("NOT FROM TAP")
             if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
+            } else {
+                print("could not get hood name from visiting area: \(DataSource.sharedInstance.visitingArea)")
             }
             if let area = DataSource.sharedInstance.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
@@ -315,8 +318,7 @@ class MapViewController: UIViewController {
             DataSource.sharedInstance.hoodState = .visiting
             
             fly(to: coord)
-        
-            updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
+            updateHoodAndAreaLabels(with: coord, fromTap: false)
         }
     }
     

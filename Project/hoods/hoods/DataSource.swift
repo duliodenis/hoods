@@ -105,6 +105,8 @@ class DataSource {
                 } else {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "StopScanning"), object: nil)
                 }
+            } else {
+                return visitingHoodName
             }
         }
         return nil
