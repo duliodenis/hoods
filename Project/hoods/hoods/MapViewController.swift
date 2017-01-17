@@ -10,10 +10,6 @@ import UIKit
 import Mapbox
 import MapKit
 
-enum HoodViewError: Error {
-    case badUpdate
-}
-
 class MapViewController: UIViewController {
     
     let padding: CGFloat = 20
@@ -68,8 +64,7 @@ class MapViewController: UIViewController {
         attemptToMoveCameraToUserLocation()
         
         if DataSource.sharedInstance.locationManager.location != nil {
-            do { try updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false) }
-            catch {}
+            updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
         }
     }
 
@@ -102,7 +97,7 @@ class MapViewController: UIViewController {
             // move into your location at a 30° angle over 3 seconds
             zoom(into: centerCoordinate, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
-            // else move camera into manhattan from 50° to 30° over 3 seconds
+        // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
             moveCameraToManhattanAnimated(true)
         }
@@ -132,31 +127,24 @@ class MapViewController: UIViewController {
         view.addSubview(cameraView!)
     }
     
-    fileprivate func updateHoodAndAreaLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) throws {
+    fileprivate func updateHoodAndAreaLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) {
         switch fromTap {
         case true:
             do {
                 if let hood = try DataSource.sharedInstance.tappedHoodName(for: coordinate) {
                     cameraView.hoodView.hoodLabel.text = hood
-                } else {
-                    throw HoodViewError.badUpdate
                 }
             } catch {}
             if let area = DataSource.sharedInstance.tappedArea {
                 cameraView.hoodView.areaLabel.text = area
-            } else {
-                throw HoodViewError.badUpdate
             }
         case false:
+            print("it was not from a tap")
             if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
-            } else {
-                throw HoodViewError.badUpdate
             }
             if let area = DataSource.sharedInstance.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
-            } else {
-                throw HoodViewError.badUpdate
             }
         }
     }
@@ -242,7 +230,7 @@ class MapViewController: UIViewController {
                 }, completion: { (Bool) in
             })
          
-            // else close it
+        // else close it
         } else {
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: {
                 
@@ -311,8 +299,7 @@ class MapViewController: UIViewController {
             
             attemptToMoveCameraToUserLocation()
         
-            do { try updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false) }
-            catch {}
+            updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
         }
     }
     
@@ -343,7 +330,7 @@ class MapViewController: UIViewController {
                 self.mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 6000, completionHandler: nil)
             }
             
-            func reverseGeocodeAndThenUpdateLabels() {
+            func reverseGeocode() {
                 let geocoder = CLGeocoder()
                 geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
                     
@@ -351,17 +338,25 @@ class MapViewController: UIViewController {
                     DataSource.sharedInstance.tappedPlacemark = placemarks![0]
                     DataSource.sharedInstance.updateTappedArea(with: placemarks![0])
                     
-                    do { try self.updateHoodAndAreaLabels(with: tappedLocation.coordinate, fromTap: true)
-                        flyToHood()
+                    do {
+                        if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
+                            self.cameraView.hoodView.hoodLabel.text = hood
+                            flyToHood()
+                        }
+                    } catch {
                     }
-                    catch {}
                 })
             }
             // update the label and hood check state
-            do { try updateHoodAndAreaLabels(with: tappedLocationCoord, fromTap: true)
-                flyToHood()
+            do {
+                if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
+                    cameraView.hoodView.hoodLabel.text = hood
+                    flyToHood()
+                } else {
+                    reverseGeocode()
+                }
             } catch {
-                reverseGeocodeAndThenUpdateLabels()
+                reverseGeocode()
             }
         }
         
@@ -639,13 +634,11 @@ extension MapViewController: CLLocationManagerDelegate {
                             DataSource.sharedInstance.visitingPlacemark = placemark
                             DataSource.sharedInstance.updateVisitingArea(with: placemark)
                             
-                            do { try self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false) }
-                            catch {}
+                            self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
                         }
                     })
                 } else {
-                    do { try updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false) }
-                    catch {}
+                    updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
                 }
             }
         }

@@ -63,7 +63,7 @@ class DataSource {
             if locality == "San Francisco" {
                 visitingArea = locality
                 
-                // else it's not SF, set the area to subLocality
+            // else it's not SF, set the area to subLocality
             } else {
                 if let subLocality = placemark.subLocality {
                     visitingArea = subLocality
@@ -79,7 +79,7 @@ class DataSource {
             if locality == "San Francisco" {
                 tappedArea = locality
                 
-                // else it's not SF, set the area to subLocality
+            // else it's not SF, set the area to subLocality
             } else {
                 if let subLocality = tappedPlacemark!.subLocality {
                     tappedArea = subLocality
@@ -101,7 +101,7 @@ class DataSource {
                     visitingHoodName = hood
                     return hood
                     
-                    // else stop scanning
+                // else stop scanning
                 } else {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "StopScanning"), object: nil)
                 }
@@ -115,23 +115,28 @@ class DataSource {
         // if this is the first map tap...
         if tappedArea == nil && visitingArea != nil {
             
-            // if hood check from visiting area succeeded...
+            // if hood check from visiting area succeeds...
             if let hoodFromVisitingArea = hoodName(for: coord, in: visitingArea!, fromTap: true) {
                 
                 // update singletons
                 tappedArea = visitingArea!
                 tappedHoodName = hoodFromVisitingArea
+                
                 return hoodFromVisitingArea
                 
-                // else not found in hood from visiting area, most likely tapped area
+            // else not found in hood from visiting area
             } else {
                 throw GeoError.areaError
             }
             
-            // else scan tapped area
+        // else scan tapped area
         } else {
+            
+            // if hood check from tapped area succeeds...
             if let hoodFromTappedArea = hoodName(for: coord, in: tappedArea!, fromTap: true) {
                 return hoodFromTappedArea
+                
+            // else not found in hood from tapped area
             } else {
                 throw GeoError.areaError
             }
@@ -233,7 +238,7 @@ class DataSource {
         case "Manhattan":
             return "manhattan"
         case "Brooklyn":
-            return "nyc"
+            return "brooklyn"
         case "Queens":
             return "queens"
         case "Bronx":
