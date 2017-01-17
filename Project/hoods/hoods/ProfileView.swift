@@ -25,7 +25,7 @@ class ProfileView: UIView {
         NotificationCenter.default.addObserver(self, selector: #selector(updateProfile), name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
         
         // profile properties
-        openRoundedCornerRadius = frame.size.width / 20
+        openRoundedCornerRadius = 0
         closedRoundedCornerRadius = frame.size.width / 2
         layer.cornerRadius = closedRoundedCornerRadius
         layer.masksToBounds = true

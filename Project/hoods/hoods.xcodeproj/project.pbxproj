@@ -13,6 +13,7 @@
 		490BD1A61E29A6EC0042FBE7 /* nyc.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1A51E29A6EC0042FBE7 /* nyc.geojson */; };
 		490BD1AC1E2C23680042FBE7 /* queens.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1AB1E2C23680042FBE7 /* queens.geojson */; };
 		490BD1AE1E2C236E0042FBE7 /* statenIsland.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */; };
+		490BD1B01E2DF3CF0042FBE7 /* brooklyn.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1AF1E2DF3CF0042FBE7 /* brooklyn.geojson */; };
 		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
 		4942DC041D799FF000A871E7 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4942DC031D799FF000A871E7 /* ProfileView.swift */; };
@@ -36,6 +37,7 @@
 		490BD1A51E29A6EC0042FBE7 /* nyc.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nyc.geojson; sourceTree = "<group>"; };
 		490BD1AB1E2C23680042FBE7 /* queens.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = queens.geojson; sourceTree = "<group>"; };
 		490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = statenIsland.geojson; sourceTree = "<group>"; };
+		490BD1AF1E2DF3CF0042FBE7 /* brooklyn.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = brooklyn.geojson; sourceTree = "<group>"; };
 		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
 		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
 		4942DC031D799FF000A871E7 /* ProfileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				490BD1A31E29A5F40042FBE7 /* manhattan.geojson */,
+				490BD1AF1E2DF3CF0042FBE7 /* brooklyn.geojson */,
 				490BD1AB1E2C23680042FBE7 /* queens.geojson */,
 				490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */,
 				490BD1A51E29A6EC0042FBE7 /* nyc.geojson */,
@@ -249,6 +252,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				490BD1A61E29A6EC0042FBE7 /* nyc.geojson in Resources */,
+				490BD1B01E2DF3CF0042FBE7 /* brooklyn.geojson in Resources */,
 				490BD1AE1E2C236E0042FBE7 /* statenIsland.geojson in Resources */,
 				490BD1AC1E2C23680042FBE7 /* queens.geojson in Resources */,
 				490BD1A41E29A5F40042FBE7 /* manhattan.geojson in Resources */,

@@ -10,6 +10,8 @@ import UIKit
 
 class HoodView: UIView {
     
+    let button = UIButton()
+    let areaLabel = UILabel()
     let hoodLabel = UILabel()
     
     override init(frame: CGRect) {
@@ -17,30 +19,73 @@ class HoodView: UIView {
         
         backgroundColor = UIColor.clear
         
-        hoodLabel.adjustsFontSizeToFitWidth = true
-        hoodLabel.font = UIFont.boldSystemFont(ofSize: 42)
-        hoodLabel.setContentHuggingPriority(251, for: .vertical)
-        hoodLabel.textAlignment = .center
         hoodLabel.text = "HOODS"
+        areaLabel.alpha = 0
+        areaLabel.isHidden = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
-        let views = [hoodLabel]
-        
-        for view in views {
-            view.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(view)
+        let labels = [areaLabel, hoodLabel]
+        for label in labels {
+            label.textAlignment = .center
+            label.adjustsFontSizeToFitWidth = true
+            label.font = UIFont.boldSystemFont(ofSize: 42)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(label)
         }
+        addSubview(button)
         
         let constraints: [NSLayoutConstraint] = [
             hoodLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
             hoodLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
             hoodLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            hoodLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
+            hoodLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+            
+            areaLabel.topAnchor.constraint(equalTo: hoodLabel.topAnchor),
+            areaLabel.leftAnchor.constraint(equalTo: hoodLabel.leftAnchor),
+            areaLabel.rightAnchor.constraint(equalTo: hoodLabel.rightAnchor),
+            areaLabel.bottomAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
+            
+            button.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            button.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            button.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            button.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
             ]
         NSLayoutConstraint.activate(constraints)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc fileprivate func buttonTapped(sender: UIButton) {
+        
+        // if hood label showing, hide hood label and show area label for 5 seconds
+        if areaLabel.isHidden {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.hoodLabel.alpha = 0
+            }, completion: { finished in
+                
+                self.hoodLabel.isHidden = true
+                self.areaLabel.isHidden = false
+                UIView.animate(withDuration: 1, animations: {
+                    self.areaLabel.alpha = 1
+                })
+            })
+            
+        // else if area label is showing, hide area label and show hood label
+        } else {
+            UIView.animate(withDuration: 0.3, animations: { 
+                self.areaLabel.alpha = 0
+            }, completion: { finished in
+                
+                self.areaLabel.isHidden = true
+                self.hoodLabel.isHidden = false
+                UIView.animate(withDuration: 1, animations: { 
+                    self.hoodLabel.alpha = 1
+                })
+            })
+        }
     }
     
     /*
