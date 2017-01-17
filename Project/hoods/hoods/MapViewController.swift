@@ -185,9 +185,12 @@ class MapViewController: UIViewController {
     }
     
     @objc fileprivate func profilePanFired(_ sender: UIPanGestureRecognizer) {
+        print("profile pan fired")
         
         // if the pan was not in the profile pic and the profile was not closed already
-        if !profileView.profileImageView.frame.contains(sender.location(in: profileView)) || DataSource.sharedInstance.profileState != .closed {
+        if DataSource.sharedInstance.profileState != .closed {
+            
+            print("pan was not in profile view OR profile state is not closed")
             toggleProfileSizeForState(.closed)
             
             self.profileView.layer.cornerRadius = self.profileView.closedRoundedCornerRadius
@@ -196,9 +199,14 @@ class MapViewController: UIViewController {
     
     @objc fileprivate func profileButtonTapped(_ sender: UIButton) {
         
+        // if map button not already hiding...
         if DataSource.sharedInstance.mapButtonState != .hiding {
+            
+            // open profile
             toggleProfileSizeForState(.open)
-            self.profileView.animateCornerRadiusOf(self.profileView, fromValue: self.profileView.openRoundedCornerRadius, toValue: 0.0, duration: 0)
+            
+            // animate corner radius to 0
+            profileView.animateCornerRadiusOf(self.profileView, fromValue: profileView.closedRoundedCornerRadius, toValue: profileView.openRoundedCornerRadius, duration: 0)
         }
     }
     
@@ -228,6 +236,9 @@ class MapViewController: UIViewController {
                 // set the profile button frame to 0
                 self.profileButton.frame = CGRect.zero
                 }, completion: { (Bool) in
+                    
+                    // sharpen edges of hood/camera view
+                    self.cameraView.animateCornerRadiusOf(self.cameraView, fromValue: self.cameraView.roundedCornerRadius, toValue: 0.0, duration: 0.3)
             })
          
         // else close it
@@ -468,9 +479,9 @@ class MapViewController: UIViewController {
                 // set map button state to Shown
                 DataSource.sharedInstance.mapButtonState = .shown
                 
-                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
-                self.profileView.frame = self.frameDict["profileViewClosed"]!
-                self.profileButton.frame = self.frameDict["profileViewClosed"]!
+//                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
+//                self.profileView.frame = self.frameDict["profileViewClosed"]!
+//                self.profileButton.frame = self.frameDict["profileViewClosed"]!
                 self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
                 self.federationButton.frame = self.frameDict["federationButtonNormal"]!
                 
@@ -499,9 +510,9 @@ class MapViewController: UIViewController {
                         self.toggleProfileSizeForState(.closed)
                     }
                     
-                    self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
-                    self.profileView.frame = self.frameDict["profileViewHidden"]!
-                    self.profileButton.frame = self.frameDict["profileViewHidden"]!
+//                    self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
+//                    self.profileView.frame = self.frameDict["profileViewHidden"]!
+//                    self.profileButton.frame = self.frameDict["profileViewHidden"]!
                     self.federationButtonShadow.frame = self.frameDict["federationButtonShadowHidden"]!
                     self.federationButton.frame = self.frameDict["federationButtonHidden"]!
                     
@@ -548,9 +559,9 @@ class MapViewController: UIViewController {
         frameDict["profileViewShadowOpen"] = CGRect(x: frameDict["profileViewOpen"]!.minX + 6, y: frameDict["profileViewOpen"]!.minY + 9, width: view.frame.width, height: view.frame.height - hoodViewHeight)
         
         // federation button
-        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - padding + 3, width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
         
         // federation button shadow
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
