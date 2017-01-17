@@ -61,10 +61,9 @@ class MapViewController: UIViewController {
     }
     
     func appDidBecomeActive() {
-        attemptToMoveCameraToUserLocation()
-        
-        if DataSource.sharedInstance.locationManager.location != nil {
-            updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
+        if let coord = DataSource.sharedInstance.locationManager.location?.coordinate {
+            fly(to: coord)
+            updateHoodAndAreaLabels(with: coord, fromTap: false)
         }
     }
 
@@ -89,17 +88,27 @@ class MapViewController: UIViewController {
     @objc fileprivate func attemptToMoveCameraToUserLocation() {
                 
         // if location available, start far out and then zoom into location at an angle over 3s
-        if let centerCoordinate = DataSource.sharedInstance.locationManager.location?.coordinate {
+        if let coord = DataSource.sharedInstance.locationManager.location?.coordinate {
             
             // start far out at a 50° angle
-            zoom(into: CLLocationCoordinate2DMake(centerCoordinate.latitude - 0.05, centerCoordinate.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            zoom(into: CLLocationCoordinate2DMake(coord.latitude - 0.05, coord.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into your location at a 30° angle over 3 seconds
-            zoom(into: centerCoordinate, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
+            zoom(into: coord, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
         // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
             moveCameraToManhattanAnimated(true)
+        }
+    }
+    
+    fileprivate func fly(to coord: CLLocationCoordinate2D) {
+        
+        // if location available...
+        if DataSource.sharedInstance.locationManager.location != nil {
+            
+            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
+            mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
         }
     }
     
@@ -301,11 +310,11 @@ class MapViewController: UIViewController {
         }
         
         // if location is available
-        if DataSource.sharedInstance.locationManager.location != nil {
+        if let coord = DataSource.sharedInstance.locationManager.location?.coordinate {
             
             DataSource.sharedInstance.hoodState = .visiting
             
-            attemptToMoveCameraToUserLocation()
+            fly(to: coord)
         
             updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
         }
@@ -335,11 +344,6 @@ class MapViewController: UIViewController {
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
             let tappedLocation = CLLocation(latitude: tappedLocationCoord.latitude, longitude: tappedLocationCoord.longitude)
             
-            func flyToHood() {
-                let mapCam = MGLMapCamera(lookingAtCenter: tappedLocationCoord, fromDistance: 5000, pitch: 30, heading: 0)
-                self.mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 6000, completionHandler: nil)
-            }
-            
             func reverseGeocode() {
                 let geocoder = CLGeocoder()
                 geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
@@ -351,7 +355,7 @@ class MapViewController: UIViewController {
                     do {
                         if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
                             self.cameraView.hoodView.hoodLabel.text = hood
-                            flyToHood()
+                            self.fly(to: tappedLocationCoord)
                         }
                     } catch {
                     }
@@ -365,7 +369,7 @@ class MapViewController: UIViewController {
             do {
                 if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
-                    flyToHood()
+                    fly(to: tappedLocationCoord)
                 } else {
                     reverseGeocode()
                 }
