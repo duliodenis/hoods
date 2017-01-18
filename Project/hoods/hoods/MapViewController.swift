@@ -116,7 +116,7 @@ class MapViewController: UIViewController {
         // if location available...
         if DataSource.si.locationManager.location != nil {
             
-            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
+            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
             mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
         }
     }
