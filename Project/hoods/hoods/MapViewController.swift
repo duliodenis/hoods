@@ -36,6 +36,8 @@ class MapViewController: UIViewController {
     fileprivate var federationButton = FederationButton()
     fileprivate var federationButtonShadow = UIView()
     
+    var shakeHintView = UIView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -174,7 +176,12 @@ class MapViewController: UIViewController {
             DataSource.si.visitingWeather = weather
             
             DispatchQueue.main.async {
-                self.cameraView.hoodView.weatherLabel.text = weather
+                if let visitingWeatherTemp = DataSource.si.weather.visitingWeatherTemp {
+                    let temperature = String(format: "%.0f", arguments: [visitingWeatherTemp])
+                    self.cameraView.hoodView.weatherLabel.text = "\(temperature)ºF \(weather)"
+                } else {
+                    self.cameraView.hoodView.weatherLabel.text = weather
+                }
             }
         }
     }
@@ -185,7 +192,12 @@ class MapViewController: UIViewController {
             DataSource.si.tappedWeather = weather
             
             DispatchQueue.main.async {
-                self.cameraView.hoodView.weatherLabel.text = weather
+                if let tappedWeatherTemp = DataSource.si.weather.tappedWeatherTemp {
+                    let temperature = String(format: "%.0f", arguments: [tappedWeatherTemp])
+                    self.cameraView.hoodView.weatherLabel.text = "\(temperature)ºF \(weather)"
+                } else {
+                    self.cameraView.hoodView.weatherLabel.text = weather
+                }
             }
         }
     }
@@ -379,21 +391,23 @@ class MapViewController: UIViewController {
             func reverseGeocode() {
                 DataSource.si.geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
                     
-                    // update tapped area and placemark singletons
-                    DataSource.si.tappedPlacemark = placemarks![0]
-                    DataSource.si.updateTappedArea(with: placemarks![0])
-                    
-                    do {
-                        if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
-                            self.cameraView.hoodView.hoodLabel.text = hood
-                            self.fly(to: tappedLocationCoord)
+                    if let placemark = placemarks?[0] {
+                        
+                        // update tapped area and placemark singletons
+                        DataSource.si.tappedPlacemark = placemark
+                        DataSource.si.updateTappedArea(with: placemark)
+                        
+                        do {
+                            if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
+                                self.cameraView.hoodView.hoodLabel.text = hood
+                                self.fly(to: tappedLocationCoord)
+                            }
+                        } catch {}
+                        if let area = DataSource.si.tappedArea {
+                            self.cameraView.hoodView.areaLabel.text = area
                         }
-                    } catch {
+                        DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, fromTap: true)
                     }
-                    if let area = DataSource.si.tappedArea {
-                        self.cameraView.hoodView.areaLabel.text = area
-                    }
-                    DataSource.si.weather.updateWeatherID(coordinate: tappedLocationCoord, fromTap: true)
                 })
             }
             
@@ -408,7 +422,7 @@ class MapViewController: UIViewController {
                 if let area = DataSource.si.tappedArea {
                     cameraView.hoodView.areaLabel.text = area
                 }
-                DataSource.si.weather.updateWeatherID(coordinate: tappedLocationCoord, fromTap: true)
+                DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, fromTap: true)
             } catch {
                 reverseGeocode()
             }
@@ -688,7 +702,6 @@ extension MapViewController: CLLocationManagerDelegate {
                         // reverse geocode coord to get the area
                         DataSource.si.geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
                             if error == nil {
-                                print("no error reverse geocoding")
                                 
                                 // update the visiting placemark singleton and get the visiting area
                                 let placemark = placemarks![0]
@@ -698,9 +711,7 @@ extension MapViewController: CLLocationManagerDelegate {
                                 self.updateHoodLabels(with: locations[0].coordinate, fromTap: false)
                                 
                                 // update weather id and if successful, update label from notification that it posts
-                                DataSource.si.weather.updateWeatherID(coordinate: (placemark.location?.coordinate)!, fromTap: false)
-                            } else {
-                                print("yes error reverse geocoding")
+                                DataSource.si.weather.updateWeatherIDAndTemp(coordinate: (placemark.location?.coordinate)!, fromTap: false)
                             }
                         })
                     } else {

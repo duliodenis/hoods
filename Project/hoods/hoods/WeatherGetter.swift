@@ -15,6 +15,8 @@ class WeatherGetter {
     private let openWeatherMapAPIKey = "10abd2dcd8626a4d75165599ff7c8625"
     var visitingWeatherID: Int?
     var tappedWeatherID: Int?
+    var visitingWeatherTemp: Double?
+    var tappedWeatherTemp: Double?
     
     func weatherEmojis(id: Int) -> String {
         switch id {
@@ -112,7 +114,7 @@ class WeatherGetter {
         }
     }
     
-    func updateWeatherID(coordinate: CLLocationCoordinate2D, fromTap: Bool) {
+    func updateWeatherIDAndTemp(coordinate: CLLocationCoordinate2D, fromTap: Bool) {
         let session = URLSession.shared
         let weatherRequestURL = URL(string: "\(openWeatherMapBaseURL)?APPID=\(openWeatherMapAPIKey)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
@@ -137,6 +139,13 @@ class WeatherGetter {
                                 self.visitingWeatherID = id as? Int
                                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
                             }
+                        }
+                    }
+                    if let temperature = json?["main"]?["temp"] as? Double {
+                        if fromTap {
+                            self.tappedWeatherTemp = temperature * 9 / 5 - 459.67
+                        } else {
+                            self.visitingWeatherTemp = temperature * 9 / 5 - 459.67
                         }
                     }
                 } catch {

@@ -137,7 +137,7 @@ class DataSource {
             }
             
         // else scan tapped area
-        } else {
+        } else if tappedArea != nil {
             
             // if hood check from tapped area succeeds...
             if let hoodFromTappedArea = hoodName(for: coord, in: tappedArea!, fromTap: true) {
@@ -147,6 +147,8 @@ class DataSource {
             } else {
                 throw GeoError.areaError
             }
+        } else {
+            throw GeoError.areaError
         }
     }
     
@@ -155,7 +157,6 @@ class DataSource {
         
         // set file path to geoJSON for area
         filePath = Bundle.main.path(forResource: geoJSONFile(for: area), ofType: "geojson")!
-        print("filepath: \(filePath)")
         
         // convert GeoJSON to NSData
         let data = try? Data(contentsOf: URL(fileURLWithPath: filePath))
@@ -249,7 +250,7 @@ class DataSource {
         case "Queens":
             return "queens"
         case "Bronx":
-            return "nyc"
+            return "bronx"
         case "Staten Island":
             return "statenIsland"
         case "San Francisco":
