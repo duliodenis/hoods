@@ -249,7 +249,7 @@ class DataSource {
         case "Queens":
             return "queens"
         case "Bronx":
-            return "nyc"
+            return "bronx"
         case "Staten Island":
             return "statenIsland"
         case "San Francisco":
