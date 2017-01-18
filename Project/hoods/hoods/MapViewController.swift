@@ -580,7 +580,7 @@ class MapViewController: UIViewController {
         
         // federation button
         frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
         frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
         
         // federation button shadow
