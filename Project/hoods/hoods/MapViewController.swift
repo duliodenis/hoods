@@ -563,7 +563,7 @@ class MapViewController: UIViewController {
         // i have included parentheses for those who does not know pemdas
         
         let buttonSize = CGSize(width: 50, height: 50)
-        let hoodViewHeight = view.frame.height * 0.1
+        let hoodViewHeight = view.frame.height * 0.15
         
         // hood view
         frameDict["cameraView"] = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + hoodViewHeight)
