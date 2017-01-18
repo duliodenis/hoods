@@ -63,7 +63,7 @@ class MapViewController: UIViewController {
     func appDidBecomeActive() {
         if let coord = DataSource.si.locationManager.location?.coordinate {
             flyToUserLocation()
-            updateHoodAndAreaLabels(with: coord, fromTap: false)
+            updateHoodLabels(with: coord, fromTap: false)
         }
     }
 
@@ -145,7 +145,7 @@ class MapViewController: UIViewController {
         view.addSubview(cameraView!)
     }
     
-    fileprivate func updateHoodAndAreaLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) {
+    fileprivate func updateHoodLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) {
         switch fromTap {
         case true:
             do {
@@ -156,12 +156,36 @@ class MapViewController: UIViewController {
             if let area = DataSource.si.tappedArea {
                 cameraView.hoodView.areaLabel.text = area
             }
+            updateWeatherLabelFromVisiting()
         case false:
             if let hood = DataSource.si.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
             }
             if let area = DataSource.si.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
+            }
+            updateWeatherLabelFromTap()
+        }
+    }
+    
+    @objc fileprivate func updateWeatherLabelFromVisiting() {
+        if DataSource.si.weather.visitingWeatherID != nil {
+            let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.visitingWeatherID!)
+            DataSource.si.visitingWeather = weather
+            
+            DispatchQueue.main.async {
+                self.cameraView.hoodView.weatherLabel.text = weather
+            }
+        }
+    }
+    
+    @objc fileprivate func updateWeatherLabelFromTap() {
+        if DataSource.si.weather.tappedWeatherID != nil {
+            let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.tappedWeatherID!)
+            DataSource.si.tappedWeather = weather
+            
+            DispatchQueue.main.async {
+                self.cameraView.hoodView.weatherLabel.text = weather
             }
         }
     }
@@ -324,7 +348,7 @@ class MapViewController: UIViewController {
             DataSource.si.hoodState = .visiting
             
             flyToUserLocation()
-            updateHoodAndAreaLabels(with: coord, fromTap: false)
+            updateHoodLabels(with: coord, fromTap: false)
         }
     }
     
@@ -369,6 +393,7 @@ class MapViewController: UIViewController {
                     if let area = DataSource.si.tappedArea {
                         self.cameraView.hoodView.areaLabel.text = area
                     }
+                    DataSource.si.weather.updateWeatherID(coordinate: tappedLocationCoord, fromTap: true)
                 })
             }
             
@@ -383,6 +408,7 @@ class MapViewController: UIViewController {
                 if let area = DataSource.si.tappedArea {
                     cameraView.hoodView.areaLabel.text = area
                 }
+                DataSource.si.weather.updateWeatherID(coordinate: tappedLocationCoord, fromTap: true)
             } catch {
                 reverseGeocode()
             }
@@ -550,6 +576,12 @@ class MapViewController: UIViewController {
         // listen for "StopScanning" notification from data source
         NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "StopScanning"), object: nil)
         
+        // listen for "GotWeatherFromVisiting" notification from weather getter
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromVisiting), name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
+        
+        // listen for "GotWeatherFromTap" notification from weather getter
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromTap), name: NSNotification.Name(rawValue: "GotWeatherFromTap"), object: nil)
+        
         // setup offline pack notification handlers.
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackProgressDidChange), name: NSNotification.Name.MGLOfflinePackProgressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackDidReceiveError), name: NSNotification.Name.MGLOfflinePackError, object: nil)
@@ -656,17 +688,23 @@ extension MapViewController: CLLocationManagerDelegate {
                         // reverse geocode coord to get the area
                         DataSource.si.geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
                             if error == nil {
+                                print("no error reverse geocoding")
                                 
                                 // update the visiting placemark singleton and get the visiting area
                                 let placemark = placemarks![0]
                                 DataSource.si.visitingPlacemark = placemark
                                 DataSource.si.updateVisitingArea(with: placemark)
                                 
-                                self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                                self.updateHoodLabels(with: locations[0].coordinate, fromTap: false)
+                                
+                                // update weather id and if successful, update label from notification that it posts
+                                DataSource.si.weather.updateWeatherID(coordinate: (placemark.location?.coordinate)!, fromTap: false)
+                            } else {
+                                print("yes error reverse geocoding")
                             }
                         })
                     } else {
-                        updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                        updateHoodLabels(with: locations[0].coordinate, fromTap: false)
                     }
                 }
             }

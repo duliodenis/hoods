@@ -13,13 +13,8 @@ class WeatherGetter {
     
     private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/weather"
     private let openWeatherMapAPIKey = "10abd2dcd8626a4d75165599ff7c8625"
-    let mùCangChảiCoord = CLLocationCoordinate2D(latitude: 21.772979, longitude: 104.107066)
-    let miamiCoord = CLLocationCoordinate2D(latitude: 25.778698, longitude: -80.133461)
-    let cairoCoord = CLLocationCoordinate2D(latitude: 30.045253, longitude: 31.232156)
-    var mùCangChảiID: Int?
-    var miamiID: Int?
-    var cairoID: Int?
-    var currentWeatherID: Int?
+    var visitingWeatherID: Int?
+    var tappedWeatherID: Int?
     
     func weatherEmojis(id: Int) -> String {
         switch id {
@@ -117,34 +112,30 @@ class WeatherGetter {
         }
     }
     
-    func updateWeatherID(coordinate: CLLocationCoordinate2D) {
-        
-        // This is a pretty simple networking task, so the shared session will do.
+    func updateWeatherID(coordinate: CLLocationCoordinate2D, fromTap: Bool) {
         let session = URLSession.shared
-        
         let weatherRequestURL = URL(string: "\(openWeatherMapBaseURL)?APPID=\(openWeatherMapAPIKey)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
-        // The data task retrieves the data.
+        // get data
         let dataTask = session.dataTask(with: weatherRequestURL as URL) {
             (data: Data?, response: URLResponse?, error: Error?) in
+            
+            // if error...
             if let error = error {
-                // Case 1: Error
                 print("Error:\n\(error)")
-            }
-            else {
-                // Case 2: Success
+                
+            // else success
+            } else {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String:AnyObject]
                     if let weather = json?["weather"] as? [[String:AnyObject]] {
                         if let id = weather.first?["id"] {
-                            if coordinate.latitude == self.mùCangChảiCoord.latitude && coordinate.longitude == self.mùCangChảiCoord.longitude {
-                                self.mùCangChảiID = id as? Int
-                            } else if coordinate.latitude == self.miamiCoord.latitude && coordinate.longitude == self.miamiCoord.longitude {
-                                self.miamiID = id as? Int
-                            } else if coordinate.latitude == self.cairoCoord.latitude && coordinate.longitude == self.cairoCoord.longitude {
-                                self.cairoID = id as? Int
+                            if fromTap {
+                                self.tappedWeatherID = id as? Int
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromTap"), object: nil)
                             } else {
-                                self.currentWeatherID = id as? Int
+                                self.visitingWeatherID = id as? Int
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
                             }
                         }
                     }
@@ -153,8 +144,6 @@ class WeatherGetter {
                 }
             }
         }
-        
-        // The data task is set up...launch it!
         dataTask.resume()
     }
 }

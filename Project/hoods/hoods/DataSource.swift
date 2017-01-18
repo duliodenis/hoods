@@ -47,12 +47,14 @@ class DataSource {
     
     var visitingHoodName: String?
     var visitingArea: String?
+    var visitingWeather: String?
     var visitingPlacemark: CLPlacemark?
     var visitingPolygonRenderer: MKPolygonRenderer?
     var visitingHoodCoords = [CLLocationCoordinate2D]()
 
     var tappedHoodName: String?
     var tappedArea: String?
+    var tappedWeather: String?
     var tappedPlacemark: CLPlacemark?
 
     var calloutRepresentedObject: MGLAnnotation?

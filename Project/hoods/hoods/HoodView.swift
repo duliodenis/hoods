@@ -21,11 +21,12 @@ class HoodView: UIView {
         backgroundColor = UIColor.clear
         
         hoodLabel.text = "HOODS"
+        areaLabel.text = "🗺"
         areaLabel.alpha = 0
         areaLabel.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        weatherLabel.text = "⛈⛈"
+        weatherLabel.text = "⏳"
         
         let labels = [areaLabel, hoodLabel, weatherLabel]
         for label in labels {
