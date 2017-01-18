@@ -43,6 +43,7 @@ class DataSource {
     var profileState: ProfileState?
 
     var locationManager = CLLocationManager()
+    var geocoder = CLGeocoder()
     
     var visitingHoodName: String?
     var visitingArea: String?

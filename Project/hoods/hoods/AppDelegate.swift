@@ -42,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
         navigationController.view.addSubview(maskBgView)
         navigationController.view.bringSubview(toFront: maskBgView)
         
-        DataSource.sharedInstance.locationManager.requestWhenInUseAuthorization()
+        DataSource.si.locationManager.requestWhenInUseAuthorization()
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         

@@ -347,8 +347,7 @@ class MapViewController: UIViewController {
             let tappedLocation = CLLocation(latitude: tappedLocationCoord.latitude, longitude: tappedLocationCoord.longitude)
             
             func reverseGeocode() {
-                let geocoder = CLGeocoder()
-                geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
+                DataSource.si.geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
                     
                     // update tapped area and placemark singletons
                     DataSource.si.tappedPlacemark = placemarks![0]
@@ -647,8 +646,7 @@ extension MapViewController: CLLocationManagerDelegate {
                     if !DataSource.si.stillInTheHood(locations[0].coordinate) {
                         
                         // reverse geocode coord to get the area
-                        let geocoder = CLGeocoder()
-                        geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                        DataSource.si.geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
                             if error == nil {
                                 
                                 // update the visiting placemark singleton and get the visiting area
