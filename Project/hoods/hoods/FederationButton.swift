@@ -15,7 +15,7 @@ class FederationButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        setTitle("✈️g", for: UIControlState())
+        setTitle("✈️", for: UIControlState())
         titleLabel!.font = UIFont.systemFont(ofSize: 23)
         titleLabel!.adjustsFontSizeToFitWidth = true
         tintColor = UIColor.white
