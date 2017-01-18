@@ -27,7 +27,7 @@ class CameraView: UIView {
         addSubview(hoodView)
         
         let constraints: [NSLayoutConstraint] = [
-            hoodView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: DataSource.sharedInstance.viewSize!.height),
+            hoodView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: DataSource.si.viewSize!.height),
             hoodView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
             hoodView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
             hoodView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)

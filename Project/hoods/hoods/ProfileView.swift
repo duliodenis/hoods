@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import FBSDKLoginKit
 
 class ProfileView: UIView {
     
@@ -17,7 +16,6 @@ class ProfileView: UIView {
     let profileImageView = UIImageView()
     let profileFirstNameLabel = UILabel()
     let profileLastNameLabel = UILabel()
-    var fbLoginButton = FBSDKLoginButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,14 +30,10 @@ class ProfileView: UIView {
         backgroundColor = UIColor.white
         
         // subview specific properties
-        profileImageView.image = DataSource.sharedInstance.cropToBounds(UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
+        profileImageView.image = DataSource.si.cropToBounds(UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
                 
-        fbLoginButton.readPermissions = ["public_profile", "user_friends"]
-        
-        DataSource.sharedInstance.fetchProfile()
-        
         let labels = [profileFirstNameLabel, profileLastNameLabel]
         for label in labels {
             label.numberOfLines = 2
@@ -49,7 +43,7 @@ class ProfileView: UIView {
         }
         
         // subview common properties
-        let subviews = [profileImageView, profileLastNameLabel, profileFirstNameLabel, fbLoginButton] as [Any]
+        let subviews = [profileImageView, profileLastNameLabel, profileFirstNameLabel] as [Any]
         for sub in subviews {
             (sub as! UIView).translatesAutoresizingMaskIntoConstraints = false
             addSubview(sub as! UIView)
@@ -86,15 +80,10 @@ class ProfileView: UIView {
                 profileLastNameLabel.topAnchor.constraint(equalTo: profileImageView.centerYAnchor),
                 profileLastNameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 10),
                 profileLastNameLabel.rightAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 100),
-                profileLastNameLabel.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-                
-                fbLoginButton.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-                fbLoginButton.leftAnchor.constraint(equalTo: profileImageView.leftAnchor),
-                fbLoginButton.rightAnchor.constraint(equalTo: profileLastNameLabel.rightAnchor),
-                fbLoginButton.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+                profileLastNameLabel.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10)                
             ]
             
-            DataSource.sharedInstance.profileState = .closed
+            DataSource.si.profileState = .closed
         } else {
             
             // open profile constraints
@@ -112,15 +101,10 @@ class ProfileView: UIView {
                 profileLastNameLabel.topAnchor.constraint(equalTo: profileImageView.centerYAnchor),
                 profileLastNameLabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 10),
                 profileLastNameLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: -5),
-                profileLastNameLabel.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: -10),
-                
-                fbLoginButton.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-                fbLoginButton.leftAnchor.constraint(equalTo: profileImageView.leftAnchor),
-                fbLoginButton.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: -10),
-                fbLoginButton.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 35)
+                profileLastNameLabel.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: -10)
             ]
             
-            DataSource.sharedInstance.profileState = .open
+            DataSource.si.profileState = .open
         }
         
         // activate constraints
@@ -129,25 +113,6 @@ class ProfileView: UIView {
     
     @objc fileprivate func updateProfile() {
         
-        profileFirstNameLabel.text = DataSource.sharedInstance.fbProfileDict["firstName"]
-        profileLastNameLabel.text = DataSource.sharedInstance.fbProfileDict["lastName"]
-        if FBSDKAccessToken.current() != nil {
-            downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
-        } else {
-            profileImageView.image = UIImage(named: "profile_placeholder")
-        }
-    }
-    
-    func downloadImage(url: URL) {
-        
-        // use passed in url to asynchronously get image and set it to profile image view
-        DataSource.sharedInstance.getDataFromURL(url: url) { (data, response, error) in
-            DispatchQueue.main.sync() { () -> Void in
-                guard let data = data, error == nil else { return }
-//                print(response?.suggestedFilename ?? url.lastPathComponent)
-                self.profileImageView.image = UIImage(data: data)
-            }
-        }
     }
     
     /*

@@ -21,7 +21,7 @@ class CalloutViewController: UIView, MGLCalloutView {
         
         // set local and data source represented object to one passed in
         self.representedObject = representedObject
-        DataSource.sharedInstance.calloutRepresentedObject = representedObject
+        DataSource.si.calloutRepresentedObject = representedObject
 
         mainBody = UIButton(type: .system)
         

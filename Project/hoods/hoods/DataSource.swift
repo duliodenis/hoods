@@ -9,7 +9,6 @@
 import UIKit
 import Mapbox
 import MapKit
-import FBSDKLoginKit
 
 enum HoodState {
     case visiting
@@ -33,7 +32,9 @@ enum GeoError: Error {
 }
 
 class DataSource {
-    static let sharedInstance = DataSource()
+    
+    // shared instance
+    static let si = DataSource()
     fileprivate init() {}
     
     var hoodState: HoodState?
@@ -41,15 +42,19 @@ class DataSource {
     var profileState: ProfileState?
 
     var locationManager = CLLocationManager()
+    let geocoder = CLGeocoder()
+    let weather = WeatherGetter()
     
     var visitingHoodName: String?
     var visitingArea: String?
+    var visitingWeather: String?
     var visitingPlacemark: CLPlacemark?
     var visitingPolygonRenderer: MKPolygonRenderer?
     var visitingHoodCoords = [CLLocationCoordinate2D]()
 
     var tappedHoodName: String?
     var tappedArea: String?
+    var tappedWeather: String?
     var tappedPlacemark: CLPlacemark?
 
     var calloutRepresentedObject: MGLAnnotation?
@@ -105,6 +110,8 @@ class DataSource {
                 } else {
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "StopScanning"), object: nil)
                 }
+            } else {
+                return visitingHoodName
             }
         }
         return nil
@@ -249,34 +256,6 @@ class DataSource {
             return "sanFrancisco"
         default:
             return ""
-        }
-    }
-    
-    func fetchProfile() {
-        
-        // if logged in
-        if FBSDKAccessToken.current() != nil {
-                        
-            // request these
-            let parameters = ["fields": "email, first_name, last_name,  picture.type(large)"]
-
-            FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
-                if error != nil {
-                    print("fb error: \(error as Any)")
-                } else {
-                    
-                    guard let resultNew = result as? [String:Any] else { return }
-                    
-                    self.fbProfileDict["firstName"] = resultNew["first_name"] as? String
-                    self.fbProfileDict["lastName"] = resultNew["last_name"] as? String
-                    self.fbProfileDict["email"] = resultNew["email"] as? String
-                    
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
-                }
-            })
-            
-        } else {
-            print("The current access token is nil.")
         }
     }
     

@@ -45,11 +45,11 @@ class MapViewController: UIViewController {
         mapboxView.tintColor = UIColor.purple
         mapboxView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
-        DataSource.sharedInstance.locationManager.delegate = self
-        DataSource.sharedInstance.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        DataSource.sharedInstance.locationManager.distanceFilter = kCLDistanceFilterNone
+        DataSource.si.locationManager.delegate = self
+        DataSource.si.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        DataSource.si.locationManager.distanceFilter = kCLDistanceFilterNone
 
-        DataSource.sharedInstance.viewSize = view.frame.size
+        DataSource.si.viewSize = view.frame.size
         populateFrameDict()
         
         addTapGesture()
@@ -57,13 +57,13 @@ class MapViewController: UIViewController {
         addProfile()
         addCameraView()
                 
-        attemptToMoveCameraToUserLocation()
+        initialZoomToUserLocation()
     }
     
     func appDidBecomeActive() {
-        if let coord = DataSource.sharedInstance.locationManager.location?.coordinate {
-            fly(to: coord)
-            updateHoodAndAreaLabels(with: coord, fromTap: false)
+        if let coord = DataSource.si.locationManager.location?.coordinate {
+            flyToUserLocation()
+            updateHoodLabels(with: coord, fromTap: false)
         }
     }
 
@@ -85,10 +85,9 @@ class MapViewController: UIViewController {
         }
     }
     
-    @objc fileprivate func attemptToMoveCameraToUserLocation() {
-                
+    @objc fileprivate func initialZoomToUserLocation() {
         // if location available, start far out and then zoom into location at an angle over 3s
-        if let coord = DataSource.sharedInstance.locationManager.location?.coordinate {
+        if let coord = DataSource.si.locationManager.location?.coordinate {
             
             // start far out at a 50° angle
             zoom(into: CLLocationCoordinate2DMake(coord.latitude - 0.05, coord.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
@@ -96,18 +95,28 @@ class MapViewController: UIViewController {
             // move into your location at a 30° angle over 3 seconds
             zoom(into: coord, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
-        // else move camera into manhattan from 50° to 30° over 3 seconds
+            // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
             moveCameraToManhattanAnimated(true)
+        }
+    }
+    
+    fileprivate func flyToUserLocation() {
+        
+        // if location available...
+        if let coord = DataSource.si.locationManager.location?.coordinate {
+            
+            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
+            mapboxView.fly(to: mapCam, withDuration: 3, peakAltitude: 13000, completionHandler: nil)
         }
     }
     
     fileprivate func fly(to coord: CLLocationCoordinate2D) {
         
         // if location available...
-        if DataSource.sharedInstance.locationManager.location != nil {
+        if DataSource.si.locationManager.location != nil {
             
-            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
+            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
             mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
         }
     }
@@ -136,23 +145,47 @@ class MapViewController: UIViewController {
         view.addSubview(cameraView!)
     }
     
-    fileprivate func updateHoodAndAreaLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) {
+    fileprivate func updateHoodLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) {
         switch fromTap {
         case true:
             do {
-                if let hood = try DataSource.sharedInstance.tappedHoodName(for: coordinate) {
+                if let hood = try DataSource.si.tappedHoodName(for: coordinate) {
                     cameraView.hoodView.hoodLabel.text = hood
                 }
             } catch {}
-            if let area = DataSource.sharedInstance.tappedArea {
+            if let area = DataSource.si.tappedArea {
                 cameraView.hoodView.areaLabel.text = area
             }
+            updateWeatherLabelFromVisiting()
         case false:
-            if let hood = DataSource.sharedInstance.visitingHoodName(for: coordinate) {
+            if let hood = DataSource.si.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
             }
-            if let area = DataSource.sharedInstance.visitingArea {
+            if let area = DataSource.si.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
+            }
+            updateWeatherLabelFromTap()
+        }
+    }
+    
+    @objc fileprivate func updateWeatherLabelFromVisiting() {
+        if DataSource.si.weather.visitingWeatherID != nil {
+            let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.visitingWeatherID!)
+            DataSource.si.visitingWeather = weather
+            
+            DispatchQueue.main.async {
+                self.cameraView.hoodView.weatherLabel.text = weather
+            }
+        }
+    }
+    
+    @objc fileprivate func updateWeatherLabelFromTap() {
+        if DataSource.si.weather.tappedWeatherID != nil {
+            let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.tappedWeatherID!)
+            DataSource.si.tappedWeather = weather
+            
+            DispatchQueue.main.async {
+                self.cameraView.hoodView.weatherLabel.text = weather
             }
         }
     }
@@ -181,7 +214,7 @@ class MapViewController: UIViewController {
         addProfilePanGesture()
         
         // activate constraints for closed profile
-        if DataSource.sharedInstance.profileState == nil {
+        if DataSource.si.profileState == nil {
             profileView.activateConstraintsForState(.closed)
         }
     }
@@ -195,7 +228,7 @@ class MapViewController: UIViewController {
     @objc fileprivate func profilePanFired(_ sender: UIPanGestureRecognizer) {
         
         // if the pan was not in the profile pic and the profile was not closed already
-        if DataSource.sharedInstance.profileState != .closed {
+        if DataSource.si.profileState != .closed {
             
             toggleProfileSizeForState(.closed)
             
@@ -206,7 +239,7 @@ class MapViewController: UIViewController {
     @objc fileprivate func profileButtonTapped(_ sender: UIButton) {
         
         // if map button not already hiding...
-        if DataSource.sharedInstance.mapButtonState != .hiding {
+        if DataSource.si.mapButtonState != .hiding {
             
             // open profile
             toggleProfileSizeForState(.open)
@@ -305,18 +338,17 @@ class MapViewController: UIViewController {
         })
         
         // close profile
-        if DataSource.sharedInstance.profileState == .open {
+        if DataSource.si.profileState == .open {
             toggleProfileSizeForState(.closed)
         }
         
         // if location is available
-        if let coord = DataSource.sharedInstance.locationManager.location?.coordinate {
+        if let coord = DataSource.si.locationManager.location?.coordinate {
             
-            DataSource.sharedInstance.hoodState = .visiting
+            DataSource.si.hoodState = .visiting
             
-            fly(to: coord)
-        
-            updateHoodAndAreaLabels(with: (DataSource.sharedInstance.locationManager.location?.coordinate)!, fromTap: false)
+            flyToUserLocation()
+            updateHoodLabels(with: coord, fromTap: false)
         }
     }
     
@@ -338,44 +370,45 @@ class MapViewController: UIViewController {
         // if tap was not in any other view...
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
             
-            DataSource.sharedInstance.hoodState = .tapping
+            DataSource.si.hoodState = .tapping
             
             // CGPoint -> CLLocationCoordinate2D -> CLLocation
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
             let tappedLocation = CLLocation(latitude: tappedLocationCoord.latitude, longitude: tappedLocationCoord.longitude)
             
             func reverseGeocode() {
-                let geocoder = CLGeocoder()
-                geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
+                DataSource.si.geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
                     
                     // update tapped area and placemark singletons
-                    DataSource.sharedInstance.tappedPlacemark = placemarks![0]
-                    DataSource.sharedInstance.updateTappedArea(with: placemarks![0])
+                    DataSource.si.tappedPlacemark = placemarks![0]
+                    DataSource.si.updateTappedArea(with: placemarks![0])
                     
                     do {
-                        if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
+                        if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                             self.cameraView.hoodView.hoodLabel.text = hood
                             self.fly(to: tappedLocationCoord)
                         }
                     } catch {
                     }
-                    if let area = DataSource.sharedInstance.tappedArea {
+                    if let area = DataSource.si.tappedArea {
                         self.cameraView.hoodView.areaLabel.text = area
                     }
+                    DataSource.si.weather.updateWeatherID(coordinate: tappedLocationCoord, fromTap: true)
                 })
             }
             
             // update the label and hood check state
             do {
-                if let hood = try DataSource.sharedInstance.tappedHoodName(for: tappedLocationCoord) {
+                if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
                     fly(to: tappedLocationCoord)
                 } else {
                     reverseGeocode()
                 }
-                if let area = DataSource.sharedInstance.tappedArea {
+                if let area = DataSource.si.tappedArea {
                     cameraView.hoodView.areaLabel.text = area
                 }
+                DataSource.si.weather.updateWeatherID(coordinate: tappedLocationCoord, fromTap: true)
             } catch {
                 reverseGeocode()
             }
@@ -384,7 +417,7 @@ class MapViewController: UIViewController {
     // profile behavior
         
         // if profile is open and tap was outside profile...
-        if DataSource.sharedInstance.profileState == .open {
+        if DataSource.si.profileState == .open {
             if !profileView.frame.contains(sender.location(in: mapboxView)) {
                 
                 // hide map icons and close profile
@@ -398,8 +431,8 @@ class MapViewController: UIViewController {
     
     fileprivate func startOfflinePackDownload() {
         
-        let latitude = DataSource.sharedInstance.locationManager.location?.coordinate.latitude
-        let longitude = DataSource.sharedInstance.locationManager.location?.coordinate.longitude
+        let latitude = DataSource.si.locationManager.location?.coordinate.latitude
+        let longitude = DataSource.si.locationManager.location?.coordinate.longitude
         
         // create a region that includes the current viewport and any tiles needed to view it when zoomed further in
         let region = MGLTilePyramidOfflineRegion(styleURL: mapboxView.styleURL, bounds: MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(latitude! - 0.3, longitude! - 0.3), CLLocationCoordinate2DMake(latitude! + 0.3, longitude! + 0.3)), fromZoomLevel: mapboxView.zoomLevel, toZoomLevel: 10)
@@ -481,13 +514,13 @@ class MapViewController: UIViewController {
     fileprivate func showMapIcons() {
                 
         // if buttons are not already showing
-        if DataSource.sharedInstance.mapButtonState != .shown {
+        if DataSource.si.mapButtonState != .shown {
             
             // animate showing of icons
             UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .curveEaseIn, animations: {
                 
                 // set map button state to Shown
-                DataSource.sharedInstance.mapButtonState = .shown
+                DataSource.si.mapButtonState = .shown
                 
 //                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
 //                self.profileView.frame = self.frameDict["profileViewClosed"]!
@@ -509,14 +542,14 @@ class MapViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(7 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)) {
             
             // if profile is not open, proceed with hiding of icons
-            if DataSource.sharedInstance.profileState != .open {
+            if DataSource.si.profileState != .open {
                 
                 // animate hiding of icons
                 UIView.animate(withDuration: 0.8, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .curveEaseIn, animations: {
                     
-                    DataSource.sharedInstance.mapButtonState = .hiding
+                    DataSource.si.mapButtonState = .hiding
                     
-                    if DataSource.sharedInstance.profileState == .open {
+                    if DataSource.si.profileState == .open {
                         self.toggleProfileSizeForState(.closed)
                     }
                     
@@ -529,7 +562,7 @@ class MapViewController: UIViewController {
                     }, completion: { finished in
                         
                         // set map icon state to Hidden
-                        DataSource.sharedInstance.mapButtonState = .hidden
+                        DataSource.si.mapButtonState = .hidden
                 })
             }
         }
@@ -543,6 +576,12 @@ class MapViewController: UIViewController {
         // listen for "StopScanning" notification from data source
         NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "StopScanning"), object: nil)
         
+        // listen for "GotWeatherFromVisiting" notification from weather getter
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromVisiting), name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
+        
+        // listen for "GotWeatherFromTap" notification from weather getter
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromTap), name: NSNotification.Name(rawValue: "GotWeatherFromTap"), object: nil)
+        
         // setup offline pack notification handlers.
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackProgressDidChange), name: NSNotification.Name.MGLOfflinePackProgressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackDidReceiveError), name: NSNotification.Name.MGLOfflinePackError, object: nil)
@@ -552,8 +591,11 @@ class MapViewController: UIViewController {
 // MARK: Frame Dict
     
     fileprivate func populateFrameDict() {
+        
+        // i have included parentheses for those who does not know pemdas
+        
         let buttonSize = CGSize(width: 50, height: 50)
-        let hoodViewHeight = view.frame.height * 0.1
+        let hoodViewHeight = view.frame.height * 0.15
         
         // hood view
         frameDict["cameraView"] = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + hoodViewHeight)
@@ -570,8 +612,8 @@ class MapViewController: UIViewController {
         
         // federation button
         frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
         
         // federation button shadow
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
@@ -611,8 +653,8 @@ extension MapViewController: CLLocationManagerDelegate {
         
         if status == .authorizedWhenInUse {
             
-            DataSource.sharedInstance.locationManager.startUpdatingLocation()
-            DataSource.sharedInstance.locationManager.startUpdatingHeading()
+            DataSource.si.locationManager.startUpdatingLocation()
+            DataSource.si.locationManager.startUpdatingHeading()
             
             // turns on hood checking until it fails and this gets set to false
             hoodScanning = true
@@ -629,7 +671,6 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // notify the app delegate to release the hole
             NotificationCenter.default.post(name: Notification.Name(rawValue: "LocationManagerAuthChanged"), object: nil)
-
         }
     }
     
@@ -637,28 +678,33 @@ extension MapViewController: CLLocationManagerDelegate {
         
         // update hood state
         if hoodScanning == true {
-            if DataSource.sharedInstance.hoodState != .tapping {
-                DataSource.sharedInstance.hoodState = .visiting
+            if DataSource.si.hoodState != .tapping {
+                DataSource.si.hoodState = .visiting
                 
                 // if not still in the hood...
-                if DataSource.sharedInstance.locationManager.location != nil {
-                    if !DataSource.sharedInstance.stillInTheHood(locations[0].coordinate) {
+                if DataSource.si.locationManager.location != nil {
+                    if !DataSource.si.stillInTheHood(locations[0].coordinate) {
                         
                         // reverse geocode coord to get the area
-                        let geocoder = CLGeocoder()
-                        geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
+                        DataSource.si.geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
                             if error == nil {
+                                print("no error reverse geocoding")
                                 
                                 // update the visiting placemark singleton and get the visiting area
                                 let placemark = placemarks![0]
-                                DataSource.sharedInstance.visitingPlacemark = placemark
-                                DataSource.sharedInstance.updateVisitingArea(with: placemark)
+                                DataSource.si.visitingPlacemark = placemark
+                                DataSource.si.updateVisitingArea(with: placemark)
                                 
-                                self.updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                                self.updateHoodLabels(with: locations[0].coordinate, fromTap: false)
+                                
+                                // update weather id and if successful, update label from notification that it posts
+                                DataSource.si.weather.updateWeatherID(coordinate: (placemark.location?.coordinate)!, fromTap: false)
+                            } else {
+                                print("yes error reverse geocoding")
                             }
                         })
                     } else {
-                        updateHoodAndAreaLabels(with: locations[0].coordinate, fromTap: false)
+                        updateHoodLabels(with: locations[0].coordinate, fromTap: false)
                     }
                 }
             }
