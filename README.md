@@ -16,7 +16,7 @@ Tap the hood name to see its area
 
 Shake the phone to see your buttons
 
-Tap the rocketship button to go back home
+Tap the 🚀 button to go back home
 
 Share location-based media such as pics/videos/gifs/POI reviews/parties with your friends by adding it to your map*
 
