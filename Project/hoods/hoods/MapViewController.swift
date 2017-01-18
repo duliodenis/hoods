@@ -57,12 +57,12 @@ class MapViewController: UIViewController {
         addProfile()
         addCameraView()
                 
-        attemptToMoveCameraToUserLocation()
+        initialZoomToUserLocation()
     }
     
     func appDidBecomeActive() {
         if let coord = DataSource.si.locationManager.location?.coordinate {
-            fly(to: coord)
+            flyToUserLocation()
             updateHoodAndAreaLabels(with: coord, fromTap: false)
         }
     }
@@ -85,8 +85,7 @@ class MapViewController: UIViewController {
         }
     }
     
-    @objc fileprivate func attemptToMoveCameraToUserLocation() {
-                
+    @objc fileprivate func initialZoomToUserLocation() {
         // if location available, start far out and then zoom into location at an angle over 3s
         if let coord = DataSource.si.locationManager.location?.coordinate {
             
@@ -96,9 +95,19 @@ class MapViewController: UIViewController {
             // move into your location at a 30° angle over 3 seconds
             zoom(into: coord, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
-        // else move camera into manhattan from 50° to 30° over 3 seconds
+            // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
             moveCameraToManhattanAnimated(true)
+        }
+    }
+    
+    fileprivate func flyToUserLocation() {
+        
+        // if location available...
+        if let coord = DataSource.si.locationManager.location?.coordinate {
+            
+            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
+            mapboxView.fly(to: mapCam, withDuration: 3, peakAltitude: 13000, completionHandler: nil)
         }
     }
     
@@ -148,11 +157,8 @@ class MapViewController: UIViewController {
                 cameraView.hoodView.areaLabel.text = area
             }
         case false:
-            print("NOT FROM TAP")
             if let hood = DataSource.si.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
-            } else {
-                print("could not get hood name from visiting area: \(DataSource.si.visitingArea)")
             }
             if let area = DataSource.si.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
@@ -317,7 +323,7 @@ class MapViewController: UIViewController {
             
             DataSource.si.hoodState = .visiting
             
-            fly(to: coord)
+            flyToUserLocation()
             updateHoodAndAreaLabels(with: coord, fromTap: false)
         }
     }
