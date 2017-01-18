@@ -639,7 +639,6 @@ extension MapViewController: CLLocationManagerDelegate {
             
             // notify the app delegate to release the hole
             NotificationCenter.default.post(name: Notification.Name(rawValue: "LocationManagerAuthChanged"), object: nil)
-
         }
     }
     

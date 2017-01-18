@@ -5,7 +5,7 @@
       "properties": {
         "nid": "8e",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Russian Hill"
+        "place": "neighborhood", "name": "Russian Hill"
       },
       "geometry": {
         "coordinates": [
@@ -599,7 +599,7 @@
       "properties": {
         "nid": "5d",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Twin Peaks"
+        "place": "neighborhood", "name": "Twin Peaks"
       },
       "geometry": {
         "coordinates": [
@@ -1023,7 +1023,7 @@
       "properties": {
         "nid": "8d",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "North Beach"
+        "place": "neighborhood", "name": "North Beach"
       },
       "geometry": {
         "coordinates": [
@@ -1063,7 +1063,7 @@
       "properties": {
         "nid": "10j",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Hunters Point"
+        "place": "neighborhood", "name": "Hunters Point"
       },
       "geometry": {
         "coordinates": [
@@ -1107,7 +1107,7 @@
       "properties": {
         "nid": "3a",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Lake Shore"
+        "place": "neighborhood", "name": "Lake Shore"
       },
       "geometry": {
         "coordinates": [
@@ -2019,7 +2019,7 @@
       "properties": {
         "nid": "9c",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "Inner Mission"
+        "place": "neighborhood", "name": "Inner Mission"
       },
       "geometry": {
         "coordinates": [
@@ -2291,7 +2291,7 @@
       "properties": {
         "nid": "3e",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Lakeside"
+        "place": "neighborhood", "name": "Lakeside"
       },
       "geometry": {
         "coordinates": [
@@ -2419,7 +2419,7 @@
       "properties": {
         "nid": "3c",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Pine Lake Park"
+        "place": "neighborhood", "name": "Pine Lake Park"
       },
       "geometry": {
         "coordinates": [
@@ -2591,7 +2591,7 @@
       "properties": {
         "nid": "8j",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Tenderloin"
+        "place": "neighborhood", "name": "Tenderloin"
       },
       "geometry": {
         "coordinates": [
@@ -2671,7 +2671,7 @@
       "properties": {
         "nid": "2f",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Inner Sunset"
+        "place": "neighborhood", "name": "Inner Sunset"
       },
       "geometry": {
         "coordinates": [
@@ -2963,7 +2963,7 @@
       "properties": {
         "nid": "7d",
         "sfar_distr": "District 7 - North",
-        "neighborhood": "Cow Hollow"
+        "place": "neighborhood", "name": "Cow Hollow"
       },
       "geometry": {
         "coordinates": [
@@ -3159,7 +3159,7 @@
       "properties": {
         "nid": "3f",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Merced Manor"
+        "place": "neighborhood", "name": "Merced Manor"
       },
       "geometry": {
         "coordinates": [
@@ -3223,7 +3223,7 @@
       "properties": {
         "nid": "1e",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Outer Richmond"
+        "place": "neighborhood", "name": "Outer Richmond"
       },
       "geometry": {
         "coordinates": [
@@ -3439,7 +3439,7 @@
       "properties": {
         "nid": "10d",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Outer Mission"
+        "place": "neighborhood", "name": "Outer Mission"
       },
       "geometry": {
         "coordinates": [
@@ -3663,7 +3663,7 @@
       "properties": {
         "nid": "10f",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Portola"
+        "place": "neighborhood", "name": "Portola"
       },
       "geometry": {
         "coordinates": [
@@ -3835,7 +3835,7 @@
       "properties": {
         "nid": null,
         "sfar_distr": "None",
-        "neighborhood": "Presidio"
+        "place": "neighborhood", "name": "Presidio"
       },
       "geometry": {
         "coordinates": [
@@ -6075,7 +6075,7 @@
       "properties": {
         "nid": "4k",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Sherwood Forest"
+        "place": "neighborhood", "name": "Sherwood Forest"
       },
       "geometry": {
         "coordinates": [
@@ -6343,7 +6343,7 @@
       "properties": {
         "nid": "6a",
         "sfar_distr": "District 6 - Central North",
-        "neighborhood": "Anza Vista"
+        "place": "neighborhood", "name": "Anza Vista"
       },
       "geometry": {
         "coordinates": [
@@ -6399,7 +6399,7 @@
       "properties": {
         "nid": "4r",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Westwood Park"
+        "place": "neighborhood", "name": "Westwood Park"
       },
       "geometry": {
         "coordinates": [
@@ -6531,7 +6531,7 @@
       "properties": {
         "nid": "4a",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Balboa Terrace"
+        "place": "neighborhood", "name": "Balboa Terrace"
       },
       "geometry": {
         "coordinates": [
@@ -6639,7 +6639,7 @@
       "properties": {
         "nid": null,
         "sfar_distr": "None",
-        "neighborhood": "Golden Gate Park"
+        "place": "neighborhood", "name": "Golden Gate Park"
       },
       "geometry": {
         "coordinates": [
@@ -7011,7 +7011,7 @@
       "properties": {
         "nid": "9j",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "Central Waterfront/Dogpatch"
+        "place": "neighborhood", "name": "Central Waterfront/Dogpatch"
       },
       "geometry": {
         "coordinates": [
@@ -8209,7 +8209,7 @@
       "properties": {
         "nid": "7b",
         "sfar_distr": "District 7 - North",
-        "neighborhood": "Pacific Heights"
+        "place": "neighborhood", "name": "Pacific Heights"
       },
       "geometry": {
         "coordinates": [
@@ -8341,7 +8341,7 @@
       "properties": {
         "nid": "5k",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Eureka Valley / Dolores Heights"
+        "place": "neighborhood", "name": "Eureka Valley / Dolores Heights"
       },
       "geometry": {
         "coordinates": [
@@ -8573,7 +8573,7 @@
       "properties": {
         "nid": "4f",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Midtown Terrace"
+        "place": "neighborhood", "name": "Midtown Terrace"
       },
       "geometry": {
         "coordinates": [
@@ -9041,7 +9041,7 @@
       "properties": {
         "nid": "2e",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Central Sunset"
+        "place": "neighborhood", "name": "Central Sunset"
       },
       "geometry": {
         "coordinates": [
@@ -9085,7 +9085,7 @@
       "properties": {
         "nid": "6e",
         "sfar_distr": "District 6 - Central North",
-        "neighborhood": "Alamo Square"
+        "place": "neighborhood", "name": "Alamo Square"
       },
       "geometry": {
         "coordinates": [
@@ -9165,7 +9165,7 @@
       "properties": {
         "nid": "5b",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Haight Ashbury"
+        "place": "neighborhood", "name": "Haight Ashbury"
       },
       "geometry": {
         "coordinates": [
@@ -9277,7 +9277,7 @@
       "properties": {
         "nid": "1c",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Jordan Park / Laurel Heights"
+        "place": "neighborhood", "name": "Jordan Park / Laurel Heights"
       },
       "geometry": {
         "coordinates": [
@@ -9353,7 +9353,7 @@
       "properties": {
         "nid": "8b",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Financial District/Barbary Coast"
+        "place": "neighborhood", "name": "Financial District/Barbary Coast"
       },
       "geometry": {
         "coordinates": [
@@ -9849,7 +9849,7 @@
       "properties": {
         "nid": "6f",
         "sfar_distr": "District 6 - Central North",
-        "neighborhood": "North Panhandle"
+        "place": "neighborhood", "name": "North Panhandle"
       },
       "geometry": {
         "coordinates": [
@@ -9921,7 +9921,7 @@
       "properties": {
         "nid": "10c",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Excelsior"
+        "place": "neighborhood", "name": "Excelsior"
       },
       "geometry": {
         "coordinates": [
@@ -10125,7 +10125,7 @@
       "properties": {
         "nid": "2g",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Inner Parkside"
+        "place": "neighborhood", "name": "Inner Parkside"
       },
       "geometry": {
         "coordinates": [
@@ -10205,7 +10205,7 @@
       "properties": {
         "nid": "8c",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Nob Hill"
+        "place": "neighborhood", "name": "Nob Hill"
       },
       "geometry": {
         "coordinates": [
@@ -10249,7 +10249,7 @@
       "properties": {
         "nid": "1f",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Sea Cliff"
+        "place": "neighborhood", "name": "Sea Cliff"
       },
       "geometry": {
         "coordinates": [
@@ -10849,7 +10849,7 @@
       "properties": {
         "nid": "5e",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Cole Valley/Parnassus Heights"
+        "place": "neighborhood", "name": "Cole Valley/Parnassus Heights"
       },
       "geometry": {
         "coordinates": [
@@ -11009,7 +11009,7 @@
       "properties": {
         "nid": "4d",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Forest Knolls"
+        "place": "neighborhood", "name": "Forest Knolls"
       },
       "geometry": {
         "coordinates": [
@@ -11273,7 +11273,7 @@
       "properties": {
         "nid": "4r",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Mount Davidson Manor"
+        "place": "neighborhood", "name": "Mount Davidson Manor"
       },
       "geometry": {
         "coordinates": [
@@ -11477,7 +11477,7 @@
       "properties": {
         "nid": "9g",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "Yerba Buena"
+        "place": "neighborhood", "name": "Yerba Buena"
       },
       "geometry": {
         "coordinates": [
@@ -11637,7 +11637,7 @@
       "properties": {
         "nid": "3d",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Stonestown"
+        "place": "neighborhood", "name": "Stonestown"
       },
       "geometry": {
         "coordinates": [
@@ -11825,7 +11825,7 @@
       "properties": {
         "nid": "4c",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Forest Hill"
+        "place": "neighborhood", "name": "Forest Hill"
       },
       "geometry": {
         "coordinates": [
@@ -12021,7 +12021,7 @@
       "properties": {
         "nid": "5h",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Clarendon Heights"
+        "place": "neighborhood", "name": "Clarendon Heights"
       },
       "geometry": {
         "coordinates": [
@@ -12225,7 +12225,7 @@
       "properties": {
         "nid": "5f",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Buena Vista Park/Ashbury Heights"
+        "place": "neighborhood", "name": "Buena Vista Park/Ashbury Heights"
       },
       "geometry": {
         "coordinates": [
@@ -12437,7 +12437,7 @@
       "properties": {
         "nid": "8f",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Van Ness/Civic Center"
+        "place": "neighborhood", "name": "Van Ness/Civic Center"
       },
       "geometry": {
         "coordinates": [
@@ -12569,7 +12569,7 @@
       "properties": {
         "nid": "4p",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Westwood Highlands"
+        "place": "neighborhood", "name": "Westwood Highlands"
       },
       "geometry": {
         "coordinates": [
@@ -12801,7 +12801,7 @@
       "properties": {
         "nid": "6b",
         "sfar_distr": "District 6 - Central North",
-        "neighborhood": "Hayes Valley"
+        "place": "neighborhood", "name": "Hayes Valley"
       },
       "geometry": {
         "coordinates": [
@@ -12977,7 +12977,7 @@
       "properties": {
         "nid": "4e",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Ingleside Terrace"
+        "place": "neighborhood", "name": "Ingleside Terrace"
       },
       "geometry": {
         "coordinates": [
@@ -13101,7 +13101,7 @@
       "properties": {
         "nid": "8h",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "North Waterfront"
+        "place": "neighborhood", "name": "North Waterfront"
       },
       "geometry": {
         "coordinates": [
@@ -17401,7 +17401,7 @@
       "properties": {
         "nid": "5a",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Glen Park"
+        "place": "neighborhood", "name": "Glen Park"
       },
       "geometry": {
         "coordinates": [
@@ -17693,7 +17693,7 @@
       "properties": {
         "nid": "4b",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Diamond Heights"
+        "place": "neighborhood", "name": "Diamond Heights"
       },
       "geometry": {
         "coordinates": [
@@ -17961,7 +17961,7 @@
       "properties": {
         "nid": "5g",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Corona Heights"
+        "place": "neighborhood", "name": "Corona Heights"
       },
       "geometry": {
         "coordinates": [
@@ -18233,7 +18233,7 @@
       "properties": {
         "nid": "10k",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Bayview Heights"
+        "place": "neighborhood", "name": "Bayview Heights"
       },
       "geometry": {
         "coordinates": [
@@ -18301,7 +18301,7 @@
       "properties": {
         "nid": "1a",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Central Richmond"
+        "place": "neighborhood", "name": "Central Richmond"
       },
       "geometry": {
         "coordinates": [
@@ -18369,7 +18369,7 @@
       "properties": {
         "nid": "1b",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Inner Richmond"
+        "place": "neighborhood", "name": "Inner Richmond"
       },
       "geometry": {
         "coordinates": [
@@ -18461,7 +18461,7 @@
       "properties": {
         "nid": "4j",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Forest Hills Extension"
+        "place": "neighborhood", "name": "Forest Hills Extension"
       },
       "geometry": {
         "coordinates": [
@@ -18617,7 +18617,7 @@
       "properties": {
         "nid": "10g",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Silver Terrace"
+        "place": "neighborhood", "name": "Silver Terrace"
       },
       "geometry": {
         "coordinates": [
@@ -18725,7 +18725,7 @@
       "properties": {
         "nid": "10j",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Hunters Point"
+        "place": "neighborhood", "name": "Hunters Point"
       },
       "geometry": {
         "coordinates": [
@@ -23605,7 +23605,7 @@
       "properties": {
         "nid": "1g",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Lone Mountain"
+        "place": "neighborhood", "name": "Lone Mountain"
       },
       "geometry": {
         "coordinates": [
@@ -23685,7 +23685,7 @@
       "properties": {
         "nid": "6f",
         "sfar_distr": "District 6 - Central North",
-        "neighborhood": "Lower Pacific Heights"
+        "place": "neighborhood", "name": "Lower Pacific Heights"
       },
       "geometry": {
         "coordinates": [
@@ -23793,7 +23793,7 @@
       "properties": {
         "nid": "10b",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Crocker Amazon"
+        "place": "neighborhood", "name": "Crocker Amazon"
       },
       "geometry": {
         "coordinates": [
@@ -23929,7 +23929,7 @@
       "properties": {
         "nid": "10h",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Mission Terrace"
+        "place": "neighborhood", "name": "Mission Terrace"
       },
       "geometry": {
         "coordinates": [
@@ -24081,7 +24081,7 @@
       "properties": {
         "nid": "3b",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Merced Heights"
+        "place": "neighborhood", "name": "Merced Heights"
       },
       "geometry": {
         "coordinates": [
@@ -24141,7 +24141,7 @@
       "properties": {
         "nid": "2a",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Golden Gate Heights"
+        "place": "neighborhood", "name": "Golden Gate Heights"
       },
       "geometry": {
         "coordinates": [
@@ -24437,7 +24437,7 @@
       "properties": {
         "nid": "4m",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Monterey Heights"
+        "place": "neighborhood", "name": "Monterey Heights"
       },
       "geometry": {
         "coordinates": [
@@ -24621,7 +24621,7 @@
       "properties": {
         "nid": "10a",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Bayview"
+        "place": "neighborhood", "name": "Bayview"
       },
       "geometry": {
         "coordinates": [
@@ -26885,7 +26885,7 @@
       "properties": {
         "nid": "5m",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Mission Dolores"
+        "place": "neighborhood", "name": "Mission Dolores"
       },
       "geometry": {
         "coordinates": [
@@ -26973,7 +26973,7 @@
       "properties": {
         "nid": "9f",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "South of Market"
+        "place": "neighborhood", "name": "South of Market"
       },
       "geometry": {
         "coordinates": [
@@ -27241,7 +27241,7 @@
       "properties": {
         "nid": "7a",
         "sfar_distr": "District 7 - North",
-        "neighborhood": "Marina"
+        "place": "neighborhood", "name": "Marina"
       },
       "geometry": {
         "coordinates": [
@@ -33395,7 +33395,7 @@
       "properties": {
         "nid": "4s",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Sunnyside"
+        "place": "neighborhood", "name": "Sunnyside"
       },
       "geometry": {
         "coordinates": [
@@ -33595,7 +33595,7 @@
       "properties": {
         "nid": "9e",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "Potrero Hill"
+        "place": "neighborhood", "name": "Potrero Hill"
       },
       "geometry": {
         "coordinates": [
@@ -33863,7 +33863,7 @@
       "properties": {
         "nid": "10e",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Visitacion Valley"
+        "place": "neighborhood", "name": "Visitacion Valley"
       },
       "geometry": {
         "coordinates": [
@@ -34051,7 +34051,7 @@
       "properties": {
         "nid": "1d",
         "sfar_distr": "District 1 - Northwest",
-        "neighborhood": "Lake Street"
+        "place": "neighborhood", "name": "Lake Street"
       },
       "geometry": {
         "coordinates": [
@@ -34535,7 +34535,7 @@
       "properties": {
         "nid": "9h",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "South Beach"
+        "place": "neighborhood", "name": "South Beach"
       },
       "geometry": {
         "coordinates": [
@@ -39335,7 +39335,7 @@
       "properties": {
         "nid": "10m",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Candlestick Point"
+        "place": "neighborhood", "name": "Candlestick Point"
       },
       "geometry": {
         "coordinates": [
@@ -42543,7 +42543,7 @@
       "properties": {
         "nid": null,
         "sfar_distr": "None",
-        "neighborhood": "Lincoln Park"
+        "place": "neighborhood", "name": "Lincoln Park"
       },
       "geometry": {
         "coordinates": [
@@ -44811,7 +44811,7 @@
       "properties": {
         "nid": "8a",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Downtown"
+        "place": "neighborhood", "name": "Downtown"
       },
       "geometry": {
         "coordinates": [
@@ -44935,7 +44935,7 @@
       "properties": {
         "nid": "3g",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Ingleside Heights"
+        "place": "neighborhood", "name": "Ingleside Heights"
       },
       "geometry": {
         "coordinates": [
@@ -45047,7 +45047,7 @@
       "properties": {
         "nid": "9d",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "Mission Bay"
+        "place": "neighborhood", "name": "Mission Bay"
       },
       "geometry": {
         "coordinates": [
@@ -46375,7 +46375,7 @@
       "properties": {
         "nid": "5j",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Duboce Triangle"
+        "place": "neighborhood", "name": "Duboce Triangle"
       },
       "geometry": {
         "coordinates": [
@@ -46443,7 +46443,7 @@
       "properties": {
         "nid": "6d",
         "sfar_distr": "District 6 - Central North",
-        "neighborhood": "Western Addition"
+        "place": "neighborhood", "name": "Western Addition"
       },
       "geometry": {
         "coordinates": [
@@ -46535,7 +46535,7 @@
       "properties": {
         "nid": "8g",
         "sfar_distr": "District 8 - Northeast",
-        "neighborhood": "Telegraph Hill"
+        "place": "neighborhood", "name": "Telegraph Hill"
       },
       "geometry": {
         "coordinates": [
@@ -46579,7 +46579,7 @@
       "properties": {
         "nid": "4t",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "West Portal"
+        "place": "neighborhood", "name": "West Portal"
       },
       "geometry": {
         "coordinates": [
@@ -46707,7 +46707,7 @@
       "properties": {
         "nid": "2b",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Outer Parkside"
+        "place": "neighborhood", "name": "Outer Parkside"
       },
       "geometry": {
         "coordinates": [
@@ -47643,7 +47643,7 @@
       "properties": {
         "nid": "2d",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Parkside"
+        "place": "neighborhood", "name": "Parkside"
       },
       "geometry": {
         "coordinates": [
@@ -47775,7 +47775,7 @@
       "properties": {
         "nid": "7c",
         "sfar_distr": "District 7 - North",
-        "neighborhood": "Presidio Heights"
+        "place": "neighborhood", "name": "Presidio Heights"
       },
       "geometry": {
         "coordinates": [
@@ -47855,7 +47855,7 @@
       "properties": {
         "nid": "3j",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Oceanview"
+        "place": "neighborhood", "name": "Oceanview"
       },
       "geometry": {
         "coordinates": [
@@ -47955,7 +47955,7 @@
       "properties": {
         "nid": "4g",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Saint Francis Wood"
+        "place": "neighborhood", "name": "Saint Francis Wood"
       },
       "geometry": {
         "coordinates": [
@@ -48187,7 +48187,7 @@
       "properties": {
         "nid": "3h",
         "sfar_distr": "District 3 - Southwest",
-        "neighborhood": "Ingleside"
+        "place": "neighborhood", "name": "Ingleside"
       },
       "geometry": {
         "coordinates": [
@@ -48335,7 +48335,7 @@
       "properties": {
         "nid": "5c",
         "sfar_distr": "District 5 - Central",
-        "neighborhood": "Noe Valley"
+        "place": "neighborhood", "name": "Noe Valley"
       },
       "geometry": {
         "coordinates": [
@@ -48583,7 +48583,7 @@
       "properties": {
         "nid": "2c",
         "sfar_distr": "District 2 - Central West",
-        "neighborhood": "Outer Sunset"
+        "place": "neighborhood", "name": "Outer Sunset"
       },
       "geometry": {
         "coordinates": [
@@ -49263,7 +49263,7 @@
       "properties": {
         "nid": "10n",
         "sfar_distr": "District 10 - Southeast",
-        "neighborhood": "Little Hollywood"
+        "place": "neighborhood", "name": "Little Hollywood"
       },
       "geometry": {
         "coordinates": [
@@ -49363,7 +49363,7 @@
       "properties": {
         "nid": "9a",
         "sfar_distr": "District 9 - Central East",
-        "neighborhood": "Bernal Heights"
+        "place": "neighborhood", "name": "Bernal Heights"
       },
       "geometry": {
         "coordinates": [
@@ -49623,7 +49623,7 @@
       "properties": {
         "nid": "4h",
         "sfar_distr": "District 4 - Twin Peaks West",
-        "neighborhood": "Miraloma Park"
+        "place": "neighborhood", "name": "Miraloma Park"
       },
       "geometry": {
         "coordinates": [
