@@ -559,6 +559,9 @@ class MapViewController: UIViewController {
 // MARK: Frame Dict
     
     fileprivate func populateFrameDict() {
+        
+        // i have included parentheses for those who does not know pemdas
+        
         let buttonSize = CGSize(width: 50, height: 50)
         let hoodViewHeight = view.frame.height * 0.1
         
@@ -578,7 +581,7 @@ class MapViewController: UIViewController {
         // federation button
         frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
         frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - padding, y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
+        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
         
         // federation button shadow
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
