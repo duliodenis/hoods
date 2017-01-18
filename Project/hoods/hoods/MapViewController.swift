@@ -66,6 +66,7 @@ class MapViewController: UIViewController {
         if let coord = DataSource.si.locationManager.location?.coordinate {
             flyToUserLocation()
             updateHoodLabels(with: coord, fromTap: false)
+            updateWeatherLabelFromVisiting()
         }
     }
 
@@ -361,6 +362,7 @@ class MapViewController: UIViewController {
             
             flyToUserLocation()
             updateHoodLabels(with: coord, fromTap: false)
+            updateWeatherLabelFromTap()
         }
     }
     
@@ -517,6 +519,10 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
+    @objc func showShakeHintView() {
+//        shakeHintView = UIView(frame: <#T##CGRect#>)
+    }
+    
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         
         // if motion was a shake and location available
@@ -633,6 +639,8 @@ class MapViewController: UIViewController {
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
         frameDict["federationButtonShadowNormal"] = CGRect(x: frameDict["federationButtonNormal"]!.minX + 4, y: frameDict["federationButtonNormal"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
         frameDict["federationButtonShadowTapped"] = CGRect(x: frameDict["federationButtonTapped"]!.minX + 3, y: frameDict["federationButtonTapped"]!.minY + 4, width: buttonSize.width, height: buttonSize.height)
+        
+//        frameDict["shakeHintViewHidden"] = CGRect(x: <#T##CGFloat#>, y: <#T##CGFloat#>, width: <#T##CGFloat#>, height: <#T##CGFloat#>)
     }
     
     @objc fileprivate func setHoodScanningToFalse() {
@@ -712,10 +720,12 @@ extension MapViewController: CLLocationManagerDelegate {
                                 
                                 // update weather id and if successful, update label from notification that it posts
                                 DataSource.si.weather.updateWeatherIDAndTemp(coordinate: (placemark.location?.coordinate)!, fromTap: false)
+                                self.updateWeatherLabelFromVisiting()
                             }
                         })
                     } else {
                         updateHoodLabels(with: locations[0].coordinate, fromTap: false)
+                        updateWeatherLabelFromVisiting()
                     }
                 }
             }
