@@ -33,7 +33,9 @@ enum GeoError: Error {
 }
 
 class DataSource {
-    static let sharedInstance = DataSource()
+    
+    // shared instance
+    static let si = DataSource()
     fileprivate init() {}
     
     var hoodState: HoodState?

@@ -32,13 +32,13 @@ class ProfileView: UIView {
         backgroundColor = UIColor.white
         
         // subview specific properties
-        profileImageView.image = DataSource.sharedInstance.cropToBounds(UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
+        profileImageView.image = DataSource.si.cropToBounds(UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
                 
         fbLoginButton.readPermissions = ["public_profile", "user_friends"]
         
-        DataSource.sharedInstance.fetchProfile()
+        DataSource.si.fetchProfile()
         
         let labels = [profileFirstNameLabel, profileLastNameLabel]
         for label in labels {
@@ -94,7 +94,7 @@ class ProfileView: UIView {
                 fbLoginButton.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
             ]
             
-            DataSource.sharedInstance.profileState = .closed
+            DataSource.si.profileState = .closed
         } else {
             
             // open profile constraints
@@ -120,7 +120,7 @@ class ProfileView: UIView {
                 fbLoginButton.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 35)
             ]
             
-            DataSource.sharedInstance.profileState = .open
+            DataSource.si.profileState = .open
         }
         
         // activate constraints
@@ -129,8 +129,8 @@ class ProfileView: UIView {
     
     @objc fileprivate func updateProfile() {
         
-        profileFirstNameLabel.text = DataSource.sharedInstance.fbProfileDict["firstName"]
-        profileLastNameLabel.text = DataSource.sharedInstance.fbProfileDict["lastName"]
+        profileFirstNameLabel.text = DataSource.si.fbProfileDict["firstName"]
+        profileLastNameLabel.text = DataSource.si.fbProfileDict["lastName"]
         if FBSDKAccessToken.current() != nil {
             downloadImage(url: URL(string:"http://graph.facebook.com/\(FBSDKAccessToken.current().userID!)/picture?type=large")!)
         } else {
@@ -141,7 +141,7 @@ class ProfileView: UIView {
     func downloadImage(url: URL) {
         
         // use passed in url to asynchronously get image and set it to profile image view
-        DataSource.sharedInstance.getDataFromURL(url: url) { (data, response, error) in
+        DataSource.si.getDataFromURL(url: url) { (data, response, error) in
             DispatchQueue.main.sync() { () -> Void in
                 guard let data = data, error == nil else { return }
 //                print(response?.suggestedFilename ?? url.lastPathComponent)
