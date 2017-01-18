@@ -9,7 +9,6 @@
 import UIKit
 import Mapbox
 import MapKit
-import FBSDKLoginKit
 
 enum HoodState {
     case visiting
@@ -254,34 +253,6 @@ class DataSource {
             return "sanFrancisco"
         default:
             return ""
-        }
-    }
-    
-    func fetchProfile() {
-        
-        // if logged in
-        if FBSDKAccessToken.current() != nil {
-                        
-            // request these
-            let parameters = ["fields": "email, first_name, last_name,  picture.type(large)"]
-
-            FBSDKGraphRequest(graphPath: "me", parameters: parameters).start(completionHandler: { connection, result, error in
-                if error != nil {
-                    print("fb error: \(error as Any)")
-                } else {
-                    
-                    guard let resultNew = result as? [String:Any] else { return }
-                    
-                    self.fbProfileDict["firstName"] = resultNew["first_name"] as? String
-                    self.fbProfileDict["lastName"] = resultNew["last_name"] as? String
-                    self.fbProfileDict["email"] = resultNew["email"] as? String
-                    
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "FetchedProfile"), object: nil)
-                }
-            })
-            
-        } else {
-            print("The current access token is nil.")
         }
     }
     
