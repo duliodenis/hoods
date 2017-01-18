@@ -10,9 +10,23 @@ San Francisco
 
 ## The App
 
-Share location-based media such as pics/videos/gifs/POI reviews/parties with your facebook friends on a map
+Find out which hood you are in and tap others to see their names
 
-Rank said media per hood with love
+Tap the hood name to see its area
+
+Shake the phone to see your buttons
+
+Tap the rocketship button to go back home
+
+Share location-based media such as pics/videos/gifs/POI reviews/parties with your friends by adding it to your map*
+
+See your friends' media on your map*
+
+Give media ❤️ and watch it go up in its 💯*
+
+Long press hood to see its 💯 (and 💯 for each category)*
+
+(Not yet implemented)
 
 
 ## Support or Contact
