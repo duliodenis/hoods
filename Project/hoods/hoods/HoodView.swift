@@ -20,8 +20,8 @@ class HoodView: UIView {
         
         backgroundColor = UIColor.clear
         
-        hoodLabel.text = "HOODS"
-        areaLabel.text = "🗺"
+        hoodLabel.text = "🗺"
+        areaLabel.text = "🎉"
         areaLabel.alpha = 0
         areaLabel.isHidden = true
         button.translatesAutoresizingMaskIntoConstraints = false
