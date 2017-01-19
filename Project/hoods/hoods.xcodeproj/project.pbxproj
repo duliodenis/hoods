@@ -17,6 +17,7 @@
 		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
 		492BE1771E2F1EE000DD88C5 /* bronx.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 492BE1761E2F1EE000DD88C5 /* bronx.geojson */; };
 		492BE17A1E2F6D9200DD88C5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 492BE1791E2F6D9200DD88C5 /* MapKit.framework */; };
+		492BE17D1E304CC800DD88C5 /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492BE17C1E304CC800DD88C5 /* HintView.swift */; };
 		49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49395FB91D6D3CD3007C34FD /* FederationButton.swift */; };
 		4942DC041D799FF000A871E7 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4942DC031D799FF000A871E7 /* ProfileView.swift */; };
 		49AD0FA51DB6830F00531AA1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 49AD0FA41DB6830F00531AA1 /* GoogleService-Info.plist */; };
@@ -43,6 +44,7 @@
 		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
 		492BE1761E2F1EE000DD88C5 /* bronx.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bronx.geojson; sourceTree = "<group>"; };
 		492BE1791E2F6D9200DD88C5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		492BE17C1E304CC800DD88C5 /* HintView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
 		49395FB91D6D3CD3007C34FD /* FederationButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FederationButton.swift; sourceTree = "<group>"; };
 		4942DC031D799FF000A871E7 /* ProfileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		49AD0FA41DB6830F00531AA1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 				49FB289F1D5BDDF5009FADF3 /* MapViewController.swift */,
 				490BD1A11E298D9B0042FBE7 /* CameraView.swift */,
 				49AD0FA61DBA393800531AA1 /* HoodView.swift */,
+				492BE17C1E304CC800DD88C5 /* HintView.swift */,
 				4942DC031D799FF000A871E7 /* ProfileView.swift */,
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 				49FB28A11D5BE137009FADF3 /* Annotation.swift */,
@@ -337,6 +340,7 @@
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,
 				49AD0FA71DBA393800531AA1 /* HoodView.swift in Sources */,
 				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
+				492BE17D1E304CC800DD88C5 /* HintView.swift in Sources */,
 				490BD1A21E298D9B0042FBE7 /* CameraView.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,
 				49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */,
