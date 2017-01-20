@@ -542,7 +542,7 @@ class MapViewController: UIViewController {
         shakeHintView = HintView(frame: frameDict["shakeHintHidden"]!)
         shakeHintView.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
         shakeHintView.layer.masksToBounds = true
-        shakeHintView.label.text = "shake your phone"
+        shakeHintView.label.text = "shake to see the buttons"
         
         shakeHintViewShadow = UIView(frame: frameDict["shakeHintShadowHidden"]!)
         shakeHintViewShadow.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
@@ -566,7 +566,7 @@ class MapViewController: UIViewController {
             }, completion: { finished in
                 
                 // delay 5 sec
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5, execute: {
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 7, execute: {
                     
                     // hide shake hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
@@ -584,7 +584,7 @@ class MapViewController: UIViewController {
         hoodHintView = HintView(frame: frameDict["hoodHintHidden"]!)
         hoodHintView.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
         hoodHintView.layer.masksToBounds = true
-        hoodHintView.label.text = "tap the name"
+        hoodHintView.label.text = "tap the hood's name to see its area"
         
         hoodHintViewShadow = UIView(frame: frameDict["hoodHintShadowHidden"]!)
         hoodHintViewShadow.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
@@ -595,7 +595,7 @@ class MapViewController: UIViewController {
         mapboxView.addSubview(hoodHintView)
         
         // show hood hint view
-        UIView.animate(withDuration: 0.7, delay: 20, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.7, delay: 16, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
             self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowShowingSmall"]!
             self.hoodHintView.frame = self.frameDict["hoodHintShowingSmall"]!
             
@@ -608,7 +608,7 @@ class MapViewController: UIViewController {
             }, completion: { finished in
                 
                 // delay 5 sec
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5, execute: {
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 7, execute: {
                     
                     // hide shake hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
@@ -626,7 +626,7 @@ class MapViewController: UIViewController {
         tapHintView = HintView(frame: frameDict["tapHintHidden"]!)
         tapHintView.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
         tapHintView.layer.masksToBounds = true
-        tapHintView.label.text = "tap hoods"
+        tapHintView.label.text = "tap the map to see which hood that is"
         
         tapHintViewShadow = UIView(frame: frameDict["tapHintShadowHidden"]!)
         tapHintViewShadow.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
@@ -637,7 +637,7 @@ class MapViewController: UIViewController {
         mapboxView.addSubview(tapHintView)
         
         // show tap hint view
-        UIView.animate(withDuration: 0.7, delay: 27, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.7, delay: 23, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
             self.tapHintViewShadow.frame = self.frameDict["tapHintShadowShowingSmall"]!
             self.tapHintView.frame = self.frameDict["tapHintShowingSmall"]!
             
@@ -650,7 +650,7 @@ class MapViewController: UIViewController {
             }, completion: { finished in
                 
                 // delay 5 sec
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5, execute: {
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3, execute: {
                     
                     // hide tap hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
