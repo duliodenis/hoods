@@ -23,19 +23,37 @@ class HintView: UIView {
         label.numberOfLines = 0
         label.adjustsFontSizeToFitWidth = true
         label.font = UIFont.boldSystemFont(ofSize: 100)
+        
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchDown)
+        
         addSubview(label)
+        addSubview(button)
         
         let constraints: [NSLayoutConstraint] = [
             label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
             label.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 10),
             label.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor, constant: -10),
-            label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
+            label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+            
+            button.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            button.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            button.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            button.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc fileprivate func buttonTapped(sender: UIButton) {
+        
+        // go to location settings
+        if let appSettings = NSURL(string: UIApplicationOpenSettingsURLString) {
+            UIApplication.shared.openURL(appSettings as URL)
+        }
     }
     
     /*

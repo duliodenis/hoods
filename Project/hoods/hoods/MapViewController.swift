@@ -48,6 +48,10 @@ class MapViewController: UIViewController {
     fileprivate var tapHintView = HintView()
     fileprivate var tapHintViewShadow = UIView()
     
+    // allow location hint
+    fileprivate var enableLocationHintView = HintView()
+    fileprivate var enableLocationHintViewShadow = UIView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -83,9 +87,14 @@ class MapViewController: UIViewController {
         if !UserDefaults.standard.bool(forKey: "firstLaunch1.0") {
             UserDefaults.standard.set(true, forKey: "firstLaunch1.0")
             UserDefaults.standard.synchronize()
-            showShakeHintView()
-            showHoodHintView()
-            showTapHintView()
+            
+            if DataSource.si.locationManager.location != nil {
+                showShakeHintView()
+                showHoodHintView()
+                showTapHintView()
+            } else {
+                showEnableLocationHintView()
+            }
         }
     }
 
@@ -134,13 +143,8 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func fly(to coord: CLLocationCoordinate2D) {
-        
-        // if location available...
-        if DataSource.si.locationManager.location != nil {
-            
-            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
-            mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
-        }
+        let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
+        mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
     }
     
     fileprivate func moveCameraToManhattanAnimated(_ animated: Bool) {
@@ -191,7 +195,9 @@ class MapViewController: UIViewController {
     }
     
     @objc fileprivate func updateWeatherLabelFromVisiting() {
+        print("Got Weather notification fired")
         if DataSource.si.weather.visitingWeatherID != nil {
+            print("visiting weather id is not nil")
             let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.visitingWeatherID!)
             DataSource.si.visitingWeather = weather
             
@@ -542,6 +548,7 @@ class MapViewController: UIViewController {
         shakeHintView = HintView(frame: frameDict["shakeHintHidden"]!)
         shakeHintView.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
         shakeHintView.layer.masksToBounds = true
+        shakeHintView.button.isEnabled = false
         shakeHintView.label.text = "shake to see the buttons"
         
         shakeHintViewShadow = UIView(frame: frameDict["shakeHintShadowHidden"]!)
@@ -584,6 +591,7 @@ class MapViewController: UIViewController {
         hoodHintView = HintView(frame: frameDict["hoodHintHidden"]!)
         hoodHintView.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
         hoodHintView.layer.masksToBounds = true
+        hoodHintView.button.isEnabled = false
         hoodHintView.label.text = "tap the hood's name to see its area"
         
         hoodHintViewShadow = UIView(frame: frameDict["hoodHintShadowHidden"]!)
@@ -626,6 +634,7 @@ class MapViewController: UIViewController {
         tapHintView = HintView(frame: frameDict["tapHintHidden"]!)
         tapHintView.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
         tapHintView.layer.masksToBounds = true
+        tapHintView.button.isEnabled = false
         tapHintView.label.text = "tap the map to see which hood that is"
         
         tapHintViewShadow = UIView(frame: frameDict["tapHintShadowHidden"]!)
@@ -656,6 +665,49 @@ class MapViewController: UIViewController {
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
                         self.tapHintViewShadow.frame = self.frameDict["tapHintShadowHidden"]!
                         self.tapHintView.frame = self.frameDict["tapHintHidden"]!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
+    fileprivate func showEnableLocationHintView() {
+        enableLocationHintView = HintView(frame: frameDict["enableLocationHintHidden"]!)
+        enableLocationHintView.layer.cornerRadius = frameDict["enableLocationHintHidden"]!.width / 2
+        enableLocationHintView.layer.masksToBounds = true
+        enableLocationHintView.button.isEnabled = true
+        enableLocationHintView.label.text = "tap here to enable location updates and see which hood you're in"
+        
+        enableLocationHintViewShadow = UIView(frame: frameDict["enableLocationHintShadowHidden"]!)
+        enableLocationHintViewShadow.layer.cornerRadius = frameDict["enableLocationHintHidden"]!.width / 2
+        enableLocationHintViewShadow.layer.masksToBounds = true
+        enableLocationHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(enableLocationHintViewShadow)
+        mapboxView.addSubview(enableLocationHintView)
+        
+        // show allow location hint view
+        UIView.animate(withDuration: 0.7, delay: 3, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.enableLocationHintViewShadow.frame = self.frameDict["enableLocationHintShadowShowingSmall"]!
+            self.enableLocationHintView.frame = self.frameDict["enableLocationHintShowingSmall"]!
+            
+            // animate allow location hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.enableLocationHintViewShadow.frame = self.frameDict["enableLocationHintShadowShowingBig"]!
+                self.enableLocationHintView.frame = self.frameDict["enableLocationHintShowingBig"]!
+                
+            }, completion: { finished in
+                
+                // delay 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 10, execute: {
+                    
+                    // hide allow location hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.enableLocationHintViewShadow.frame = self.frameDict["tapHintShadowHidden"]!
+                        self.enableLocationHintView.frame = self.frameDict["tapHintHidden"]!
                         
                     }, completion: { finished in
                     })
@@ -811,6 +863,16 @@ class MapViewController: UIViewController {
         frameDict["tapHintShadowHidden"] = CGRect(x: frameDict["tapHintHidden"]!.minX + 4, y: frameDict["tapHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
         frameDict["tapHintShadowShowingSmall"] = CGRect(x: frameDict["tapHintShowingSmall"]!.minX + 4, y: frameDict["tapHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
         frameDict["tapHintShadowShowingBig"] = CGRect(x: frameDict["tapHintShowingBig"]!.minX + 4, y: frameDict["tapHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // allow location hint
+        frameDict["enableLocationHintHidden"] = frameDict["tapHintHidden"]!
+        frameDict["enableLocationHintShowingSmall"] = frameDict["tapHintShowingSmall"]!
+        frameDict["enableLocationHintShowingBig"] = frameDict["tapHintShowingBig"]!
+        
+        // allow location hint shadow
+        frameDict["enableLocationHintShadowHidden"] = frameDict["tapHintShadowHidden"]!
+        frameDict["enableLocationHintShadowShowingSmall"] = frameDict["tapHintShadowShowingSmall"]!
+        frameDict["enableLocationHintShadowShowingBig"] = frameDict["tapHintShadowShowingBig"]!
     }
     
     @objc fileprivate func setHoodScanningToFalse() {
