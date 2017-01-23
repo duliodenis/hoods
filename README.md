@@ -13,8 +13,6 @@ Hoods is available in [the App Store](https://itunes.apple.com/us/app/hoods-neig
 
 ## The App
 
-![](Design/HoodsMockup.png?raw=true)
-
 Find out which hood you are in and tap others to see their names
 
 Tap the hood name to see its area
