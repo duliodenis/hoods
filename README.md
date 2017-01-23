@@ -1,14 +1,19 @@
 # HOODS
+A Swift 3 / iOS 10 Geolocation Social Network Platform.
 
+![](Art/screenshot/hoods00.gif?raw=true)
 
-## Locations
+Hoods is available in [the App Store](https://itunes.apple.com/us/app/hoods-neighborhood-map-for/id1064326860?mt=8).
 
-New York City
+## Current Locations Supported
 
-San Francisco
+* New York City
+* San Francisco
 
 
 ## The App
+
+![](Design/HoodsMockup.png?raw=true)
 
 Find out which hood you are in and tap others to see their names
 
@@ -26,8 +31,6 @@ Give media ❤️ and watch it go up in its 💯*
 
 Long press hood to see its 💯 (and 💯 for each category)*
 
-(Not yet implemented)
-
 
 ## Support or Contact
 
@@ -35,6 +38,6 @@ Network  | Account
 ------------- | -------------
 Andrew | andrew@yugetech.com
 Dulio | dulio@yugetech.com
-AppStore | Hoods - What's Good In The Hood
+[AppStore](https://itunes.apple.com/us/app/hoods-neighborhood-map-for/id1064326860?mt=8) | Hoods - What's Good In The Hood
 
-Visit [Yuge Technologies](http://yugetech.com/) to see more.
+## Visit [Yuge Technologies](http://yugetech.com/) to see more.
