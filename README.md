@@ -23,14 +23,6 @@ Shake the phone to see your buttons
 
 Tap the ✈️ button to go back home
 
-Share location-based media such as pics/videos/gifs/POI reviews/parties with your friends by adding it to your map*
-
-See your friends' media on your map*
-
-Give media ❤️ and watch it go up in its 💯*
-
-Long press hood to see its 💯 (and 💯 for each category)*
-
 
 ## Support or Contact
 
