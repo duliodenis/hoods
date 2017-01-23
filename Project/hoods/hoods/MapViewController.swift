@@ -9,7 +9,9 @@
 import UIKit
 import Mapbox
 import MapKit
+import AudioToolbox
 
+@available(iOS 10.0, *)
 class MapViewController: UIViewController {
     
     let padding: CGFloat = 20
@@ -410,6 +412,10 @@ class MapViewController: UIViewController {
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
             
             DataSource.si.hoodState = .tapping
+            
+            // haptic feedback for iPhone 7 and iPhone 7 Plus
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
             
             // CGPoint -> CLLocationCoordinate2D -> CLLocation
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
@@ -886,6 +892,7 @@ class MapViewController: UIViewController {
 
 // MARK: UIGestureRecognizerDelegate
 
+@available(iOS 10.0, *)
 extension MapViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
@@ -900,6 +907,7 @@ extension MapViewController: UIGestureRecognizerDelegate {
 
 // MARK: CLLocationManagerDelegate
 
+@available(iOS 10.0, *)
 extension MapViewController: CLLocationManagerDelegate {
     
     // when authorization status changes...
@@ -967,6 +975,7 @@ extension MapViewController: CLLocationManagerDelegate {
 
 // MARK: MGLMapViewDelegate
 
+@available(iOS 10.0, *)
 extension MapViewController: MGLMapViewDelegate {
     
     func mapView(_ mapView: MGLMapView, annotationCanShowCallout annotation: MGLAnnotation) -> Bool {
