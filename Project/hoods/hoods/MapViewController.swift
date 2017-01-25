@@ -21,7 +21,7 @@ class MapViewController: UIViewController {
     // gestures
     fileprivate var tap = UITapGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
-    
+g
     // map
     fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
@@ -197,9 +197,7 @@ class MapViewController: UIViewController {
     }
     
     @objc fileprivate func updateWeatherLabelFromVisiting() {
-        print("Got Weather notification fired")
         if DataSource.si.weather.visitingWeatherID != nil {
-            print("visiting weather id is not nil")
             let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.visitingWeatherID!)
             DataSource.si.visitingWeather = weather
             
