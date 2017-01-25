@@ -21,7 +21,7 @@ class MapViewController: UIViewController {
     // gestures
     fileprivate var tap = UITapGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
-g
+
     // map
     fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
