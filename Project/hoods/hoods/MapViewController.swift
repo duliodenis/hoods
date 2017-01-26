@@ -9,7 +9,9 @@
 import UIKit
 import Mapbox
 import MapKit
+import AudioToolbox
 
+@available(iOS 10.0, *)
 class MapViewController: UIViewController {
     
     let padding: CGFloat = 20
@@ -36,7 +38,21 @@ class MapViewController: UIViewController {
     fileprivate var federationButton = FederationButton()
     fileprivate var federationButtonShadow = UIView()
     
-    var shakeHintView = UIView()
+    // shake hint
+    fileprivate var shakeHintView = HintView()
+    fileprivate var shakeHintViewShadow = UIView()
+    
+    // hood hint
+    fileprivate var hoodHintView = HintView()
+    fileprivate var hoodHintViewShadow = UIView()
+    
+    // tap hint
+    fileprivate var tapHintView = HintView()
+    fileprivate var tapHintViewShadow = UIView()
+    
+    // allow location hint
+    fileprivate var enableLocationHintView = HintView()
+    fileprivate var enableLocationHintViewShadow = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +82,21 @@ class MapViewController: UIViewController {
         if let coord = DataSource.si.locationManager.location?.coordinate {
             flyToUserLocation()
             updateHoodLabels(with: coord, fromTap: false)
+            updateWeatherLabelFromVisiting()
+        }
+        
+        // only show hint view on first launch
+        if !UserDefaults.standard.bool(forKey: "firstLaunch1.0") {
+            UserDefaults.standard.set(true, forKey: "firstLaunch1.0")
+            UserDefaults.standard.synchronize()
+            
+            if DataSource.si.locationManager.location != nil {
+                showShakeHintView()
+                showHoodHintView()
+                showTapHintView()
+            } else {
+                showEnableLocationHintView()
+            }
         }
     }
 
@@ -114,13 +145,8 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func fly(to coord: CLLocationCoordinate2D) {
-        
-        // if location available...
-        if DataSource.si.locationManager.location != nil {
-            
-            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
-            mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
-        }
+        let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
+        mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
     }
     
     fileprivate func moveCameraToManhattanAnimated(_ animated: Bool) {
@@ -171,7 +197,9 @@ class MapViewController: UIViewController {
     }
     
     @objc fileprivate func updateWeatherLabelFromVisiting() {
+        print("Got Weather notification fired")
         if DataSource.si.weather.visitingWeatherID != nil {
+            print("visiting weather id is not nil")
             let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.visitingWeatherID!)
             DataSource.si.visitingWeather = weather
             
@@ -361,6 +389,7 @@ class MapViewController: UIViewController {
             
             flyToUserLocation()
             updateHoodLabels(with: coord, fromTap: false)
+            updateWeatherLabelFromTap()
         }
     }
     
@@ -383,6 +412,10 @@ class MapViewController: UIViewController {
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
             
             DataSource.si.hoodState = .tapping
+            
+            // haptic feedback for iPhone 7 and iPhone 7 Plus
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
             
             // CGPoint -> CLLocationCoordinate2D -> CLLocation
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
@@ -517,6 +550,178 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
+    fileprivate func showShakeHintView() {
+        shakeHintView = HintView(frame: frameDict["shakeHintHidden"]!)
+        shakeHintView.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
+        shakeHintView.layer.masksToBounds = true
+        shakeHintView.button.isEnabled = false
+        shakeHintView.label.text = "shake to see the buttons"
+        
+        shakeHintViewShadow = UIView(frame: frameDict["shakeHintShadowHidden"]!)
+        shakeHintViewShadow.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
+        shakeHintViewShadow.layer.masksToBounds = true
+        shakeHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(shakeHintViewShadow)
+        mapboxView.addSubview(shakeHintView)
+        
+        // show shake hint view
+        UIView.animate(withDuration: 0.7, delay: 5, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.shakeHintViewShadow.frame = self.frameDict["shakeHintShadowShowingSmall"]!
+            self.shakeHintView.frame = self.frameDict["shakeHintShowingSmall"]!
+            
+        // animate shake hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.shakeHintViewShadow.frame = self.frameDict["shakeHintShadowShowingBig"]!
+                self.shakeHintView.frame = self.frameDict["shakeHintShowingBig"]!
+                
+            }, completion: { finished in
+                
+                // delay 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 7, execute: {
+                    
+                    // hide shake hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.shakeHintViewShadow.frame = self.frameDict["shakeHintShadowHidden"]!
+                        self.shakeHintView.frame = self.frameDict["shakeHintHidden"]!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
+    fileprivate func showHoodHintView() {
+        hoodHintView = HintView(frame: frameDict["hoodHintHidden"]!)
+        hoodHintView.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
+        hoodHintView.layer.masksToBounds = true
+        hoodHintView.button.isEnabled = false
+        hoodHintView.label.text = "tap the hood's name to see its area"
+        
+        hoodHintViewShadow = UIView(frame: frameDict["hoodHintShadowHidden"]!)
+        hoodHintViewShadow.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
+        hoodHintViewShadow.layer.masksToBounds = true
+        hoodHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(hoodHintViewShadow)
+        mapboxView.addSubview(hoodHintView)
+        
+        // show hood hint view
+        UIView.animate(withDuration: 0.7, delay: 16, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowShowingSmall"]!
+            self.hoodHintView.frame = self.frameDict["hoodHintShowingSmall"]!
+            
+            // animate hood hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowShowingBig"]!
+                self.hoodHintView.frame = self.frameDict["hoodHintShowingBig"]!
+                
+            }, completion: { finished in
+                
+                // delay 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 7, execute: {
+                    
+                    // hide shake hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowHidden"]!
+                        self.hoodHintView.frame = self.frameDict["hoodHintHidden"]!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
+    fileprivate func showTapHintView() {
+        tapHintView = HintView(frame: frameDict["tapHintHidden"]!)
+        tapHintView.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
+        tapHintView.layer.masksToBounds = true
+        tapHintView.button.isEnabled = false
+        tapHintView.label.text = "tap the map to see which hood that is"
+        
+        tapHintViewShadow = UIView(frame: frameDict["tapHintShadowHidden"]!)
+        tapHintViewShadow.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
+        tapHintViewShadow.layer.masksToBounds = true
+        tapHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(tapHintViewShadow)
+        mapboxView.addSubview(tapHintView)
+        
+        // show tap hint view
+        UIView.animate(withDuration: 0.7, delay: 23, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.tapHintViewShadow.frame = self.frameDict["tapHintShadowShowingSmall"]!
+            self.tapHintView.frame = self.frameDict["tapHintShowingSmall"]!
+            
+            // animate tap hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.tapHintViewShadow.frame = self.frameDict["tapHintShadowShowingBig"]!
+                self.tapHintView.frame = self.frameDict["tapHintShowingBig"]!
+                
+            }, completion: { finished in
+                
+                // delay 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3, execute: {
+                    
+                    // hide tap hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.tapHintViewShadow.frame = self.frameDict["tapHintShadowHidden"]!
+                        self.tapHintView.frame = self.frameDict["tapHintHidden"]!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
+    fileprivate func showEnableLocationHintView() {
+        enableLocationHintView = HintView(frame: frameDict["enableLocationHintHidden"]!)
+        enableLocationHintView.layer.cornerRadius = frameDict["enableLocationHintHidden"]!.width / 2
+        enableLocationHintView.layer.masksToBounds = true
+        enableLocationHintView.button.isEnabled = true
+        enableLocationHintView.label.text = "tap here to enable location updates and see which hood you're in"
+        
+        enableLocationHintViewShadow = UIView(frame: frameDict["enableLocationHintShadowHidden"]!)
+        enableLocationHintViewShadow.layer.cornerRadius = frameDict["enableLocationHintHidden"]!.width / 2
+        enableLocationHintViewShadow.layer.masksToBounds = true
+        enableLocationHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(enableLocationHintViewShadow)
+        mapboxView.addSubview(enableLocationHintView)
+        
+        // show allow location hint view
+        UIView.animate(withDuration: 0.7, delay: 3, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.enableLocationHintViewShadow.frame = self.frameDict["enableLocationHintShadowShowingSmall"]!
+            self.enableLocationHintView.frame = self.frameDict["enableLocationHintShowingSmall"]!
+            
+            // animate allow location hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.enableLocationHintViewShadow.frame = self.frameDict["enableLocationHintShadowShowingBig"]!
+                self.enableLocationHintView.frame = self.frameDict["enableLocationHintShowingBig"]!
+                
+            }, completion: { finished in
+                
+                // delay 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 10, execute: {
+                    
+                    // hide allow location hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.enableLocationHintViewShadow.frame = self.frameDict["tapHintShadowHidden"]!
+                        self.enableLocationHintView.frame = self.frameDict["tapHintHidden"]!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         
         // if motion was a shake and location available
@@ -609,7 +814,8 @@ class MapViewController: UIViewController {
         // i have included parentheses for those who does not know pemdas
         
         let buttonSize = CGSize(width: 50, height: 50)
-        let hoodViewHeight = view.frame.height * 0.15
+        let hoodViewHeight = view.frame.height * 0.14
+        let hintViewSize = CGSize(width: view.frame.width / 2, height: buttonSize.height)
         
         // hood view
         frameDict["cameraView"] = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + hoodViewHeight)
@@ -633,6 +839,46 @@ class MapViewController: UIViewController {
         frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
         frameDict["federationButtonShadowNormal"] = CGRect(x: frameDict["federationButtonNormal"]!.minX + 4, y: frameDict["federationButtonNormal"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
         frameDict["federationButtonShadowTapped"] = CGRect(x: frameDict["federationButtonTapped"]!.minX + 3, y: frameDict["federationButtonTapped"]!.minY + 4, width: buttonSize.width, height: buttonSize.height)
+        
+        // shake hint
+        frameDict["shakeHintHidden"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.maxY + padding, width: buttonSize.width, height: buttonSize.height)
+        frameDict["shakeHintShowingSmall"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.maxY - hintViewSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["shakeHintShowingBig"] = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: view.frame.maxY - hintViewSize.height - (padding * 2), width: hintViewSize.width, height: hintViewSize.height)
+        
+        // shake hint shadow
+        frameDict["shakeHintShadowHidden"] = CGRect(x: frameDict["shakeHintHidden"]!.minX + 4, y: frameDict["shakeHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        frameDict["shakeHintShadowShowingSmall"] = CGRect(x: frameDict["shakeHintShowingSmall"]!.minX + 4, y: frameDict["shakeHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        frameDict["shakeHintShadowShowingBig"] = CGRect(x: frameDict["shakeHintShowingBig"]!.minX + 4, y: frameDict["shakeHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // hood hint
+        frameDict["hoodHintHidden"] = CGRect(x: view.frame.minX - buttonSize.width - padding, y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
+        frameDict["hoodHintShowingSmall"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
+        frameDict["hoodHintShowingBig"] = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: hoodViewHeight + padding, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // hood hint shadow
+        frameDict["hoodHintShadowHidden"] = CGRect(x: frameDict["hoodHintHidden"]!.minX + 4, y: frameDict["hoodHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        frameDict["hoodHintShadowShowingSmall"] = CGRect(x: frameDict["hoodHintShowingSmall"]!.minX + 4, y: frameDict["hoodHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        frameDict["hoodHintShadowShowingBig"] = CGRect(x: frameDict["hoodHintShowingBig"]!.minX + 4, y: frameDict["hoodHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // tap hint
+        frameDict["tapHintHidden"] = CGRect(x: view.frame.minX - buttonSize.width - padding, y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["tapHintShowingSmall"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
+        frameDict["tapHintShowingBig"] = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: view.frame.midY - (hintViewSize.height / 2), width: hintViewSize.width, height: hintViewSize.height)
+        
+        // tap hint shadow
+        frameDict["tapHintShadowHidden"] = CGRect(x: frameDict["tapHintHidden"]!.minX + 4, y: frameDict["tapHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        frameDict["tapHintShadowShowingSmall"] = CGRect(x: frameDict["tapHintShowingSmall"]!.minX + 4, y: frameDict["tapHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        frameDict["tapHintShadowShowingBig"] = CGRect(x: frameDict["tapHintShowingBig"]!.minX + 4, y: frameDict["tapHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // allow location hint
+        frameDict["enableLocationHintHidden"] = frameDict["tapHintHidden"]!
+        frameDict["enableLocationHintShowingSmall"] = frameDict["tapHintShowingSmall"]!
+        frameDict["enableLocationHintShowingBig"] = frameDict["tapHintShowingBig"]!
+        
+        // allow location hint shadow
+        frameDict["enableLocationHintShadowHidden"] = frameDict["tapHintShadowHidden"]!
+        frameDict["enableLocationHintShadowShowingSmall"] = frameDict["tapHintShadowShowingSmall"]!
+        frameDict["enableLocationHintShadowShowingBig"] = frameDict["tapHintShadowShowingBig"]!
     }
     
     @objc fileprivate func setHoodScanningToFalse() {
@@ -646,6 +892,7 @@ class MapViewController: UIViewController {
 
 // MARK: UIGestureRecognizerDelegate
 
+@available(iOS 10.0, *)
 extension MapViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
@@ -660,6 +907,7 @@ extension MapViewController: UIGestureRecognizerDelegate {
 
 // MARK: CLLocationManagerDelegate
 
+@available(iOS 10.0, *)
 extension MapViewController: CLLocationManagerDelegate {
     
     // when authorization status changes...
@@ -712,10 +960,12 @@ extension MapViewController: CLLocationManagerDelegate {
                                 
                                 // update weather id and if successful, update label from notification that it posts
                                 DataSource.si.weather.updateWeatherIDAndTemp(coordinate: (placemark.location?.coordinate)!, fromTap: false)
+                                self.updateWeatherLabelFromVisiting()
                             }
                         })
                     } else {
                         updateHoodLabels(with: locations[0].coordinate, fromTap: false)
+                        updateWeatherLabelFromVisiting()
                     }
                 }
             }
@@ -725,6 +975,7 @@ extension MapViewController: CLLocationManagerDelegate {
 
 // MARK: MGLMapViewDelegate
 
+@available(iOS 10.0, *)
 extension MapViewController: MGLMapViewDelegate {
     
     func mapView(_ mapView: MGLMapView, annotationCanShowCallout annotation: MGLAnnotation) -> Bool {

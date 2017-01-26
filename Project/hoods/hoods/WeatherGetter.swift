@@ -115,6 +115,7 @@ class WeatherGetter {
     }
     
     func updateWeatherIDAndTemp(coordinate: CLLocationCoordinate2D, fromTap: Bool) {
+        print("updateWeatherIDAndTemp()")
         let session = URLSession.shared
         let weatherRequestURL = URL(string: "\(openWeatherMapBaseURL)?APPID=\(openWeatherMapAPIKey)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
@@ -137,6 +138,7 @@ class WeatherGetter {
                                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromTap"), object: nil)
                             } else {
                                 self.visitingWeatherID = id as? Int
+                                print("got weather in weather getter: \(self.visitingWeatherID)")
                                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
                             }
                         }
