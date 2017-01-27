@@ -10,9 +10,10 @@ import UIKit
 import Mapbox
 import MapKit
 
-enum HoodState {
+enum MapState {
     case visiting
     case tapping
+    case searching
 }
 
 enum MapButtonState {
@@ -37,7 +38,7 @@ class DataSource {
     static let si = DataSource()
     fileprivate init() {}
     
-    var hoodState: HoodState?
+    var mapState: MapState?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
 

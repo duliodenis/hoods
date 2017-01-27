@@ -74,7 +74,8 @@ class MapViewController: UIViewController {
         addFederationButton()
         addProfile()
         addCameraView()
-                
+        cameraView.hoodView.searchBar.delegate = self
+        
         initialZoomToUserLocation()
     }
     
@@ -383,7 +384,7 @@ class MapViewController: UIViewController {
         // if location is available
         if let coord = DataSource.si.locationManager.location?.coordinate {
             
-            DataSource.si.hoodState = .visiting
+            DataSource.si.mapState = .visiting
             
             flyToUserLocation()
             updateHoodLabels(with: coord, fromTap: false)
@@ -409,7 +410,7 @@ class MapViewController: UIViewController {
         // if tap was not in any other view...
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
             
-            DataSource.si.hoodState = .tapping
+            DataSource.si.mapState = .tapping
             
             // haptic feedback for iPhone 7 and iPhone 7 Plus
             let generator = UIImpactFeedbackGenerator(style: .light)
@@ -456,6 +457,14 @@ class MapViewController: UIViewController {
                 DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, fromTap: true)
             } catch {
                 reverseGeocode()
+            }
+            
+            if cameraView.hoodView.searchBar.isFirstResponder {
+                
+                // dismiss search keyboard
+                cameraView.hoodView.searchBar.resignFirstResponder()
+                
+                cameraView.hoodView.hideSearch()
             }
         }
         
@@ -938,8 +947,8 @@ extension MapViewController: CLLocationManagerDelegate {
         
         // update hood state
         if hoodScanning == true {
-            if DataSource.si.hoodState != .tapping {
-                DataSource.si.hoodState = .visiting
+            if DataSource.si.mapState != .tapping {
+                DataSource.si.mapState = .visiting
                 
                 // if not still in the hood...
                 if DataSource.si.locationManager.location != nil {
@@ -1001,6 +1010,18 @@ extension MapViewController: MGLMapViewDelegate {
             return CalloutViewController(representedObject: annotation)
         }
         return nil
+    }
+}
+
+@available(iOS 10.0, *)
+extension MapViewController: UISearchBarDelegate {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        DataSource.si.mapState = .searching
+        cameraView.hoodView.enlargeSearch()
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        cameraView.hoodView.activateConstraints()
     }
 }
 
