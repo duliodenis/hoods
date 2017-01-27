@@ -1,17 +1,17 @@
 //
-//  CameraView.swift
+//  SearchResultsView.swift
 //  hoods
 //
-//  Created by Andrew Carvajal on 1/13/17.
+//  Created by Andrew Carvajal on 1/27/17.
 //  Copyright © 2017 YugeTech. All rights reserved.
 //
 
 import UIKit
 
-class CameraView: UIView {
+class SearchResultsView: UIView {
     
     var roundedCornerRadius = CGFloat()
-    let hoodView = HoodView()
+    var tableView = UITableView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -22,14 +22,14 @@ class CameraView: UIView {
         layer.masksToBounds = true
         backgroundColor = UIColor.white
         
-        hoodView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(hoodView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(tableView)
         
         let constraints: [NSLayoutConstraint] = [
-            hoodView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: DataSource.si.viewSize!.height),
-            hoodView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
-            hoodView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            hoodView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: DataSource.si.viewSize!.height),
+            tableView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -47,4 +47,3 @@ class CameraView: UIView {
      */
     
 }
-

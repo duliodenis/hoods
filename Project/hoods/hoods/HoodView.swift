@@ -11,6 +11,7 @@ import UIKit
 class HoodView: UIView {
     
     let frameHeight = (DataSource.si.viewSize?.height)! * 0.15
+    var searchBarWidthSmall = CGFloat()
     let button = UIButton()
     let areaLabel = UILabel()
     let hoodLabel = UILabel()
@@ -21,6 +22,7 @@ class HoodView: UIView {
         super.init(frame: frame)
         
         backgroundColor = UIColor.clear
+        searchBarWidthSmall = frameHeight * 0.21
         
         hoodLabel.text = "HOODS"
         areaLabel.text = "🗺"
@@ -98,11 +100,11 @@ class HoodView: UIView {
             button.bottomAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
             
             searchBar.topAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
-            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 7),
-            searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 35),
+            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: -2),
+            searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: searchBarWidthSmall),
             searchBar.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-            searchBar.widthAnchor.constraint(equalToConstant: frameHeight * 0.2),
-            searchBar.heightAnchor.constraint(equalToConstant: frameHeight * 0.2),
+            searchBar.widthAnchor.constraint(equalToConstant: searchBarWidthSmall),
+            searchBar.heightAnchor.constraint(equalToConstant: searchBarWidthSmall),
             
             weatherLabel.topAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
             weatherLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
@@ -110,6 +112,9 @@ class HoodView: UIView {
             weatherLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ]
         NSLayoutConstraint.activate(defaultConstraints)
+        print("AC searchBar.minX: \(self.searchBar.frame.minX)")
+        print("AC hoodLabel.minX: \(self.hoodLabel.frame.minX)")
+
     }
     
     fileprivate func configureSearchBar() {
@@ -125,7 +130,7 @@ class HoodView: UIView {
         searchBar.showsCancelButton = false
         searchBar.showsSearchResultsButton = false
         searchBar.spellCheckingType = .no
-        searchBar.layer.cornerRadius = (frameHeight * 0.2) / 2
+        searchBar.layer.cornerRadius = searchBarWidthSmall / 2
         searchBar.layer.masksToBounds = true
         if #available(iOS 10.0, *) {
             searchBar.textContentType = .location
@@ -137,7 +142,7 @@ class HoodView: UIView {
     // activating a different set of constraints did not animate the enlarging of the search bar - this way does
     func enlargeSearch() {
         UIView.animate(withDuration: 0.3, animations: {
-            self.searchBar.frame = CGRect(x: self.frame.minX, y: self.hoodLabel.frame.maxY, width: self.frame.width, height: self.searchBar.frame.height)
+            self.searchBar.frame = CGRect(x: 0, y: self.hoodLabel.frame.maxY, width: self.frame.width, height: self.searchBar.frame.height)
             self.weatherLabel.frame = CGRect(x: self.frame.maxX, y: self.weatherLabel.frame.minY, width: self.frame.width, height: self.weatherLabel.frame.height)
         }) { finished in
         }
@@ -146,9 +151,12 @@ class HoodView: UIView {
     func hideSearch() {
         searchBar.text = ""
         UIView.animate(withDuration: 0.3, animations: {
-            self.searchBar.frame = CGRect(x: self.frame.minX, y: self.hoodLabel.frame.maxY, width: self.frameHeight * 0.2, height: self.searchBar.frame.height)
+            self.searchBar.frame = CGRect(x: 0, y: self.hoodLabel.frame.maxY, width: self.frameHeight * 0.3, height: self.searchBar.frame.height)
             self.weatherLabel.frame = CGRect(x: self.searchBar.frame.maxX, y: self.weatherLabel.frame.minY, width: self.frame.width - (self.searchBar.frame.width * 2), height: self.weatherLabel.frame.height)
         }) { finished in
+            print("searchBar.minX: \(self.searchBar.frame.minX)")
+            print("hoodLabel.minX: \(self.hoodLabel.frame.minX)")
+
         }
     }
     

@@ -11,12 +11,54 @@ import Mapbox
 import MapKit
 import AudioToolbox
 
+struct Frames {
+    var cameraView: CGRect
+    var searchResultsViewHidden: CGRect
+    var searchResultsViewDropped: CGRect
+    var profileViewHidden: CGRect
+    var profileViewClosed: CGRect
+    var profileViewOpen: CGRect
+    var profileViewShadowHidden: CGRect
+    var profileViewShadowClosed: CGRect
+    var profileViewShadowOpen: CGRect
+    var federationButtonHidden: CGRect
+    var federationButtonNormal: CGRect
+    var federationButtonTapped: CGRect
+    var federationButtonShadowHidden: CGRect
+    var federationButtonShadowNormal: CGRect
+    var federationButtonShadowTapped: CGRect
+    var shakeHintHidden: CGRect
+    var shakeHintShowingSmall: CGRect
+    var shakeHintShowingBig: CGRect
+    var shakeHintShadowHidden: CGRect
+    var shakeHintShadowShowingSmall: CGRect
+    var shakeHintShadowShowingBig: CGRect
+    var hoodHintHidden: CGRect
+    var hoodHintShowingSmall: CGRect
+    var hoodHintShowingBig: CGRect
+    var hoodHintShadowHidden: CGRect
+    var hoodHintShadowShowingSmall: CGRect
+    var hoodHintShadowShowingBig: CGRect
+    var tapHintHidden: CGRect
+    var tapHintShowingSmall: CGRect
+    var tapHintShowingBig: CGRect
+    var tapHintShadowHidden: CGRect
+    var tapHintShadowShowingSmall: CGRect
+    var tapHintShadowShowingBig: CGRect
+    var enableLocationHintHidden: CGRect
+    var enableLocationHintShowingSmall: CGRect
+    var enableLocationHintShowingBig: CGRect
+    var enableLocationHintShadowHidden: CGRect
+    var enableLocationHintShadowShowingSmall: CGRect
+    var enableLocationHintShadowShowingBig: CGRect
+}
+
 @available(iOS 10.0, *)
 class MapViewController: UIViewController {
     
     let padding: CGFloat = 20
     fileprivate var hoodScanning = false
-    fileprivate var frameDict = [String:CGRect]()
+    fileprivate var frames: Frames?
     
     // gestures
     fileprivate var tap = UITapGestureRecognizer()
@@ -25,6 +67,9 @@ class MapViewController: UIViewController {
     // map
     fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
+    
+    // search results
+    fileprivate var searchResultsView = UIView()
     
     // camera
     fileprivate var cameraView: CameraView!
@@ -72,6 +117,7 @@ class MapViewController: UIViewController {
         
         addTapGesture()
         addFederationButton()
+        addSearchResultsView()
         addProfile()
         addCameraView()
         cameraView.hoodView.searchBar.delegate = self
@@ -170,7 +216,7 @@ class MapViewController: UIViewController {
 // MARK: Hood View
     
     fileprivate func addCameraView() {
-        cameraView = CameraView(frame: frameDict["cameraView"]!)
+        cameraView = CameraView(frame: (frames?.cameraView)!)
         view.addSubview(cameraView!)
     }
     
@@ -229,21 +275,42 @@ class MapViewController: UIViewController {
         }
     }
     
+// MARK: Search
+    
+    fileprivate func addSearchResultsView() {
+        searchResultsView = SearchResultsView(frame: (frames?.searchResultsViewHidden)!)
+        mapboxView.addSubview(searchResultsView)
+    }
+    
+    fileprivate func dropSearchResultsView() {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: { 
+            self.searchResultsView.frame = (self.frames?.searchResultsViewDropped)!
+        }) { finished in
+        }
+    }
+    
+    fileprivate func hideSearchResultsView() {
+        UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseIn, animations: {
+            self.searchResultsView.frame = (self.frames?.searchResultsViewHidden)!
+        }) { finished in
+        }
+    }
+    
 // MARK: Profile
     
     fileprivate func addProfile() {
         
         // add the profile view with profile frame CLOSED
-        profileView = ProfileView(frame: frameDict["profileViewHidden"]!)
+        profileView = ProfileView(frame: (frames?.profileViewHidden)!)
 
         // add the profile view shadow
-        profileViewShadow = UIView(frame: frameDict["profileViewShadowHidden"]!)
+        profileViewShadow = UIView(frame: (frames?.profileViewShadowHidden)!)
         profileViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         profileViewShadow.layer.cornerRadius = profileViewShadow.frame.width / 2
         profileViewShadow.layer.masksToBounds = true
         
         // set the profile button frame to CLOSED
-        profileButton.frame = frameDict["profileViewHidden"]!
+        profileButton.frame = (frames?.profileViewHidden)!
         profileButton.addTarget(self, action: #selector(MapViewController.profileButtonTapped(_:)), for: .touchUpInside)
         
         mapboxView.addSubview(profileViewShadow)
@@ -305,8 +372,8 @@ class MapViewController: UIViewController {
             UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
                 
                 // set the profile frame and its shadow to OPEN
-                self.profileView.frame = self.frameDict["profileViewOpen"]!
-                self.profileViewShadow.frame = self.frameDict["profileViewShadowOpen"]!
+                self.profileView.frame = (self.frames?.profileViewOpen)!
+                self.profileViewShadow.frame = (self.frames?.profileViewShadowOpen)!
                 
                 // activate the profile subview constraints for OPENED state
                 self.profileView.activateConstraintsForState(.open)
@@ -324,14 +391,14 @@ class MapViewController: UIViewController {
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: UIViewAnimationOptions(), animations: {
                 
                 // set the profile frame to CLOSED
-                self.profileView.frame = self.frameDict["profileViewClosed"]!
-                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
+                self.profileView.frame = (self.frames?.profileViewClosed)!
+                self.profileViewShadow.frame = (self.frames?.profileViewShadowClosed)!
                 
                 // activate the profile subview constraints for CLOSED state
                 self.profileView.activateConstraintsForState(.closed)
                 
                 // set the profile button frame to profile frame CLOSED
-                self.profileButton.frame = self.frameDict["profileViewClosed"]!
+                self.profileButton.frame = (self.frames?.profileViewClosed)!
                 }, completion: { (Bool) in
                     
                     // unlock the map
@@ -348,13 +415,13 @@ class MapViewController: UIViewController {
     func addFederationButton() {
         
         // button
-        federationButton = FederationButton(frame: frameDict["federationButtonHidden"]!)
+        federationButton = FederationButton(frame: (frames?.federationButtonHidden)!)
         federationButton.addTarget(self, action: #selector(MapViewController.federationButtonTapped), for: .touchDown)
         
         // shadow
-        federationButtonShadow = UIView(frame: frameDict["federationButtonShadowHidden"]!)
+        federationButtonShadow = UIView(frame: (frames?.federationButtonShadowHidden)!)
         federationButtonShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
-        federationButtonShadow.layer.cornerRadius = frameDict["federationButtonNormal"]!.width / 2
+        federationButtonShadow.layer.cornerRadius = (frames?.federationButtonNormal.width)! / 2
         federationButtonShadow.layer.masksToBounds = true
         
         view.addSubview(federationButtonShadow)
@@ -367,12 +434,12 @@ class MapViewController: UIViewController {
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
         UIView.animate(withDuration: 0.1, animations: {
             self.federationButton.backgroundColor = UIColor.black
-            self.federationButton.frame = self.frameDict["federationButtonTapped"]!
-            self.federationButtonShadow.frame = self.frameDict["federationButtonShadowTapped"]!
+            self.federationButton.frame = (self.frames?.federationButtonTapped)!
+            self.federationButtonShadow.frame = (self.frames?.federationButtonShadowTapped)!
             }, completion: { (Bool) in
                 UIView.animate(withDuration: 0.2, animations: {
-                    self.federationButton.frame = self.frameDict["federationButtonNormal"]!
-                    self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
+                    self.federationButton.frame = (self.frames?.federationButtonNormal)!
+                    self.federationButtonShadow.frame = (self.frames?.federationButtonShadowNormal)!
                 })
         })
         
@@ -463,8 +530,6 @@ class MapViewController: UIViewController {
                 
                 // dismiss search keyboard
                 cameraView.hoodView.searchBar.resignFirstResponder()
-                
-                cameraView.hoodView.hideSearch()
             }
         }
         
@@ -558,14 +623,14 @@ class MapViewController: UIViewController {
 // MARK: Miscellaneous
     
     fileprivate func showShakeHintView() {
-        shakeHintView = HintView(frame: frameDict["shakeHintHidden"]!)
-        shakeHintView.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
+        shakeHintView = HintView(frame: (frames?.shakeHintHidden)!)
+        shakeHintView.layer.cornerRadius = (frames?.shakeHintHidden.width)! / 2
         shakeHintView.layer.masksToBounds = true
         shakeHintView.button.isEnabled = false
         shakeHintView.label.text = "shake to see the buttons"
         
-        shakeHintViewShadow = UIView(frame: frameDict["shakeHintShadowHidden"]!)
-        shakeHintViewShadow.layer.cornerRadius = frameDict["shakeHintHidden"]!.width / 2
+        shakeHintViewShadow = UIView(frame: (frames?.shakeHintShadowHidden)!)
+        shakeHintViewShadow.layer.cornerRadius = (frames?.shakeHintHidden.width)! / 2
         shakeHintViewShadow.layer.masksToBounds = true
         shakeHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         
@@ -574,14 +639,14 @@ class MapViewController: UIViewController {
         
         // show shake hint view
         UIView.animate(withDuration: 0.7, delay: 5, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-            self.shakeHintViewShadow.frame = self.frameDict["shakeHintShadowShowingSmall"]!
-            self.shakeHintView.frame = self.frameDict["shakeHintShowingSmall"]!
+            self.shakeHintViewShadow.frame = (self.frames?.shakeHintShadowShowingSmall)!
+            self.shakeHintView.frame = (self.frames?.shakeHintShowingSmall)!
             
         // animate shake hint view to big
         }) { finished in
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                self.shakeHintViewShadow.frame = self.frameDict["shakeHintShadowShowingBig"]!
-                self.shakeHintView.frame = self.frameDict["shakeHintShowingBig"]!
+                self.shakeHintViewShadow.frame = (self.frames?.shakeHintShadowShowingBig)!
+                self.shakeHintView.frame = (self.frames?.shakeHintShowingBig)!
                 
             }, completion: { finished in
                 
@@ -590,8 +655,8 @@ class MapViewController: UIViewController {
                     
                     // hide shake hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                        self.shakeHintViewShadow.frame = self.frameDict["shakeHintShadowHidden"]!
-                        self.shakeHintView.frame = self.frameDict["shakeHintHidden"]!
+                        self.shakeHintViewShadow.frame = (self.frames?.shakeHintShadowHidden)!
+                        self.shakeHintView.frame = (self.frames?.shakeHintHidden)!
                         
                     }, completion: { finished in
                     })
@@ -601,14 +666,14 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func showHoodHintView() {
-        hoodHintView = HintView(frame: frameDict["hoodHintHidden"]!)
-        hoodHintView.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
+        hoodHintView = HintView(frame: (frames?.hoodHintHidden)!)
+        hoodHintView.layer.cornerRadius = (frames?.hoodHintHidden.width)! / 2
         hoodHintView.layer.masksToBounds = true
         hoodHintView.button.isEnabled = false
         hoodHintView.label.text = "tap the hood's name to see its area"
         
-        hoodHintViewShadow = UIView(frame: frameDict["hoodHintShadowHidden"]!)
-        hoodHintViewShadow.layer.cornerRadius = frameDict["hoodHintHidden"]!.width / 2
+        hoodHintViewShadow = UIView(frame: (frames?.hoodHintShadowHidden)!)
+        hoodHintViewShadow.layer.cornerRadius = (frames?.hoodHintHidden.width)! / 2
         hoodHintViewShadow.layer.masksToBounds = true
         hoodHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         
@@ -617,14 +682,14 @@ class MapViewController: UIViewController {
         
         // show hood hint view
         UIView.animate(withDuration: 0.7, delay: 16, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-            self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowShowingSmall"]!
-            self.hoodHintView.frame = self.frameDict["hoodHintShowingSmall"]!
+            self.hoodHintViewShadow.frame = (self.frames?.hoodHintShadowShowingSmall)!
+            self.hoodHintView.frame = (self.frames?.hoodHintShowingSmall)!
             
             // animate hood hint view to big
         }) { finished in
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowShowingBig"]!
-                self.hoodHintView.frame = self.frameDict["hoodHintShowingBig"]!
+                self.hoodHintViewShadow.frame = (self.frames?.hoodHintShadowShowingBig)!
+                self.hoodHintView.frame = (self.frames?.hoodHintShowingBig)!
                 
             }, completion: { finished in
                 
@@ -633,8 +698,8 @@ class MapViewController: UIViewController {
                     
                     // hide shake hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                        self.hoodHintViewShadow.frame = self.frameDict["hoodHintShadowHidden"]!
-                        self.hoodHintView.frame = self.frameDict["hoodHintHidden"]!
+                        self.hoodHintViewShadow.frame = (self.frames?.hoodHintShadowHidden)!
+                        self.hoodHintView.frame = (self.frames?.hoodHintHidden)!
                         
                     }, completion: { finished in
                     })
@@ -644,14 +709,14 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func showTapHintView() {
-        tapHintView = HintView(frame: frameDict["tapHintHidden"]!)
-        tapHintView.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
+        tapHintView = HintView(frame: (frames?.tapHintHidden)!)
+        tapHintView.layer.cornerRadius = (frames?.tapHintHidden.width)! / 2
         tapHintView.layer.masksToBounds = true
         tapHintView.button.isEnabled = false
         tapHintView.label.text = "tap the map to see which hood that is"
         
-        tapHintViewShadow = UIView(frame: frameDict["tapHintShadowHidden"]!)
-        tapHintViewShadow.layer.cornerRadius = frameDict["tapHintHidden"]!.width / 2
+        tapHintViewShadow = UIView(frame: (frames?.tapHintShadowHidden)!)
+        tapHintViewShadow.layer.cornerRadius = (frames?.tapHintHidden.width)! / 2
         tapHintViewShadow.layer.masksToBounds = true
         tapHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         
@@ -660,14 +725,14 @@ class MapViewController: UIViewController {
         
         // show tap hint view
         UIView.animate(withDuration: 0.7, delay: 23, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-            self.tapHintViewShadow.frame = self.frameDict["tapHintShadowShowingSmall"]!
-            self.tapHintView.frame = self.frameDict["tapHintShowingSmall"]!
+            self.tapHintViewShadow.frame = (self.frames?.tapHintShadowShowingSmall)!
+            self.tapHintView.frame = (self.frames?.tapHintShowingSmall)!
             
             // animate tap hint view to big
         }) { finished in
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                self.tapHintViewShadow.frame = self.frameDict["tapHintShadowShowingBig"]!
-                self.tapHintView.frame = self.frameDict["tapHintShowingBig"]!
+                self.tapHintViewShadow.frame = (self.frames?.tapHintShadowShowingBig)!
+                self.tapHintView.frame = (self.frames?.tapHintShowingBig)!
                 
             }, completion: { finished in
                 
@@ -676,8 +741,8 @@ class MapViewController: UIViewController {
                     
                     // hide tap hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                        self.tapHintViewShadow.frame = self.frameDict["tapHintShadowHidden"]!
-                        self.tapHintView.frame = self.frameDict["tapHintHidden"]!
+                        self.tapHintViewShadow.frame = (self.frames?.tapHintShadowHidden)!
+                        self.tapHintView.frame = (self.frames?.tapHintHidden)!
                         
                     }, completion: { finished in
                     })
@@ -687,14 +752,14 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func showEnableLocationHintView() {
-        enableLocationHintView = HintView(frame: frameDict["enableLocationHintHidden"]!)
-        enableLocationHintView.layer.cornerRadius = frameDict["enableLocationHintHidden"]!.width / 2
+        enableLocationHintView = HintView(frame: (frames?.enableLocationHintHidden)!)
+        enableLocationHintView.layer.cornerRadius = (frames?.enableLocationHintHidden.width)! / 2
         enableLocationHintView.layer.masksToBounds = true
         enableLocationHintView.button.isEnabled = true
         enableLocationHintView.label.text = "tap here to enable location updates and see which hood you're in"
         
-        enableLocationHintViewShadow = UIView(frame: frameDict["enableLocationHintShadowHidden"]!)
-        enableLocationHintViewShadow.layer.cornerRadius = frameDict["enableLocationHintHidden"]!.width / 2
+        enableLocationHintViewShadow = UIView(frame: (frames?.enableLocationHintShadowHidden)!)
+        enableLocationHintViewShadow.layer.cornerRadius = (frames?.enableLocationHintHidden.width)! / 2
         enableLocationHintViewShadow.layer.masksToBounds = true
         enableLocationHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
         
@@ -703,14 +768,14 @@ class MapViewController: UIViewController {
         
         // show allow location hint view
         UIView.animate(withDuration: 0.7, delay: 3, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-            self.enableLocationHintViewShadow.frame = self.frameDict["enableLocationHintShadowShowingSmall"]!
-            self.enableLocationHintView.frame = self.frameDict["enableLocationHintShowingSmall"]!
+            self.enableLocationHintViewShadow.frame = (self.frames?.enableLocationHintShadowShowingSmall)!
+            self.enableLocationHintView.frame = (self.frames?.enableLocationHintShowingSmall)!
             
             // animate allow location hint view to big
         }) { finished in
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                self.enableLocationHintViewShadow.frame = self.frameDict["enableLocationHintShadowShowingBig"]!
-                self.enableLocationHintView.frame = self.frameDict["enableLocationHintShowingBig"]!
+                self.enableLocationHintViewShadow.frame = (self.frames?.enableLocationHintShadowShowingBig)!
+                self.enableLocationHintView.frame = (self.frames?.enableLocationHintShowingBig)!
                 
             }, completion: { finished in
                 
@@ -719,8 +784,8 @@ class MapViewController: UIViewController {
                     
                     // hide allow location hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
-                        self.enableLocationHintViewShadow.frame = self.frameDict["tapHintShadowHidden"]!
-                        self.enableLocationHintView.frame = self.frameDict["tapHintHidden"]!
+                        self.enableLocationHintViewShadow.frame = (self.frames?.tapHintShadowHidden)!
+                        self.enableLocationHintView.frame = (self.frames?.tapHintHidden)!
                         
                     }, completion: { finished in
                     })
@@ -751,8 +816,8 @@ class MapViewController: UIViewController {
 //                self.profileViewShadow.frame = self.frameDict["profileViewShadowClosed"]!
 //                self.profileView.frame = self.frameDict["profileViewClosed"]!
 //                self.profileButton.frame = self.frameDict["profileViewClosed"]!
-                self.federationButtonShadow.frame = self.frameDict["federationButtonShadowNormal"]!
-                self.federationButton.frame = self.frameDict["federationButtonNormal"]!
+                self.federationButtonShadow.frame = (self.frames?.federationButtonShadowNormal)!
+                self.federationButton.frame = (self.frames?.federationButtonNormal)!
                 
                 // then hide them
                 }, completion: { finished in
@@ -782,8 +847,8 @@ class MapViewController: UIViewController {
 //                    self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
 //                    self.profileView.frame = self.frameDict["profileViewHidden"]!
 //                    self.profileButton.frame = self.frameDict["profileViewHidden"]!
-                    self.federationButtonShadow.frame = self.frameDict["federationButtonShadowHidden"]!
-                    self.federationButton.frame = self.frameDict["federationButtonHidden"]!
+                    self.federationButtonShadow.frame = (self.frames?.federationButtonShadowHidden)!
+                    self.federationButton.frame = (self.frames?.federationButtonHidden)!
                     
                     }, completion: { finished in
                         
@@ -818,74 +883,119 @@ class MapViewController: UIViewController {
     
     fileprivate func populateFrameDict() {
         
-        // i have included parentheses for those who does not know pemdas
+        // i have included parentheses for those who does not know pemdas http://lmgtfy.com/?q=pemdas
         
         let buttonSize = CGSize(width: 50, height: 50)
         let hoodViewHeight = view.frame.height * 0.14
+        let searchResultsViewHeight = view.frame.height * 0.4
         let hintViewSize = CGSize(width: view.frame.width / 2, height: buttonSize.height)
         
         // hood view
-        frameDict["cameraView"] = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + hoodViewHeight)
+        let cameraView = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + hoodViewHeight)
+        
+        // search results view
+        let searchResultsViewHidden = CGRect(x: 0, y: view.frame.minY - view.frame.height - searchResultsViewHeight, width: view.frame.width, height: searchResultsViewHeight)
+        let searchResultsViewDropped = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + searchResultsViewHeight)
         
         // profile view
-        frameDict["profileViewHidden"] = CGRect(x: -padding - buttonSize.width, y: frameDict["cameraView"]!.maxY + padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["profileViewClosed"] = CGRect(x: padding, y: frameDict["cameraView"]!.maxY + padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["profileViewOpen"] = CGRect(x: 0, y: frameDict["cameraView"]!.maxY, width: view.frame.width, height: view.frame.height - hoodViewHeight)
+        let profileViewHidden = CGRect(x: -padding - buttonSize.width, y: cameraView.maxY + padding, width: buttonSize.width, height: buttonSize.height)
+        let profileViewClosed = CGRect(x: padding, y: cameraView.maxY + padding, width: buttonSize.width, height: buttonSize.height)
+        let profileViewOpen = CGRect(x: 0, y: cameraView.maxY, width: view.frame.width, height: view.frame.height - hoodViewHeight)
         
         // profile view shadow
-        frameDict["profileViewShadowHidden"] = CGRect(x: frameDict["profileViewHidden"]!.minX + 6, y: frameDict["profileViewHidden"]!.minY + 7, width: buttonSize.width, height: 50)
-        frameDict["profileViewShadowClosed"] = CGRect(x: frameDict["profileViewClosed"]!.minX + 6, y: frameDict["profileViewClosed"]!.minY + 7, width: buttonSize.width, height: 50)
-        frameDict["profileViewShadowOpen"] = CGRect(x: frameDict["profileViewOpen"]!.minX + 6, y: frameDict["profileViewOpen"]!.minY + 9, width: view.frame.width, height: view.frame.height - hoodViewHeight)
+        let profileViewShadowHidden = CGRect(x: profileViewHidden.minX + 6, y: profileViewHidden.minY + 7, width: buttonSize.width, height: 50)
+        let profileViewShadowClosed = CGRect(x: profileViewClosed.minX + 6, y: profileViewClosed.minY + 7, width: buttonSize.width, height: 50)
+        let profileViewShadowOpen = CGRect(x: profileViewOpen.minX + 6, y: profileViewOpen.minY + 9, width: view.frame.width, height: view.frame.height - hoodViewHeight)
         
         // federation button
-        frameDict["federationButtonHidden"] = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonNormal"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonTapped"] = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
+        let federationButtonHidden = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        let federationButtonNormal = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        let federationButtonTapped = CGRect(x: view.frame.maxX - buttonSize.width - (padding * 2), y: view.frame.height - buttonSize.height - (padding * 2) + 3, width: buttonSize.width, height: buttonSize.height)
         
         // federation button shadow
-        frameDict["federationButtonShadowHidden"] = CGRect(x: frameDict["federationButtonHidden"]!.minX + 4, y: frameDict["federationButtonHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonShadowNormal"] = CGRect(x: frameDict["federationButtonNormal"]!.minX + 4, y: frameDict["federationButtonNormal"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["federationButtonShadowTapped"] = CGRect(x: frameDict["federationButtonTapped"]!.minX + 3, y: frameDict["federationButtonTapped"]!.minY + 4, width: buttonSize.width, height: buttonSize.height)
+        let federationButtonShadowHidden = CGRect(x: federationButtonHidden.minX + 4, y: federationButtonHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let federationButtonShadowNormal = CGRect(x: federationButtonNormal.minX + 4, y: federationButtonNormal.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let federationButtonShadowTapped = CGRect(x: federationButtonTapped.minX + 3, y: federationButtonTapped.minY + 4, width: buttonSize.width, height: buttonSize.height)
         
         // shake hint
-        frameDict["shakeHintHidden"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.maxY + padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["shakeHintShowingSmall"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.maxY - hintViewSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["shakeHintShowingBig"] = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: view.frame.maxY - hintViewSize.height - (padding * 2), width: hintViewSize.width, height: hintViewSize.height)
+        let shakeHintHidden = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.maxY + padding, width: buttonSize.width, height: buttonSize.height)
+        let shakeHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.maxY - hintViewSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
+        let shakeHintShowingBig = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: view.frame.maxY - hintViewSize.height - (padding * 2), width: hintViewSize.width, height: hintViewSize.height)
         
         // shake hint shadow
-        frameDict["shakeHintShadowHidden"] = CGRect(x: frameDict["shakeHintHidden"]!.minX + 4, y: frameDict["shakeHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["shakeHintShadowShowingSmall"] = CGRect(x: frameDict["shakeHintShowingSmall"]!.minX + 4, y: frameDict["shakeHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["shakeHintShadowShowingBig"] = CGRect(x: frameDict["shakeHintShowingBig"]!.minX + 4, y: frameDict["shakeHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        let shakeHintShadowHidden = CGRect(x: shakeHintHidden.minX + 4, y: shakeHintHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let shakeHintShadowShowingSmall = CGRect(x: shakeHintShowingSmall.minX + 4, y: shakeHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let shakeHintShadowShowingBig = CGRect(x: shakeHintShowingBig.minX + 4, y: shakeHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
         // hood hint
-        frameDict["hoodHintHidden"] = CGRect(x: view.frame.minX - buttonSize.width - padding, y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["hoodHintShowingSmall"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
-        frameDict["hoodHintShowingBig"] = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: hoodViewHeight + padding, width: hintViewSize.width, height: hintViewSize.height)
+        let hoodHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
+        let hoodHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
+        let hoodHintShowingBig = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: hoodViewHeight + padding, width: hintViewSize.width, height: hintViewSize.height)
         
         // hood hint shadow
-        frameDict["hoodHintShadowHidden"] = CGRect(x: frameDict["hoodHintHidden"]!.minX + 4, y: frameDict["hoodHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["hoodHintShadowShowingSmall"] = CGRect(x: frameDict["hoodHintShowingSmall"]!.minX + 4, y: frameDict["hoodHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["hoodHintShadowShowingBig"] = CGRect(x: frameDict["hoodHintShowingBig"]!.minX + 4, y: frameDict["hoodHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        let hoodHintShadowHidden = CGRect(x: hoodHintHidden.minX + 4, y: hoodHintHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let hoodHintShadowShowingSmall = CGRect(x: hoodHintShowingSmall.minX + 4, y: hoodHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let hoodHintShadowShowingBig = CGRect(x: hoodHintShowingBig.minX + 4, y: hoodHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
         // tap hint
-        frameDict["tapHintHidden"] = CGRect(x: view.frame.minX - buttonSize.width - padding, y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["tapHintShowingSmall"] = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
-        frameDict["tapHintShowingBig"] = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: view.frame.midY - (hintViewSize.height / 2), width: hintViewSize.width, height: hintViewSize.height)
+        let tapHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
+        let tapHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
+        let tapHintShowingBig = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: view.frame.midY - (hintViewSize.height / 2), width: hintViewSize.width, height: hintViewSize.height)
         
         // tap hint shadow
-        frameDict["tapHintShadowHidden"] = CGRect(x: frameDict["tapHintHidden"]!.minX + 4, y: frameDict["tapHintHidden"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["tapHintShadowShowingSmall"] = CGRect(x: frameDict["tapHintShowingSmall"]!.minX + 4, y: frameDict["tapHintShowingSmall"]!.minY + 5, width: buttonSize.width, height: buttonSize.height)
-        frameDict["tapHintShadowShowingBig"] = CGRect(x: frameDict["tapHintShowingBig"]!.minX + 4, y: frameDict["tapHintShowingBig"]!.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        let tapHintShadowHidden = CGRect(x: tapHintHidden.minX + 4, y: tapHintHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let tapHintShadowShowingSmall = CGRect(x: tapHintShowingSmall.minX + 4, y: tapHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let tapHintShadowShowingBig = CGRect(x: tapHintShowingBig.minX + 4, y: tapHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
         // allow location hint
-        frameDict["enableLocationHintHidden"] = frameDict["tapHintHidden"]!
-        frameDict["enableLocationHintShowingSmall"] = frameDict["tapHintShowingSmall"]!
-        frameDict["enableLocationHintShowingBig"] = frameDict["tapHintShowingBig"]!
+        let enableLocationHintHidden = tapHintHidden
+        let enableLocationHintShowingSmall = tapHintShowingSmall
+        let enableLocationHintShowingBig = tapHintShowingBig
         
         // allow location hint shadow
-        frameDict["enableLocationHintShadowHidden"] = frameDict["tapHintShadowHidden"]!
-        frameDict["enableLocationHintShadowShowingSmall"] = frameDict["tapHintShadowShowingSmall"]!
-        frameDict["enableLocationHintShadowShowingBig"] = frameDict["tapHintShadowShowingBig"]!
+        let enableLocationHintShadowHidden = tapHintShadowHidden
+        let enableLocationHintShadowShowingSmall = tapHintShadowShowingSmall
+        let enableLocationHintShadowShowingBig = tapHintShadowShowingBig
+        
+        frames = Frames(cameraView: cameraView,
+                        searchResultsViewHidden: searchResultsViewHidden,
+                        searchResultsViewDropped: searchResultsViewDropped,
+                        profileViewHidden: profileViewHidden,
+                        profileViewClosed: profileViewClosed,
+                        profileViewOpen: profileViewOpen,
+                        profileViewShadowHidden: profileViewShadowHidden,
+                        profileViewShadowClosed: profileViewShadowClosed,
+                        profileViewShadowOpen: profileViewShadowOpen,
+                        federationButtonHidden: federationButtonHidden,
+                        federationButtonNormal: federationButtonNormal,
+                        federationButtonTapped: federationButtonTapped,
+                        federationButtonShadowHidden: federationButtonShadowHidden,
+                        federationButtonShadowNormal: federationButtonShadowNormal,
+                        federationButtonShadowTapped: federationButtonShadowTapped,
+                        shakeHintHidden: shakeHintHidden,
+                        shakeHintShowingSmall: shakeHintShowingSmall,
+                        shakeHintShowingBig: shakeHintShowingBig,
+                        shakeHintShadowHidden: shakeHintShadowHidden,
+                        shakeHintShadowShowingSmall: shakeHintShadowShowingSmall,
+                        shakeHintShadowShowingBig: shakeHintShadowShowingBig,
+                        hoodHintHidden: hoodHintHidden,
+                        hoodHintShowingSmall: hoodHintShowingSmall,
+                        hoodHintShowingBig: hoodHintShowingBig,
+                        hoodHintShadowHidden: hoodHintShadowHidden,
+                        hoodHintShadowShowingSmall: hoodHintShadowShowingSmall,
+                        hoodHintShadowShowingBig: hoodHintShadowShowingBig,
+                        tapHintHidden: tapHintHidden,
+                        tapHintShowingSmall: tapHintShowingSmall,
+                        tapHintShowingBig: tapHintShowingBig,
+                        tapHintShadowHidden: tapHintShadowHidden,
+                        tapHintShadowShowingSmall: tapHintShadowShowingSmall,
+                        tapHintShadowShowingBig: tapHintShadowShowingBig,
+                        enableLocationHintHidden: enableLocationHintHidden,
+                        enableLocationHintShowingSmall: enableLocationHintShowingSmall,
+                        enableLocationHintShowingBig: enableLocationHintShowingBig,
+                        enableLocationHintShadowHidden: enableLocationHintShadowHidden,
+                        enableLocationHintShadowShowingSmall: enableLocationHintShadowShowingSmall,
+                        enableLocationHintShadowShowingBig: enableLocationHintShadowShowingBig)
     }
     
     @objc fileprivate func setHoodScanningToFalse() {
@@ -1018,10 +1128,12 @@ extension MapViewController: UISearchBarDelegate {
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         DataSource.si.mapState = .searching
         cameraView.hoodView.enlargeSearch()
+        dropSearchResultsView()
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        cameraView.hoodView.activateConstraints()
+        hideSearchResultsView()
+        cameraView.hoodView.hideSearch()
     }
 }
 
