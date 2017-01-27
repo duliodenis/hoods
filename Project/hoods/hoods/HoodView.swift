@@ -98,8 +98,8 @@ class HoodView: UIView {
             button.bottomAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
             
             searchBar.topAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
-            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
-            searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: frameHeight * 0.2),
+            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 7),
+            searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 35),
             searchBar.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
             searchBar.widthAnchor.constraint(equalToConstant: frameHeight * 0.2),
             searchBar.heightAnchor.constraint(equalToConstant: frameHeight * 0.2),
