@@ -38,6 +38,8 @@ class DataSource {
     static let si = DataSource()
     fileprivate init() {}
     
+    var hoodNames = [String]()
+    
     var mapState: MapState?
     var mapButtonState: MapButtonState?
     var profileState: ProfileState?
@@ -59,8 +61,8 @@ class DataSource {
     var tappedPlacemark: CLPlacemark?
 
     var calloutRepresentedObject: MGLAnnotation?
-    var fbProfileDict = [String:String]()
     var viewSize: CGSize?
+    var hoodViewHeight: CGFloat?
     
     func updateVisitingArea(with placemark: CLPlacemark) {
         
@@ -157,7 +159,7 @@ class DataSource {
         var filePath = ""
         
         // set file path to geoJSON for area
-        filePath = Bundle.main.path(forResource: geoJSONFile(for: area), ofType: "geojson")!
+        filePath = Bundle.main.path(forResource: geoJSONFileName(for: area), ofType: "geojson")!
         
         // convert GeoJSON to NSData
         let data = try? Data(contentsOf: URL(fileURLWithPath: filePath))
@@ -240,7 +242,30 @@ class DataSource {
         return false
     }
     
-    fileprivate func geoJSONFile(for area: String) -> String {
+    func populateHoodNamesForSearching() {
+        
+        // for all passed in areas, get the hood name and add it to hoodNames for searching
+        let areas = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "San Francisco"]
+        for area in areas {
+            var filePath = ""
+            filePath = Bundle.main.path(forResource: geoJSONFileName(for: area), ofType: "geojson")!
+            let data = try? Data(contentsOf: URL(fileURLWithPath: filePath))
+            do {
+                let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String:AnyObject]
+                if let hoods = json?["features"] as? [[String: AnyObject]] {
+                    for hood in hoods {
+                        if let properties = hood["properties"] as? [String: AnyObject] {
+                            if let neighborhood = properties["name"] as? String {
+                                hoodNames.append(neighborhood)
+                            }
+                        }
+                    }
+                }
+            } catch {}
+        }
+    }
+    
+    fileprivate func geoJSONFileName(for area: String) -> String {
         
         // if the user location was found in an area, return appropriate GeoJSON file name
         switch area {

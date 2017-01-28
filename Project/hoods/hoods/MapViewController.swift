@@ -70,6 +70,7 @@ class MapViewController: UIViewController {
     
     // search results
     fileprivate var searchResultsView = UIView()
+    fileprivate var filteredHoods = [String]()
     
     // camera
     fileprivate var cameraView: CameraView!
@@ -117,10 +118,12 @@ class MapViewController: UIViewController {
         
         addTapGesture()
         addFederationButton()
-        addSearchResultsView()
         addProfile()
+        addSearchResultsView()
         addCameraView()
+        
         cameraView.hoodView.searchBar.delegate = self
+        DataSource.si.populateHoodNamesForSearching()
         
         initialZoomToUserLocation()
     }
@@ -280,6 +283,10 @@ class MapViewController: UIViewController {
     fileprivate func addSearchResultsView() {
         searchResultsView = SearchResultsView(frame: (frames?.searchResultsViewHidden)!)
         mapboxView.addSubview(searchResultsView)
+        
+        (searchResultsView as! SearchResultsView).tableView.delegate = self
+        (searchResultsView as! SearchResultsView).tableView.dataSource = self
+        (searchResultsView as! SearchResultsView).tableView.rowHeight = 50
     }
     
     fileprivate func dropSearchResultsView() {
@@ -886,12 +893,12 @@ class MapViewController: UIViewController {
         // i have included parentheses for those who does not know pemdas http://lmgtfy.com/?q=pemdas
         
         let buttonSize = CGSize(width: 50, height: 50)
-        let hoodViewHeight = view.frame.height * 0.14
+        DataSource.si.hoodViewHeight = view.frame.height * 0.14
         let searchResultsViewHeight = view.frame.height * 0.4
         let hintViewSize = CGSize(width: view.frame.width / 2, height: buttonSize.height)
         
         // hood view
-        let cameraView = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + hoodViewHeight)
+        let cameraView = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + DataSource.si.hoodViewHeight!)
         
         // search results view
         let searchResultsViewHidden = CGRect(x: 0, y: view.frame.minY - view.frame.height - searchResultsViewHeight, width: view.frame.width, height: searchResultsViewHeight)
@@ -900,12 +907,12 @@ class MapViewController: UIViewController {
         // profile view
         let profileViewHidden = CGRect(x: -padding - buttonSize.width, y: cameraView.maxY + padding, width: buttonSize.width, height: buttonSize.height)
         let profileViewClosed = CGRect(x: padding, y: cameraView.maxY + padding, width: buttonSize.width, height: buttonSize.height)
-        let profileViewOpen = CGRect(x: 0, y: cameraView.maxY, width: view.frame.width, height: view.frame.height - hoodViewHeight)
+        let profileViewOpen = CGRect(x: 0, y: cameraView.maxY, width: view.frame.width, height: view.frame.height - DataSource.si.hoodViewHeight!)
         
         // profile view shadow
         let profileViewShadowHidden = CGRect(x: profileViewHidden.minX + 6, y: profileViewHidden.minY + 7, width: buttonSize.width, height: 50)
         let profileViewShadowClosed = CGRect(x: profileViewClosed.minX + 6, y: profileViewClosed.minY + 7, width: buttonSize.width, height: 50)
-        let profileViewShadowOpen = CGRect(x: profileViewOpen.minX + 6, y: profileViewOpen.minY + 9, width: view.frame.width, height: view.frame.height - hoodViewHeight)
+        let profileViewShadowOpen = CGRect(x: profileViewOpen.minX + 6, y: profileViewOpen.minY + 9, width: view.frame.width, height: view.frame.height - DataSource.si.hoodViewHeight!)
         
         // federation button
         let federationButtonHidden = CGRect(x: view.frame.maxX + padding, y: view.frame.height - buttonSize.height - (padding * 2), width: buttonSize.width, height: buttonSize.height)
@@ -928,9 +935,9 @@ class MapViewController: UIViewController {
         let shakeHintShadowShowingBig = CGRect(x: shakeHintShowingBig.minX + 4, y: shakeHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
         // hood hint
-        let hoodHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
-        let hoodHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: hoodViewHeight + padding, width: buttonSize.width, height: buttonSize.height)
-        let hoodHintShowingBig = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: hoodViewHeight + padding, width: hintViewSize.width, height: hintViewSize.height)
+        let hoodHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: DataSource.si.hoodViewHeight! + padding, width: buttonSize.width, height: buttonSize.height)
+        let hoodHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: DataSource.si.hoodViewHeight! + padding, width: buttonSize.width, height: buttonSize.height)
+        let hoodHintShowingBig = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: DataSource.si.hoodViewHeight! + padding, width: hintViewSize.width, height: hintViewSize.height)
         
         // hood hint shadow
         let hoodHintShadowHidden = CGRect(x: hoodHintHidden.minX + 4, y: hoodHintHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
@@ -1134,6 +1141,46 @@ extension MapViewController: UISearchBarDelegate {
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         hideSearchResultsView()
         cameraView.hoodView.hideSearch()
+    }
+}
+
+@available(iOS 10.0, *)
+extension MapViewController: UISearchResultsUpdating {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        updateFilteredContent(with: cameraView.hoodView.searchBar.text!)
+        (searchResultsView as! SearchResultsView).tableView.reloadData()
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {}
+    
+    func updateFilteredContent(with searchText: String) {
+        filteredHoods.removeAll()
+        for hood in DataSource.si.hoodNames {
+            if hood.range(of: searchText) != nil {
+                filteredHoods.append(hood)
+            }
+        }
+    }
+}
+
+@available(iOS 10.0, *)
+extension MapViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return filteredHoods.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "SearchCell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "SearchCell")
+        cell?.textLabel?.text = filteredHoods[indexPath.row]
+//        print("filteredHoods[indexPath.row]: \(filteredHoods[indexPath.row])")
+        return cell!
     }
 }
 

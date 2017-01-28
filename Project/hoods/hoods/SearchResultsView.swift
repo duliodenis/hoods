@@ -26,7 +26,7 @@ class SearchResultsView: UIView {
         addSubview(tableView)
         
         let constraints: [NSLayoutConstraint] = [
-            tableView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: DataSource.si.viewSize!.height),
+            tableView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: DataSource.si.viewSize!.height + DataSource.si.hoodViewHeight!),
             tableView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
             tableView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
             tableView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)

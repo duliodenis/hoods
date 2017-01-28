@@ -112,9 +112,6 @@ class HoodView: UIView {
             weatherLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ]
         NSLayoutConstraint.activate(defaultConstraints)
-        print("AC searchBar.minX: \(self.searchBar.frame.minX)")
-        print("AC hoodLabel.minX: \(self.hoodLabel.frame.minX)")
-
     }
     
     fileprivate func configureSearchBar() {
@@ -154,9 +151,6 @@ class HoodView: UIView {
             self.searchBar.frame = CGRect(x: 0, y: self.hoodLabel.frame.maxY, width: self.frameHeight * 0.3, height: self.searchBar.frame.height)
             self.weatherLabel.frame = CGRect(x: self.searchBar.frame.maxX, y: self.weatherLabel.frame.minY, width: self.frame.width - (self.searchBar.frame.width * 2), height: self.weatherLabel.frame.height)
         }) { finished in
-            print("searchBar.minX: \(self.searchBar.frame.minX)")
-            print("hoodLabel.minX: \(self.hoodLabel.frame.minX)")
-
         }
     }
     
