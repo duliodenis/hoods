@@ -115,6 +115,7 @@ class HoodView: UIView {
     }
     
     fileprivate func configureSearchBar() {
+        searchBar.placeholder = "Search for a hood or an address"
         searchBar.backgroundColor = .white
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.autocapitalizationType = .words
@@ -138,6 +139,7 @@ class HoodView: UIView {
     
     // activating a different set of constraints did not animate the enlarging of the search bar - this way does
     func enlargeSearch() {
+        searchBar.placeholder = "Search for a hood or an address"
         UIView.animate(withDuration: 0.3, animations: {
             self.searchBar.frame = CGRect(x: 0, y: self.hoodLabel.frame.maxY, width: self.frame.width, height: self.searchBar.frame.height)
             self.weatherLabel.frame = CGRect(x: self.frame.maxX, y: self.weatherLabel.frame.minY, width: self.frame.width, height: self.weatherLabel.frame.height)
@@ -146,6 +148,7 @@ class HoodView: UIView {
     }
     
     func hideSearch() {
+        searchBar.placeholder = ""
         searchBar.text = ""
         UIView.animate(withDuration: 0.3, animations: {
             self.searchBar.frame = CGRect(x: 0, y: self.hoodLabel.frame.maxY, width: self.frameHeight * 0.3, height: self.searchBar.frame.height)

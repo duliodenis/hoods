@@ -13,38 +13,52 @@ import AudioToolbox
 
 struct Frames {
     var cameraView: CGRect
+    
     var searchResultsViewHidden: CGRect
     var searchResultsViewDropped: CGRect
+    
     var profileViewHidden: CGRect
     var profileViewClosed: CGRect
     var profileViewOpen: CGRect
     var profileViewShadowHidden: CGRect
     var profileViewShadowClosed: CGRect
     var profileViewShadowOpen: CGRect
+    
     var federationButtonHidden: CGRect
     var federationButtonNormal: CGRect
     var federationButtonTapped: CGRect
     var federationButtonShadowHidden: CGRect
     var federationButtonShadowNormal: CGRect
     var federationButtonShadowTapped: CGRect
+    
     var shakeHintHidden: CGRect
     var shakeHintShowingSmall: CGRect
     var shakeHintShowingBig: CGRect
     var shakeHintShadowHidden: CGRect
     var shakeHintShadowShowingSmall: CGRect
     var shakeHintShadowShowingBig: CGRect
+    
     var hoodHintHidden: CGRect
     var hoodHintShowingSmall: CGRect
     var hoodHintShowingBig: CGRect
     var hoodHintShadowHidden: CGRect
     var hoodHintShadowShowingSmall: CGRect
     var hoodHintShadowShowingBig: CGRect
+    
+    var searchHintHidden: CGRect
+    var searchHintShowingSmall: CGRect
+    var searchHintShowingBig: CGRect
+    var searchHintShadowHidden: CGRect
+    var searchHintShadowShowingSmall: CGRect
+    var searchHintShadowShowingBig: CGRect
+    
     var tapHintHidden: CGRect
     var tapHintShowingSmall: CGRect
     var tapHintShowingBig: CGRect
     var tapHintShadowHidden: CGRect
     var tapHintShadowShowingSmall: CGRect
     var tapHintShadowShowingBig: CGRect
+    
     var enableLocationHintHidden: CGRect
     var enableLocationHintShowingSmall: CGRect
     var enableLocationHintShowingBig: CGRect
@@ -90,6 +104,10 @@ class MapViewController: UIViewController {
     // hood hint
     fileprivate var hoodHintView = HintView()
     fileprivate var hoodHintViewShadow = UIView()
+    
+    // search hint
+    fileprivate var searchHintView = HintView()
+    fileprivate var searchHintViewShadow = UIView()
     
     // tap hint
     fileprivate var tapHintView = HintView()
@@ -142,6 +160,7 @@ class MapViewController: UIViewController {
             if DataSource.si.locationManager.location != nil {
                 showShakeHintView()
                 showHoodHintView()
+                showSearchHintView()
                 showTapHintView()
             } else {
                 showEnableLocationHintView()
@@ -189,7 +208,7 @@ class MapViewController: UIViewController {
         if let coord = DataSource.si.locationManager.location?.coordinate {
             
             let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
-            mapboxView.fly(to: mapCam, withDuration: 3, peakAltitude: 13000, completionHandler: nil)
+            mapboxView.fly(to: mapCam, withDuration: 3.5, peakAltitude: 13000, completionHandler: nil)
         }
     }
     
@@ -685,7 +704,7 @@ class MapViewController: UIViewController {
                 
             }, completion: { finished in
                 
-                // delay 5 sec
+                // delay hiding 7 sec
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 7, execute: {
                     
                     // hide shake hint view
@@ -728,13 +747,56 @@ class MapViewController: UIViewController {
                 
             }, completion: { finished in
                 
-                // delay 5 sec
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 7, execute: {
+                // delay hiding 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5, execute: {
                     
-                    // hide shake hint view
+                    // hide hood hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
                         self.hoodHintViewShadow.frame = (self.frames?.hoodHintShadowHidden)!
                         self.hoodHintView.frame = (self.frames?.hoodHintHidden)!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
+    fileprivate func showSearchHintView() {
+        searchHintView = HintView(frame: (frames?.searchHintHidden)!)
+        searchHintView.layer.cornerRadius = (frames?.searchHintHidden.width)! / 2
+        searchHintView.layer.masksToBounds = true
+        searchHintView.button.isEnabled = false
+        searchHintView.label.text = "try searching for a hood or an address"
+        
+        searchHintViewShadow = UIView(frame: (frames?.searchHintShadowHidden)!)
+        searchHintViewShadow.layer.cornerRadius = (frames?.searchHintHidden.width)! / 2
+        searchHintViewShadow.layer.masksToBounds = true
+        searchHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(searchHintViewShadow)
+        mapboxView.addSubview(searchHintView)
+        
+        // show search hint view
+        UIView.animate(withDuration: 0.7, delay: 28, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.searchHintViewShadow.frame = (self.frames?.searchHintShadowShowingSmall)!
+            self.searchHintView.frame = (self.frames?.searchHintShowingSmall)!
+            
+            // animate search hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.searchHintViewShadow.frame = (self.frames?.searchHintShadowShowingBig)!
+                self.searchHintView.frame = (self.frames?.searchHintShowingBig)!
+                
+            }, completion: { finished in
+                
+                // delay hiding 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5, execute: {
+                    
+                    // hide search hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.searchHintViewShadow.frame = (self.frames?.searchHintShadowHidden)!
+                        self.searchHintView.frame = (self.frames?.searchHintHidden)!
                         
                     }, completion: { finished in
                     })
@@ -771,7 +833,7 @@ class MapViewController: UIViewController {
                 
             }, completion: { finished in
                 
-                // delay 5 sec
+                // delay hiding 3 sec
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3, execute: {
                     
                     // hide tap hint view
@@ -801,12 +863,12 @@ class MapViewController: UIViewController {
         mapboxView.addSubview(enableLocationHintViewShadow)
         mapboxView.addSubview(enableLocationHintView)
         
-        // show allow location hint view
+        // show enable location hint view
         UIView.animate(withDuration: 0.7, delay: 3, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
             self.enableLocationHintViewShadow.frame = (self.frames?.enableLocationHintShadowShowingSmall)!
             self.enableLocationHintView.frame = (self.frames?.enableLocationHintShowingSmall)!
             
-            // animate allow location hint view to big
+            // animate enable location hint view to big
         }) { finished in
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
                 self.enableLocationHintViewShadow.frame = (self.frames?.enableLocationHintShadowShowingBig)!
@@ -817,7 +879,7 @@ class MapViewController: UIViewController {
                 // delay 5 sec
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 10, execute: {
                     
-                    // hide allow location hint view
+                    // hide enable location hint view
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
                         self.enableLocationHintViewShadow.frame = (self.frames?.tapHintShadowHidden)!
                         self.enableLocationHintView.frame = (self.frames?.tapHintHidden)!
@@ -971,6 +1033,16 @@ class MapViewController: UIViewController {
         let hoodHintShadowShowingSmall = CGRect(x: hoodHintShowingSmall.minX + 4, y: hoodHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
         let hoodHintShadowShowingBig = CGRect(x: hoodHintShowingBig.minX + 4, y: hoodHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
+        // search hint
+        let searchHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: DataSource.si.hoodViewHeight! + padding, width: buttonSize.width, height: buttonSize.height)
+        let searchHintShowingSmall = CGRect(x: padding, y: DataSource.si.hoodViewHeight! + padding, width: buttonSize.width, height: buttonSize.height)
+        let searchHintShowingBig = CGRect(x: padding, y: DataSource.si.hoodViewHeight! + padding, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // search hint shadow
+        let searchHintShadowHidden = CGRect(x: searchHintHidden.minX + 4, y: searchHintHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let searchHintShadowShowingSmall = CGRect(x: searchHintShowingSmall.minX + 4, y: searchHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let searchHintShadowShowingBig = CGRect(x: searchHintShowingBig.minX + 4, y: searchHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        
         // tap hint
         let tapHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
         let tapHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: view.frame.midY - (buttonSize.height / 2), width: buttonSize.width, height: buttonSize.height)
@@ -1023,6 +1095,13 @@ class MapViewController: UIViewController {
                         hoodHintShadowHidden: hoodHintShadowHidden,
                         hoodHintShadowShowingSmall: hoodHintShadowShowingSmall,
                         hoodHintShadowShowingBig: hoodHintShadowShowingBig,
+                        
+                        searchHintHidden: searchHintHidden,
+                        searchHintShowingSmall: searchHintShowingSmall,
+                        searchHintShowingBig: searchHintShowingBig,
+                        searchHintShadowHidden: searchHintShadowHidden,
+                        searchHintShadowShowingSmall: searchHintShadowShowingSmall,
+                        searchHintShadowShowingBig: searchHintShadowShowingBig,
                         
                         tapHintHidden: tapHintHidden,
                         tapHintShowingSmall: tapHintShowingSmall,
@@ -1196,6 +1275,7 @@ extension MapViewController: UISearchResultsUpdating {
                             self.updateHoodLabels(with: coord, from: "search")
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
                             self.updateWeatherLabelFromSearch()
+                            self.hoodScanning = false
                         }
                     }
                 }

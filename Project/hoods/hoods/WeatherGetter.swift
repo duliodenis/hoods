@@ -120,7 +120,6 @@ class WeatherGetter {
     }
     
     func updateWeatherIDAndTemp(coordinate: CLLocationCoordinate2D, from: String) {
-        print("updateWeatherIDAndTemp")
         let session = URLSession.shared
         let weatherRequestURL = URL(string: "\(openWeatherMapBaseURL)?APPID=\(openWeatherMapAPIKey)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
