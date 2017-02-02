@@ -128,6 +128,11 @@ class MapViewController: UIViewController {
     }
     
     func appDidBecomeActive() {
+        if let coord = DataSource.si.locationManager.location?.coordinate {
+            flyToUserLocation()
+            updateHoodLabels(with: coord, from: "visit")
+            updateWeatherLabelFromVisit()
+        }
         
         // only show hint view on first launch
         if !UserDefaults.standard.bool(forKey: "firstLaunch1.0") {
@@ -217,9 +222,9 @@ class MapViewController: UIViewController {
         view.addSubview(cameraView!)
     }
     
-    fileprivate func updateHoodLabels(with coordinate: CLLocationCoordinate2D, fromTap: Bool) {
-        switch fromTap {
-        case true:
+    fileprivate func updateHoodLabels(with coordinate: CLLocationCoordinate2D, from: String) {
+        switch from {
+        case "tap":
             do {
                 if let hood = try DataSource.si.tappedHoodName(for: coordinate) {
                     cameraView.hoodView.hoodLabel.text = hood
@@ -228,19 +233,26 @@ class MapViewController: UIViewController {
             if let area = DataSource.si.tappedArea {
                 cameraView.hoodView.areaLabel.text = area
             }
-            updateWeatherLabelFromVisiting()
-        case false:
+        case "search":
+            do {
+                if let hood = try DataSource.si.searchedAddressHoodName(for: coordinate) {
+                    cameraView.hoodView.hoodLabel.text = hood
+                }
+            } catch {}
+            if let area = DataSource.si.searchedAddressArea {
+                cameraView.hoodView.areaLabel.text = area
+            }
+        default:
             if let hood = DataSource.si.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
             }
             if let area = DataSource.si.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
             }
-            updateWeatherLabelFromTap()
         }
     }
     
-    @objc fileprivate func updateWeatherLabelFromVisiting() {
+    @objc fileprivate func updateWeatherLabelFromVisit() {
         if DataSource.si.weather.visitingWeatherID != nil {
             let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.visitingWeatherID!)
             DataSource.si.visitingWeather = weather
@@ -248,8 +260,10 @@ class MapViewController: UIViewController {
             DispatchQueue.main.async {
                 if let visitingWeatherTemp = DataSource.si.weather.visitingWeatherTemp {
                     let temperature = String(format: "%.0f", arguments: [visitingWeatherTemp])
+                    print("updateWeatherLabelFromVisit() -> temp: \(temperature)")
                     self.cameraView.hoodView.weatherLabel.text = "\(temperature)ºF \(weather)"
                 } else {
+                    print("visitingWeatherTemp is nil: \(DataSource.si.weather.visitingWeatherTemp)")
                     self.cameraView.hoodView.weatherLabel.text = weather
                 }
             }
@@ -264,6 +278,22 @@ class MapViewController: UIViewController {
             DispatchQueue.main.async {
                 if let tappedWeatherTemp = DataSource.si.weather.tappedWeatherTemp {
                     let temperature = String(format: "%.0f", arguments: [tappedWeatherTemp])
+                    self.cameraView.hoodView.weatherLabel.text = "\(temperature)ºF \(weather)"
+                } else {
+                    self.cameraView.hoodView.weatherLabel.text = weather
+                }
+            }
+        }
+    }
+    
+    @objc fileprivate func updateWeatherLabelFromSearch() {
+        if DataSource.si.weather.searchedAddressWeatherID != nil {
+            let weather = DataSource.si.weather.weatherEmojis(id: DataSource.si.weather.searchedAddressWeatherID!)
+            DataSource.si.searchedAddressWeather = weather
+            
+            DispatchQueue.main.async {
+                if let searchedAddressWeatherTemp = DataSource.si.weather.searchedAddressWeatherTemp {
+                    let temperature = String(format: "%.0f", arguments: [searchedAddressWeatherTemp])
                     self.cameraView.hoodView.weatherLabel.text = "\(temperature)ºF \(weather)"
                 } else {
                     self.cameraView.hoodView.weatherLabel.text = weather
@@ -455,8 +485,8 @@ class MapViewController: UIViewController {
             DataSource.si.mapState = .visiting
             
             flyToUserLocation()
-            updateHoodLabels(with: coord, fromTap: false)
-            updateWeatherLabelFromTap()
+            updateHoodLabels(with: coord, from: "visit")
+            updateWeatherLabelFromVisit()
         }
     }
     
@@ -510,7 +540,8 @@ class MapViewController: UIViewController {
                         if let area = DataSource.si.tappedArea {
                             self.cameraView.hoodView.areaLabel.text = area
                         }
-                        DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, fromTap: true)
+                        DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, from: "tap")
+                        self.updateWeatherLabelFromTap()
                     }
                 })
             }
@@ -526,7 +557,8 @@ class MapViewController: UIViewController {
                 if let area = DataSource.si.tappedArea {
                     cameraView.hoodView.areaLabel.text = area
                 }
-                DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, fromTap: true)
+                DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, from: "tap")
+                updateWeatherLabelFromTap()
             } catch {
                 reverseGeocode()
             }
@@ -872,11 +904,10 @@ class MapViewController: UIViewController {
         // listen for "StopScanning" notification from data source
         NotificationCenter.default.addObserver(self, selector: #selector(setHoodScanningToFalse), name: NSNotification.Name(rawValue: "StopScanning"), object: nil)
         
-        // listen for "GotWeatherFromVisiting" notification from weather getter
-        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromVisiting), name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
-        
-        // listen for "GotWeatherFromTap" notification from weather getter
+        // listen for weather notifications from weather getter
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromVisit), name: NSNotification.Name(rawValue: "GotWeatherFromVisit"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromTap), name: NSNotification.Name(rawValue: "GotWeatherFromTap"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherLabelFromSearch), name: NSNotification.Name(rawValue: "GotWeatherFromSearch"), object: nil)
         
         // setup offline pack notification handlers.
         NotificationCenter.default.addObserver(self, selector: #selector(offlinePackProgressDidChange), name: NSNotification.Name.MGLOfflinePackProgressChanged, object: nil)
@@ -1083,17 +1114,18 @@ extension MapViewController: CLLocationManagerDelegate {
                                 DataSource.si.visitingPlacemark = placemark
                                 DataSource.si.updateVisitingArea(with: placemark)
                                 
-                                self.updateHoodLabels(with: locations[0].coordinate, fromTap: false)
+                                self.updateHoodLabels(with: locations[0].coordinate, from: "visit")
                                 
                                 // update weather id and if successful, update label from notification that it posts
-                                DataSource.si.weather.updateWeatherIDAndTemp(coordinate: (placemark.location?.coordinate)!, fromTap: false)
-                                self.updateWeatherLabelFromVisiting()
+                                DataSource.si.weather.updateWeatherIDAndTemp(coordinate: (placemark.location?.coordinate)!, from: "visit")
+                                self.updateWeatherLabelFromVisit()
                             }
                         })
                     } else {
-                        updateHoodLabels(with: locations[0].coordinate, fromTap: false)
-                        updateWeatherLabelFromVisiting()
+                        updateHoodLabels(with: locations[0].coordinate, from: "visit")
                     }
+                    DataSource.si.weather.updateWeatherIDAndTemp(coordinate: locations[0].coordinate, from: "visit")
+                    updateWeatherLabelFromVisit()
                 }
             }
         }
@@ -1152,6 +1184,27 @@ extension MapViewController: UISearchResultsUpdating {
         (searchResultsView as! SearchResultsView).tableView.reloadData()
     }
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if searchBar.text != nil {
+            DataSource.si.geocoder.geocodeAddressString(searchBar.text!, completionHandler: { (placemarks, error) in
+                if error == nil {
+                    if let placemark = placemarks?.first {
+                        DataSource.si.searchedAddressPlacemark = placemark
+                        DataSource.si.updateSearchedAddressArea(with: placemark)
+                        
+                        if let coord = placemark.location?.coordinate {
+                            self.fly(to: coord)
+                            self.cameraView.hoodView.searchBar.resignFirstResponder()
+                            self.updateHoodLabels(with: coord, from: "search")
+                            DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
+                            self.updateWeatherLabelFromSearch()
+                        }
+                    }
+                }
+            })
+        }
+    }
+    
     func updateSearchResults(for searchController: UISearchController) {}
     
     func updateFilteredContent(with searchText: String) {
@@ -1194,6 +1247,8 @@ extension MapViewController: UITableViewDelegate, UITableViewDataSource {
         cameraView.hoodView.searchBar.resignFirstResponder()
         cameraView.hoodView.hoodLabel.text = filteredHood["neighborhood"]!
         cameraView.hoodView.areaLabel.text = filteredHood["area"]!
+        DataSource.si.weather.updateWeatherIDAndTemp(coordinate: searchedCentroid, from: "search")
+        updateWeatherLabelFromSearch()
         hoodScanning = false
     }
 }

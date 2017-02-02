@@ -60,6 +60,11 @@ class DataSource {
     var tappedWeather: String?
     var tappedPlacemark: CLPlacemark?
     
+    var searchedAddressHoodName: String?
+    var searchedAddressArea: String?
+    var searchedAddressWeather: String?
+    var searchedAddressPlacemark: CLPlacemark?
+    
     var searchedHoodCoords = [CLLocationCoordinate2D]()
 
     var calloutRepresentedObject: MGLAnnotation?
@@ -73,7 +78,7 @@ class DataSource {
             if locality == "San Francisco" {
                 visitingArea = locality
                 
-            // else it's not SF, set the area to subLocality
+            // else it's not SF, set the area to subLocality for NYC boroughs
             } else {
                 if let subLocality = placemark.subLocality {
                     visitingArea = subLocality
@@ -89,10 +94,26 @@ class DataSource {
             if locality == "San Francisco" {
                 tappedArea = locality
                 
-            // else it's not SF, set the area to subLocality
+            // else it's not SF, set the area to subLocality for NYC boroughs
             } else {
                 if let subLocality = tappedPlacemark!.subLocality {
                     tappedArea = subLocality
+                }
+            }
+        }
+    }
+    
+    func updateSearchedAddressArea(with placemark: CLPlacemark) {
+        
+        // if locality is SF, set the area singleton to locality...
+        if let locality = searchedAddressPlacemark!.locality {
+            if locality == "San Francisco" {
+                searchedAddressArea = locality
+                
+            // else it's not SF, set the area to subLocality for NYC boroughs
+            } else {
+                if let subLocality = searchedAddressPlacemark!.subLocality {
+                    searchedAddressArea = subLocality
                 }
             }
         }
@@ -149,6 +170,24 @@ class DataSource {
                 return hoodFromTappedArea
                 
             // else not found in hood from tapped area
+            } else {
+                throw GeoError.areaError
+            }
+        } else {
+            throw GeoError.areaError
+        }
+    }
+    
+    func searchedAddressHoodName(for coord: CLLocationCoordinate2D) throws -> String? {
+        
+        // scan searched area
+        if searchedAddressArea != nil {
+            
+            // if hood check from searched address area succeeds...
+            if let hoodFromSearchedAddressArea = hoodName(for: coord, in: searchedAddressArea!, fromTap: true) {
+                return hoodFromSearchedAddressArea
+                
+            // else not found in hood from searched address area
             } else {
                 throw GeoError.areaError
             }

@@ -23,6 +23,7 @@ class SearchResultsView: UIView {
         backgroundColor = UIColor.white
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.separatorColor = .clear
         addSubview(tableView)
         
         let constraints: [NSLayoutConstraint] = [

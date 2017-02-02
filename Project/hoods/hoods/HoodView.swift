@@ -100,7 +100,7 @@ class HoodView: UIView {
             button.bottomAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
             
             searchBar.topAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
-            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 0),
+            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: -2),
             searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: searchBarSizeSmall.width),
             searchBar.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
             searchBar.widthAnchor.constraint(equalToConstant: searchBarSizeSmall.width),

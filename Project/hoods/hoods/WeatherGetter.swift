@@ -14,9 +14,11 @@ class WeatherGetter {
     private let openWeatherMapBaseURL = "http://api.openweathermap.org/data/2.5/weather"
     private let openWeatherMapAPIKey = "10abd2dcd8626a4d75165599ff7c8625"
     var visitingWeatherID: Int?
-    var tappedWeatherID: Int?
     var visitingWeatherTemp: Double?
+    var tappedWeatherID: Int?
     var tappedWeatherTemp: Double?
+    var searchedAddressWeatherID: Int?
+    var searchedAddressWeatherTemp: Double?
     
     func weatherEmojis(id: Int) -> String {
         switch id {
@@ -80,6 +82,9 @@ class WeatherGetter {
         case 771: return "🌬"
         case 781: return "🌪"
             
+        // clear sky
+        case 800: return "☀️"
+            
         // clouds
         case 801: return "☁️"
         case 802: return "☁️☁️"
@@ -114,7 +119,8 @@ class WeatherGetter {
         }
     }
     
-    func updateWeatherIDAndTemp(coordinate: CLLocationCoordinate2D, fromTap: Bool) {
+    func updateWeatherIDAndTemp(coordinate: CLLocationCoordinate2D, from: String) {
+        print("updateWeatherIDAndTemp")
         let session = URLSession.shared
         let weatherRequestURL = URL(string: "\(openWeatherMapBaseURL)?APPID=\(openWeatherMapAPIKey)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
@@ -132,20 +138,32 @@ class WeatherGetter {
                     let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String:AnyObject]
                     if let weather = json?["weather"] as? [[String:AnyObject]] {
                         if let id = weather.first?["id"] {
-                            if fromTap {
+                            print("WEATHER: \(weather)")
+                            print("WEATHER ID: \(id)")
+                            switch from {
+                            case "tap":
                                 self.tappedWeatherID = id as? Int
                                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromTap"), object: nil)
-                            } else {
+                            case "search":
+                                self.searchedAddressWeatherID = id as? Int
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromSearch"), object: nil)
+                            default:
                                 self.visitingWeatherID = id as? Int
-                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromVisiting"), object: nil)
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "GotWeatherFromVisit"), object: nil)
                             }
                         }
                     }
                     if let temperature = json?["main"]?["temp"] as? Double {
-                        if fromTap {
+                        switch from {
+                        case "tap":
                             self.tappedWeatherTemp = temperature * 9 / 5 - 459.67
-                        } else {
+                            print("TEMP (tap): \(self.tappedWeatherTemp)")
+                        case "search":
+                            self.searchedAddressWeatherTemp = temperature * 9 / 5 - 459.67
+                            print("TEMP (search): \(self.searchedAddressWeatherTemp)")
+                        default:
                             self.visitingWeatherTemp = temperature * 9 / 5 - 459.67
+                            print("TEMP (visit): \(self.visitingWeatherTemp)")
                         }
                     }
                 } catch {
