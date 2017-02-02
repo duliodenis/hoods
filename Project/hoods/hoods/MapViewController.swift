@@ -260,10 +260,8 @@ class MapViewController: UIViewController {
             DispatchQueue.main.async {
                 if let visitingWeatherTemp = DataSource.si.weather.visitingWeatherTemp {
                     let temperature = String(format: "%.0f", arguments: [visitingWeatherTemp])
-                    print("updateWeatherLabelFromVisit() -> temp: \(temperature)")
                     self.cameraView.hoodView.weatherLabel.text = "\(temperature)ºF \(weather)"
                 } else {
-                    print("visitingWeatherTemp is nil: \(DataSource.si.weather.visitingWeatherTemp)")
                     self.cameraView.hoodView.weatherLabel.text = weather
                 }
             }
