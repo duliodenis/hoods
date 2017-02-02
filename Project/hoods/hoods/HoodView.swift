@@ -22,7 +22,7 @@ class HoodView: UIView {
         super.init(frame: frame)
         
         backgroundColor = UIColor.clear
-        searchBarSizeSmall = CGSize(width: 20, height: 20)
+        searchBarSizeSmall = CGSize(width: 23, height: 23)
         
         hoodLabel.text = "HOODS"
         areaLabel.text = "🗺"
