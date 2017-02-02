@@ -53,7 +53,6 @@ struct Frames {
     var enableLocationHintShadowShowingBig: CGRect
 }
 
-@available(iOS 10.0, *)
 class MapViewController: UIViewController {
     
     let padding: CGFloat = 20
@@ -70,7 +69,7 @@ class MapViewController: UIViewController {
     
     // search results
     fileprivate var searchResultsView = UIView()
-    fileprivate var filteredHoods = [String]()
+    fileprivate var filteredHoods = [[String:String]]()
     
     // camera
     fileprivate var cameraView: CameraView!
@@ -129,11 +128,6 @@ class MapViewController: UIViewController {
     }
     
     func appDidBecomeActive() {
-        if let coord = DataSource.si.locationManager.location?.coordinate {
-            flyToUserLocation()
-            updateHoodLabels(with: coord, fromTap: false)
-            updateWeatherLabelFromVisiting()
-        }
         
         // only show hint view on first launch
         if !UserDefaults.standard.bool(forKey: "firstLaunch1.0") {
@@ -290,14 +284,14 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func dropSearchResultsView() {
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: { 
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
             self.searchResultsView.frame = (self.frames?.searchResultsViewDropped)!
         }) { finished in
         }
     }
     
     fileprivate func hideSearchResultsView() {
-        UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseIn, animations: {
+        UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseIn, animations: {
             self.searchResultsView.frame = (self.frames?.searchResultsViewHidden)!
         }) { finished in
         }
@@ -482,13 +476,17 @@ class MapViewController: UIViewController {
     // map behavior
         
         // if tap was not in any other view...
-        if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) {
+        if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) && !searchResultsView.frame.contains(sender.location(in: mapboxView)) {
             
             DataSource.si.mapState = .tapping
             
             // haptic feedback for iPhone 7 and iPhone 7 Plus
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
+            if #available(iOS 10.0, *) {
+                let generator = UIImpactFeedbackGenerator(style: .light)
+                generator.impactOccurred()
+            } else {
+                // Fallback on earlier versions
+            }
             
             // CGPoint -> CLLocationCoordinate2D -> CLLocation
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
@@ -894,10 +892,10 @@ class MapViewController: UIViewController {
         
         let buttonSize = CGSize(width: 50, height: 50)
         DataSource.si.hoodViewHeight = view.frame.height * 0.14
-        let searchResultsViewHeight = view.frame.height * 0.4
+        let searchResultsViewHeight = view.frame.height * 0.5
         let hintViewSize = CGSize(width: view.frame.width / 2, height: buttonSize.height)
         
-        // hood view
+        // camera view view
         let cameraView = CGRect(x: 0, y: view.frame.minY - view.frame.height, width: view.frame.width, height: view.frame.height + DataSource.si.hoodViewHeight!)
         
         // search results view
@@ -965,38 +963,45 @@ class MapViewController: UIViewController {
         let enableLocationHintShadowShowingBig = tapHintShadowShowingBig
         
         frames = Frames(cameraView: cameraView,
+                        
                         searchResultsViewHidden: searchResultsViewHidden,
                         searchResultsViewDropped: searchResultsViewDropped,
+                        
                         profileViewHidden: profileViewHidden,
                         profileViewClosed: profileViewClosed,
                         profileViewOpen: profileViewOpen,
                         profileViewShadowHidden: profileViewShadowHidden,
                         profileViewShadowClosed: profileViewShadowClosed,
                         profileViewShadowOpen: profileViewShadowOpen,
+                        
                         federationButtonHidden: federationButtonHidden,
                         federationButtonNormal: federationButtonNormal,
                         federationButtonTapped: federationButtonTapped,
                         federationButtonShadowHidden: federationButtonShadowHidden,
                         federationButtonShadowNormal: federationButtonShadowNormal,
                         federationButtonShadowTapped: federationButtonShadowTapped,
+                        
                         shakeHintHidden: shakeHintHidden,
                         shakeHintShowingSmall: shakeHintShowingSmall,
                         shakeHintShowingBig: shakeHintShowingBig,
                         shakeHintShadowHidden: shakeHintShadowHidden,
                         shakeHintShadowShowingSmall: shakeHintShadowShowingSmall,
                         shakeHintShadowShowingBig: shakeHintShadowShowingBig,
+                        
                         hoodHintHidden: hoodHintHidden,
                         hoodHintShowingSmall: hoodHintShowingSmall,
                         hoodHintShowingBig: hoodHintShowingBig,
                         hoodHintShadowHidden: hoodHintShadowHidden,
                         hoodHintShadowShowingSmall: hoodHintShadowShowingSmall,
                         hoodHintShadowShowingBig: hoodHintShadowShowingBig,
+                        
                         tapHintHidden: tapHintHidden,
                         tapHintShowingSmall: tapHintShowingSmall,
                         tapHintShowingBig: tapHintShowingBig,
                         tapHintShadowHidden: tapHintShadowHidden,
                         tapHintShadowShowingSmall: tapHintShadowShowingSmall,
                         tapHintShadowShowingBig: tapHintShadowShowingBig,
+                        
                         enableLocationHintHidden: enableLocationHintHidden,
                         enableLocationHintShowingSmall: enableLocationHintShowingSmall,
                         enableLocationHintShowingBig: enableLocationHintShowingBig,
@@ -1016,13 +1021,12 @@ class MapViewController: UIViewController {
 
 // MARK: UIGestureRecognizerDelegate
 
-@available(iOS 10.0, *)
 extension MapViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
 
         // if touch is not in camera or profile views, let gesture pass through to map
-        if !cameraView!.frame.contains(touch.location(in: mapboxView)) && !profileView.frame.contains(touch.location(in: mapboxView)) {
+        if !cameraView!.frame.contains(touch.location(in: mapboxView)) && !profileView.frame.contains(touch.location(in: mapboxView)) && !searchResultsView.frame.contains(touch.location(in: mapboxView)) {
             return true
         }
         return false
@@ -1031,7 +1035,6 @@ extension MapViewController: UIGestureRecognizerDelegate {
 
 // MARK: CLLocationManagerDelegate
 
-@available(iOS 10.0, *)
 extension MapViewController: CLLocationManagerDelegate {
     
     // when authorization status changes...
@@ -1099,7 +1102,6 @@ extension MapViewController: CLLocationManagerDelegate {
 
 // MARK: MGLMapViewDelegate
 
-@available(iOS 10.0, *)
 extension MapViewController: MGLMapViewDelegate {
     
     func mapView(_ mapView: MGLMapView, annotationCanShowCallout annotation: MGLAnnotation) -> Bool {
@@ -1130,7 +1132,6 @@ extension MapViewController: MGLMapViewDelegate {
     }
 }
 
-@available(iOS 10.0, *)
 extension MapViewController: UISearchBarDelegate {
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         DataSource.si.mapState = .searching
@@ -1144,7 +1145,6 @@ extension MapViewController: UISearchBarDelegate {
     }
 }
 
-@available(iOS 10.0, *)
 extension MapViewController: UISearchResultsUpdating {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -1156,15 +1156,16 @@ extension MapViewController: UISearchResultsUpdating {
     
     func updateFilteredContent(with searchText: String) {
         filteredHoods.removeAll()
-        for hood in DataSource.si.hoodNames {
-            if hood.range(of: searchText) != nil {
-                filteredHoods.append(hood)
+        for hood in DataSource.si.hoodAndAreaNames {
+            if hood["neighborhood"]?.range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil {
+                let neighborhood = hood["neighborhood"]
+                let area = hood["area"]
+                filteredHoods.append(["neighborhood": neighborhood!, "area": area!])
             }
         }
     }
 }
 
-@available(iOS 10.0, *)
 extension MapViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -1178,9 +1179,22 @@ extension MapViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "SearchCell")
         let cell = tableView.dequeueReusableCell(withIdentifier: "SearchCell")
-        cell?.textLabel?.text = filteredHoods[indexPath.row]
-//        print("filteredHoods[indexPath.row]: \(filteredHoods[indexPath.row])")
+        let filteredHood = filteredHoods[indexPath.row]
+        let neighborhood = filteredHood["neighborhood"]!
+        let area = filteredHood["area"]!
+        cell?.textLabel?.text = "\(neighborhood), \(area)"
         return cell!
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let filteredHood = filteredHoods[indexPath.row]
+        DataSource.si.updateSearchedHoodCoords(from: filteredHood["neighborhood"]!, area: filteredHood["area"]!)
+        let searchedCentroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
+        fly(to: searchedCentroid)
+        cameraView.hoodView.searchBar.resignFirstResponder()
+        cameraView.hoodView.hoodLabel.text = filteredHood["neighborhood"]!
+        cameraView.hoodView.areaLabel.text = filteredHood["area"]!
+        hoodScanning = false
     }
 }
 

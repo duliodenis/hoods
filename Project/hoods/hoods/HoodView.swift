@@ -11,7 +11,7 @@ import UIKit
 class HoodView: UIView {
     
     let frameHeight = (DataSource.si.viewSize?.height)! * 0.15
-    var searchBarWidthSmall = CGFloat()
+    var searchBarSizeSmall = CGSize()
     let button = UIButton()
     let areaLabel = UILabel()
     let hoodLabel = UILabel()
@@ -22,7 +22,7 @@ class HoodView: UIView {
         super.init(frame: frame)
         
         backgroundColor = UIColor.clear
-        searchBarWidthSmall = frameHeight * 0.21
+        searchBarSizeSmall = CGSize(width: 20, height: 20)
         
         hoodLabel.text = "HOODS"
         areaLabel.text = "🗺"
@@ -100,11 +100,11 @@ class HoodView: UIView {
             button.bottomAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
             
             searchBar.topAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
-            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: -2),
-            searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: searchBarWidthSmall),
+            searchBar.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 0),
+            searchBar.rightAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: searchBarSizeSmall.width),
             searchBar.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-            searchBar.widthAnchor.constraint(equalToConstant: searchBarWidthSmall),
-            searchBar.heightAnchor.constraint(equalToConstant: searchBarWidthSmall),
+            searchBar.widthAnchor.constraint(equalToConstant: searchBarSizeSmall.width),
+            searchBar.heightAnchor.constraint(equalToConstant: searchBarSizeSmall.height),
             
             weatherLabel.topAnchor.constraint(equalTo: hoodLabel.bottomAnchor),
             weatherLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
@@ -127,7 +127,7 @@ class HoodView: UIView {
         searchBar.showsCancelButton = false
         searchBar.showsSearchResultsButton = false
         searchBar.spellCheckingType = .no
-        searchBar.layer.cornerRadius = searchBarWidthSmall / 2
+        searchBar.layer.cornerRadius = searchBarSizeSmall.width / 2
         searchBar.layer.masksToBounds = true
         if #available(iOS 10.0, *) {
             searchBar.textContentType = .location

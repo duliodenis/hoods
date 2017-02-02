@@ -38,7 +38,7 @@ class DataSource {
     static let si = DataSource()
     fileprivate init() {}
     
-    var hoodNames = [String]()
+    var hoodAndAreaNames = [[String:String]]()
     
     var mapState: MapState?
     var mapButtonState: MapButtonState?
@@ -59,6 +59,8 @@ class DataSource {
     var tappedArea: String?
     var tappedWeather: String?
     var tappedPlacemark: CLPlacemark?
+    
+    var searchedHoodCoords = [CLLocationCoordinate2D]()
 
     var calloutRepresentedObject: MGLAnnotation?
     var viewSize: CGSize?
@@ -166,7 +168,7 @@ class DataSource {
         do {
             let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String:AnyObject]
             
-            if let hoods = json?["features"] as? [[String: AnyObject]] {
+            if let hoods = json?["features"] as? [[String:AnyObject]] {
                 
                 // iterate through all hoods in the GeoJSON file
                 for hood in hoods {
@@ -174,14 +176,14 @@ class DataSource {
                     var coords = [CLLocationCoordinate2D]()
                     var currentNeighborhood = ""
                     
-                    if let properties = hood["properties"] as? [String: AnyObject] {
+                    if let properties = hood["properties"] as? [String:AnyObject] {
                         if let neighborhood = properties["name"] as? String {
                             currentNeighborhood = neighborhood
                         }
                     }
                     
                     // add the coord pairs to the coords array
-                    if let geometry = hood["geometry"] as? [String: AnyObject] {
+                    if let geometry = hood["geometry"] as? [String:AnyObject] {
                         if let coordinates = geometry["coordinates"] as? [[[Float]]] {
                             for array in coordinates {
                                 for coord in array {
@@ -256,13 +258,46 @@ class DataSource {
                     for hood in hoods {
                         if let properties = hood["properties"] as? [String: AnyObject] {
                             if let neighborhood = properties["name"] as? String {
-                                hoodNames.append(neighborhood)
+                                hoodAndAreaNames.append(["neighborhood": "\(neighborhood)", "area": "\(area)"])
                             }
                         }
                     }
                 }
             } catch {}
         }
+    }
+    
+    func updateSearchedHoodCoords(from searchedHood: String, area: String) {
+        searchedHoodCoords.removeAll()
+        var filePath = ""
+        filePath = Bundle.main.path(forResource: geoJSONFileName(for: area), ofType: "geojson")!
+        let data = try? Data(contentsOf: URL(fileURLWithPath: filePath))
+        do {
+            let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as? [String:AnyObject]
+            if let hoods = json?["features"] as? [[String:AnyObject]] {
+                for hood in hoods {
+                    if let properties = hood["properties"] as? [String:AnyObject] {
+                        if let neighborhood = properties["name"] as? String {
+                            
+                            // if hood found in geojson from passed in hood, add its coords to searchedHoodCoords
+                            if neighborhood == searchedHood {
+                                if let geometry = hood["geometry"] as? [String:AnyObject] {
+                                    if let coordinates = geometry["coordinates"] as? [[[Float]]] {
+                                        for array in coordinates {
+                                            for coord in array {
+                                                let latitude = CLLocationDegrees(coord[1])
+                                                let longitude = CLLocationDegrees(coord[0])
+                                                searchedHoodCoords.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch {}
     }
     
     fileprivate func geoJSONFileName(for area: String) -> String {
@@ -335,9 +370,9 @@ class DataSource {
         for coord in coords {
             if coord.longitude < 0 {
                 if coord.longitude > x1Long! {
-                    x1Long = coord.longitude
-                } else {
                     x2Long = coord.longitude
+                } else {
+                    x1Long = coord.longitude
                 }
             } else {
                 if coord.longitude < x1Long! {
@@ -348,9 +383,9 @@ class DataSource {
             }
             if coord.latitude < 0 {
                 if coord.latitude > y1Lat! {
-                    y1Lat = coord.latitude
-                } else {
                     y2Lat = coord.latitude
+                } else {
+                    y1Lat = coord.latitude
                 }
             } else {
                 if coord.latitude < y1Lat! {
