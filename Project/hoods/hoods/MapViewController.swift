@@ -159,7 +159,7 @@ class MapViewController: UIViewController {
     func appDidBecomeActive() {
         if let coord = DataSource.si.locationManager.location?.coordinate {
             flyToUserLocation()
-            updateHoodLabels(with: coord, from: "visit")
+            updateHoodLabels(with: coord, from: "visit", hoodName: nil, areaName: nil)
             updateWeatherLabelFromVisit()
         }
         
@@ -253,7 +253,7 @@ class MapViewController: UIViewController {
         view.addSubview(cameraView!)
     }
     
-    fileprivate func updateHoodLabels(with coordinate: CLLocationCoordinate2D, from: String) {
+    fileprivate func updateHoodLabels(with coordinate: CLLocationCoordinate2D, from: String, hoodName: String?, areaName: String?) {
         switch from {
         case "tap":
             do {
@@ -265,7 +265,6 @@ class MapViewController: UIViewController {
                 cameraView.hoodView.areaLabel.text = area
             }
         case "addressSearch":
-            print("was an address search")
             do {
                 if let hood = try DataSource.si.searchedAddressHoodName(for: coordinate) {
                     cameraView.hoodView.hoodLabel.text = hood
@@ -282,11 +281,12 @@ class MapViewController: UIViewController {
                 cameraView.hoodView.areaLabel.text = area
             }
         default:
-            print("was a hood search: \(from)")
             for hood in DataSource.si.hoodAndAreaNames {
-                if hood["neighborhood"] == from {
-                    cameraView.hoodView.hoodLabel.text = hood["neighborhood"]!
-                    cameraView.hoodView.areaLabel.text = hood["area"]!
+                if hoodName != nil && areaName != nil {
+                    if hood["neighborhood"] == hoodName && hood["area"] == areaName {
+                        cameraView.hoodView.hoodLabel.text = hood["neighborhood"]!
+                        cameraView.hoodView.areaLabel.text = hood["area"]!
+                    }
                 }
             }
         }
@@ -523,7 +523,7 @@ class MapViewController: UIViewController {
             DataSource.si.mapState = .visiting
             
             flyToUserLocation()
-            updateHoodLabels(with: coord, from: "visit")
+            updateHoodLabels(with: coord, from: "visit", hoodName: nil, areaName: nil)
             updateWeatherLabelFromVisit()
         }
     }
@@ -1272,7 +1272,7 @@ extension MapViewController: CLLocationManagerDelegate {
                                 DataSource.si.visitingPlacemark = placemark
                                 DataSource.si.updateVisitingArea(with: placemark)
                                 
-                                self.updateHoodLabels(with: locations[0].coordinate, from: "visit")
+                                self.updateHoodLabels(with: locations[0].coordinate, from: "visit", hoodName: nil, areaName: nil)
                                 
                                 // update weather id and if successful, update label from notification that it posts
                                 DataSource.si.weather.updateWeatherIDAndTemp(coordinate: (placemark.location?.coordinate)!, from: "visit")
@@ -1280,7 +1280,7 @@ extension MapViewController: CLLocationManagerDelegate {
                             }
                         })
                     } else {
-                        updateHoodLabels(with: locations[0].coordinate, from: "visit")
+                        updateHoodLabels(with: locations[0].coordinate, from: "visit", hoodName: nil, areaName: nil)
                     }
                     DataSource.si.weather.updateWeatherIDAndTemp(coordinate: locations[0].coordinate, from: "visit")
                     updateWeatherLabelFromVisit()
@@ -1351,11 +1351,10 @@ extension MapViewController: UISearchResultsUpdating {
                     let centroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
                     self.fly(to: centroid)
                     self.cameraView.hoodView.searchBar.resignFirstResponder()
-                    self.updateHoodLabels(with: centroid, from: hood["neighborhood"]!)
+                    self.updateHoodLabels(with: centroid, from: "hoodSearch", hoodName: hood["neighborhood"]!, areaName: hood["area"]!)
                     DataSource.si.weather.updateWeatherIDAndTemp(coordinate: centroid, from: "search")
                     self.updateWeatherLabelFromSearch()
                     self.hoodScanning = false
-                    print("search text was equal to a hood")
                     return
                 }
             }
@@ -1368,7 +1367,7 @@ extension MapViewController: UISearchResultsUpdating {
                         if let coord = placemark.location?.coordinate {
                             self.fly(to: coord)
                             self.cameraView.hoodView.searchBar.resignFirstResponder()
-                            self.updateHoodLabels(with: coord, from: "addressSearch")
+                            self.updateHoodLabels(with: coord, from: "addressSearch", hoodName: nil, areaName: nil)
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
                             self.updateWeatherLabelFromSearch()
                             self.hoodScanning = false

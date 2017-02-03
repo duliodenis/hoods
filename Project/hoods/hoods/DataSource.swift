@@ -113,6 +113,7 @@ class DataSource {
             // else it's not SF, set the area to subLocality for NYC boroughs
             } else {
                 if let subLocality = searchedAddressPlacemark!.subLocality {
+                    print("searchedAddressPlacemark: \(searchedAddressPlacemark)")
                     searchedAddressArea = subLocality
                 }
             }
