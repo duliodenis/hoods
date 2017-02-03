@@ -45,6 +45,13 @@ struct Frames {
     var hoodHintShadowShowingSmall: CGRect
     var hoodHintShadowShowingBig: CGRect
     
+    var areaHintHidden: CGRect
+    var areaHintShowingSmall: CGRect
+    var areaHintShowingBig: CGRect
+    var areaHintShadowHidden: CGRect
+    var areaHintShadowShowingSmall: CGRect
+    var areaHintShadowShowingBig: CGRect
+    
     var searchHintHidden: CGRect
     var searchHintShowingSmall: CGRect
     var searchHintShowingBig: CGRect
@@ -105,6 +112,10 @@ class MapViewController: UIViewController {
     fileprivate var hoodHintView = HintView()
     fileprivate var hoodHintViewShadow = UIView()
     
+    // area hint
+    fileprivate var areaHintView = HintView()
+    fileprivate var areaHintViewShadow = UIView()
+    
     // search hint
     fileprivate var searchHintView = HintView()
     fileprivate var searchHintViewShadow = UIView()
@@ -160,6 +171,7 @@ class MapViewController: UIViewController {
             if DataSource.si.locationManager.location != nil {
                 showShakeHintView()
                 showHoodHintView()
+                showAreaHintView()
                 showSearchHintView()
                 showTapHintView()
             } else {
@@ -252,7 +264,8 @@ class MapViewController: UIViewController {
             if let area = DataSource.si.tappedArea {
                 cameraView.hoodView.areaLabel.text = area
             }
-        case "search":
+        case "addressSearch":
+            print("was an address search")
             do {
                 if let hood = try DataSource.si.searchedAddressHoodName(for: coordinate) {
                     cameraView.hoodView.hoodLabel.text = hood
@@ -261,12 +274,20 @@ class MapViewController: UIViewController {
             if let area = DataSource.si.searchedAddressArea {
                 cameraView.hoodView.areaLabel.text = area
             }
-        default:
+        case "visit":
             if let hood = DataSource.si.visitingHoodName(for: coordinate) {
                 cameraView.hoodView.hoodLabel.text = hood
             }
             if let area = DataSource.si.visitingArea {
                 cameraView.hoodView.areaLabel.text = area
+            }
+        default:
+            print("was a hood search: \(from)")
+            for hood in DataSource.si.hoodAndAreaNames {
+                if hood["neighborhood"] == from {
+                    cameraView.hoodView.hoodLabel.text = hood["neighborhood"]!
+                    cameraView.hoodView.areaLabel.text = hood["area"]!
+                }
             }
         }
     }
@@ -762,6 +783,49 @@ class MapViewController: UIViewController {
         }
     }
     
+    fileprivate func showAreaHintView() {
+        areaHintView = HintView(frame: (frames?.areaHintHidden)!)
+        areaHintView.layer.cornerRadius = (frames?.areaHintHidden.width)! / 2
+        areaHintView.layer.masksToBounds = true
+        areaHintView.button.isEnabled = false
+        areaHintView.label.text = "tap the area name to go back to hoods"
+        
+        areaHintViewShadow = UIView(frame: (frames?.areaHintShadowHidden)!)
+        areaHintViewShadow.layer.cornerRadius = (frames?.areaHintHidden.width)! / 2
+        areaHintViewShadow.layer.masksToBounds = true
+        areaHintViewShadow.backgroundColor = UIColor(white: 0.1, alpha: 0.5)
+        
+        mapboxView.addSubview(areaHintViewShadow)
+        mapboxView.addSubview(areaHintView)
+        
+        // show area hint view
+        UIView.animate(withDuration: 0.7, delay: 22, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+            self.areaHintViewShadow.frame = (self.frames?.areaHintShadowShowingSmall)!
+            self.areaHintView.frame = (self.frames?.areaHintShowingSmall)!
+            
+            // animate area hint view to big
+        }) { finished in
+            UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                self.areaHintViewShadow.frame = (self.frames?.areaHintShadowShowingBig)!
+                self.areaHintView.frame = (self.frames?.areaHintShowingBig)!
+                
+            }, completion: { finished in
+                
+                // delay hiding 5 sec
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 5, execute: {
+                    
+                    // hide area hint view
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+                        self.areaHintViewShadow.frame = (self.frames?.areaHintShadowHidden)!
+                        self.areaHintView.frame = (self.frames?.areaHintHidden)!
+                        
+                    }, completion: { finished in
+                    })
+                })
+            })
+        }
+    }
+    
     fileprivate func showSearchHintView() {
         searchHintView = HintView(frame: (frames?.searchHintHidden)!)
         searchHintView.layer.cornerRadius = (frames?.searchHintHidden.width)! / 2
@@ -778,7 +842,7 @@ class MapViewController: UIViewController {
         mapboxView.addSubview(searchHintView)
         
         // show search hint view
-        UIView.animate(withDuration: 0.7, delay: 28, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.7, delay: 35, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
             self.searchHintViewShadow.frame = (self.frames?.searchHintShadowShowingSmall)!
             self.searchHintView.frame = (self.frames?.searchHintShowingSmall)!
             
@@ -821,7 +885,7 @@ class MapViewController: UIViewController {
         mapboxView.addSubview(tapHintView)
         
         // show tap hint view
-        UIView.animate(withDuration: 0.7, delay: 23, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
+        UIView.animate(withDuration: 0.7, delay: 28, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.5, options: .curveEaseOut, animations: {
             self.tapHintViewShadow.frame = (self.frames?.tapHintShadowShowingSmall)!
             self.tapHintView.frame = (self.frames?.tapHintShowingSmall)!
             
@@ -1033,6 +1097,16 @@ class MapViewController: UIViewController {
         let hoodHintShadowShowingSmall = CGRect(x: hoodHintShowingSmall.minX + 4, y: hoodHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
         let hoodHintShadowShowingBig = CGRect(x: hoodHintShowingBig.minX + 4, y: hoodHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
+        // area hint
+        let areaHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: hoodHintHidden.maxY + padding, width: buttonSize.width, height: buttonSize.height)
+        let areaHintShowingSmall = CGRect(x: view.frame.midX - (buttonSize.width / 2), y: hoodHintShowingSmall.maxY + padding, width: buttonSize.width, height: buttonSize.height)
+        let areaHintShowingBig = CGRect(x: view.frame.midX - (hintViewSize.width / 2), y: hoodHintShowingBig.maxY + padding, width: hintViewSize.width, height: hintViewSize.height)
+        
+        // area hint shadow
+        let areaHintShadowHidden = CGRect(x: areaHintHidden.minX + 4, y: areaHintHidden.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let areaHintShadowShowingSmall = CGRect(x: areaHintShowingSmall.minX + 4, y: areaHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
+        let areaHintShadowShowingBig = CGRect(x: areaHintShowingBig.minX + 4, y: areaHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
+        
         // search hint
         let searchHintHidden = CGRect(x: view.frame.minX - buttonSize.width - padding, y: DataSource.si.hoodViewHeight! + padding, width: buttonSize.width, height: buttonSize.height)
         let searchHintShowingSmall = CGRect(x: padding, y: DataSource.si.hoodViewHeight! + padding, width: buttonSize.width, height: buttonSize.height)
@@ -1095,6 +1169,13 @@ class MapViewController: UIViewController {
                         hoodHintShadowHidden: hoodHintShadowHidden,
                         hoodHintShadowShowingSmall: hoodHintShadowShowingSmall,
                         hoodHintShadowShowingBig: hoodHintShadowShowingBig,
+                        
+                        areaHintHidden: areaHintHidden,
+                        areaHintShowingSmall: areaHintShowingSmall,
+                        areaHintShowingBig: areaHintShowingBig,
+                        areaHintShadowHidden: areaHintShadowHidden,
+                        areaHintShadowShowingSmall: areaHintShadowShowingSmall,
+                        areaHintShadowShowingBig: areaHintShadowShowingBig,
                         
                         searchHintHidden: searchHintHidden,
                         searchHintShowingSmall: searchHintShowingSmall,
@@ -1263,6 +1344,21 @@ extension MapViewController: UISearchResultsUpdating {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if searchBar.text != nil {
+            for hood in DataSource.si.hoodAndAreaNames {
+                let searchText = searchBar.text?.lowercased()
+                if hood["neighborhood"]?.lowercased() == searchText {
+                    DataSource.si.updateSearchedHoodCoords(from: hood["neighborhood"]!, area: hood["area"]!)
+                    let centroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
+                    self.fly(to: centroid)
+                    self.cameraView.hoodView.searchBar.resignFirstResponder()
+                    self.updateHoodLabels(with: centroid, from: hood["neighborhood"]!)
+                    DataSource.si.weather.updateWeatherIDAndTemp(coordinate: centroid, from: "search")
+                    self.updateWeatherLabelFromSearch()
+                    self.hoodScanning = false
+                    print("search text was equal to a hood")
+                    return
+                }
+            }
             DataSource.si.geocoder.geocodeAddressString(searchBar.text!, completionHandler: { (placemarks, error) in
                 if error == nil {
                     if let placemark = placemarks?.first {
@@ -1272,7 +1368,7 @@ extension MapViewController: UISearchResultsUpdating {
                         if let coord = placemark.location?.coordinate {
                             self.fly(to: coord)
                             self.cameraView.hoodView.searchBar.resignFirstResponder()
-                            self.updateHoodLabels(with: coord, from: "search")
+                            self.updateHoodLabels(with: coord, from: "addressSearch")
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
                             self.updateWeatherLabelFromSearch()
                             self.hoodScanning = false
