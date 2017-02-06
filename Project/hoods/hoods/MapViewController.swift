@@ -10,6 +10,7 @@ import UIKit
 import Mapbox
 import MapKit
 import AudioToolbox
+import AVFoundation
 
 struct Frames {
     var cameraView: CGRect
@@ -79,9 +80,10 @@ class MapViewController: UIViewController {
     let padding: CGFloat = 20
     fileprivate var hoodScanning = false
     fileprivate var frames: Frames?
+    var audioPlayer: AVAudioPlayer?
     
     // gestures
-    fileprivate var tap = UITapGestureRecognizer()
+    fileprivate var tap = TouchDownGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
 
     // map
@@ -539,71 +541,84 @@ class MapViewController: UIViewController {
         mapboxView.addGestureRecognizer(tap)
     }
     
-    @objc fileprivate func tapFired(_ sender: UITapGestureRecognizer) {
+    @objc fileprivate func tapFired(_ sender: TouchDownGestureRecognizer) {
         
     // map behavior
         
         // if tap was not in any other view...
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) && !searchResultsView.frame.contains(sender.location(in: mapboxView)) {
             
+            // play map tap sound
+            playMapTapSound()
+            
+            // update map state
             DataSource.si.mapState = .tapping
             
-            // haptic feedback for iPhone 7 and iPhone 7 Plus
+            // enable haptic feedback for iPhone 7 and iPhone 7 Plus
             if #available(iOS 10.0, *) {
                 let generator = UIImpactFeedbackGenerator(style: .light)
                 generator.impactOccurred()
-            } else {
-                // Fallback on earlier versions
             }
             
             // CGPoint -> CLLocationCoordinate2D -> CLLocation
             let tappedLocationCoord = mapboxView.convert(sender.location(in: mapboxView), toCoordinateFrom: mapboxView)
             let tappedLocation = CLLocation(latitude: tappedLocationCoord.latitude, longitude: tappedLocationCoord.longitude)
             
+            // reverse geocode func that is used if hood not found for current or tapped area
             func reverseGeocode() {
                 DataSource.si.geocoder.reverseGeocodeLocation(tappedLocation, completionHandler: { (placemarks, error) in
                     
                     if let placemark = placemarks?[0] {
                         
-                        // update tapped area and placemark singletons
+                        // update tapped placemark and area singletons
                         DataSource.si.tappedPlacemark = placemark
                         DataSource.si.updateTappedArea(with: placemark)
                         
+                        // update hood label and fly to hood
                         do {
                             if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                                 self.cameraView.hoodView.hoodLabel.text = hood
                                 self.fly(to: tappedLocationCoord)
                             }
                         } catch {}
+                        
+                        // update area label
                         if let area = DataSource.si.tappedArea {
                             self.cameraView.hoodView.areaLabel.text = area
                         }
+                        
+                        // update weather data for tapped location and update weather label
                         DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, from: "tap")
                         self.updateWeatherLabelFromTap()
                     }
                 })
             }
             
-            // update the label and hood check state
             do {
+                // try to update hood label from tapped location and fly there...
                 if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
                     fly(to: tappedLocationCoord)
+                    
+                // else use reverse geocode func to update area and then update hood/area/weather labels
                 } else {
                     reverseGeocode()
                 }
+                
+                // update area label
                 if let area = DataSource.si.tappedArea {
                     cameraView.hoodView.areaLabel.text = area
                 }
+                
+                // update weather data from tapped location and update weather label
                 DataSource.si.weather.updateWeatherIDAndTemp(coordinate: tappedLocationCoord, from: "tap")
                 updateWeatherLabelFromTap()
             } catch {
                 reverseGeocode()
             }
             
+            // if keyboard showing from search bar, hide it
             if cameraView.hoodView.searchBar.isFirstResponder {
-                
-                // dismiss search keyboard
                 cameraView.hoodView.searchBar.resignFirstResponder()
             }
         }
@@ -696,6 +711,20 @@ class MapViewController: UIViewController {
     }
     
 // MARK: Miscellaneous
+    
+    fileprivate func playMapTapSound() {
+        let url = Bundle.main.url(forResource: "tap-mellow", withExtension: "aif")!
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            guard let player = audioPlayer else { return }
+            
+            player.prepareToPlay()
+            player.play()
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
     
     fileprivate func showShakeHintView() {
         shakeHintView = HintView(frame: (frames?.shakeHintHidden)!)
@@ -1214,8 +1243,8 @@ extension MapViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
 
-        // if touch is not in camera or profile views, let gesture pass through to map
-        if !cameraView!.frame.contains(touch.location(in: mapboxView)) && !profileView.frame.contains(touch.location(in: mapboxView)) && !searchResultsView.frame.contains(touch.location(in: mapboxView)) {
+        // if touch is not in camera, profile, search results, enable location hint, or federation button, let gesture pass through to map
+        if !cameraView!.frame.contains(touch.location(in: mapboxView)) && !profileView.frame.contains(touch.location(in: mapboxView)) && !searchResultsView.frame.contains(touch.location(in: mapboxView)) && !enableLocationHintView.frame.contains(touch.location(in: mapboxView)) && !federationButton.frame.contains(touch.location(in: mapboxView)) {
             return true
         }
         return false

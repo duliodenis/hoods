@@ -49,6 +49,7 @@ class HintView: UIView {
     }
     
     @objc fileprivate func buttonTapped(sender: UIButton) {
+        print("hint tapped")
         
         // go to location settings
         if let appSettings = NSURL(string: UIApplicationOpenSettingsURLString) {
