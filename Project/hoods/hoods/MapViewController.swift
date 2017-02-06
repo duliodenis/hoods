@@ -501,6 +501,8 @@ class MapViewController: UIViewController {
     
     @objc fileprivate func federationButtonTapped(_ sender: UIButton) {
         
+        playSound(name: "swoosh", fileExtension: "wav")
+        
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
         UIView.animate(withDuration: 0.1, animations: {
@@ -549,7 +551,7 @@ class MapViewController: UIViewController {
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) && !searchResultsView.frame.contains(sender.location(in: mapboxView)) {
             
             // play map tap sound
-            playMapTapSound()
+            playSound(name: "tap-mellow", fileExtension: "aif")
             
             // update map state
             DataSource.si.mapState = .tapping
@@ -712,8 +714,8 @@ class MapViewController: UIViewController {
     
 // MARK: Miscellaneous
     
-    fileprivate func playMapTapSound() {
-        let url = Bundle.main.url(forResource: "tap-mellow", withExtension: "aif")!
+    fileprivate func playSound(name: String, fileExtension: String) {
+        let url = Bundle.main.url(forResource: name, withExtension: fileExtension)!
         
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
