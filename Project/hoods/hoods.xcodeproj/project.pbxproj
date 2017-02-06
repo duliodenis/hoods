@@ -26,6 +26,7 @@
 		49E5D7351E47FFE600CDF24D /* tap-mellow.aif in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */; };
 		49E5D7371E48038900CDF24D /* TouchDownGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E5D7361E48038900CDF24D /* TouchDownGestureRecognizer.swift */; };
 		49E5D7391E480B3800CDF24D /* swoosh.wav in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D7381E480B3800CDF24D /* swoosh.wav */; };
+		49E5D73B1E481AE500CDF24D /* heaven.wav in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D73A1E481AE500CDF24D /* heaven.wav */; };
 		49FB28851D5B9D58009FADF3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FB28841D5B9D58009FADF3 /* AppDelegate.swift */; };
 		49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49FB28881D5B9D58009FADF3 /* Main.storyboard */; };
 		49FB288C1D5B9D58009FADF3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49FB288B1D5B9D58009FADF3 /* Assets.xcassets */; };
@@ -58,6 +59,7 @@
 		49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "tap-mellow.aif"; sourceTree = "<group>"; };
 		49E5D7361E48038900CDF24D /* TouchDownGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchDownGestureRecognizer.swift; sourceTree = "<group>"; };
 		49E5D7381E480B3800CDF24D /* swoosh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = swoosh.wav; sourceTree = "<group>"; };
+		49E5D73A1E481AE500CDF24D /* heaven.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = heaven.wav; sourceTree = "<group>"; };
 		49FB28811D5B9D58009FADF3 /* hoods.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hoods.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49FB28841D5B9D58009FADF3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49FB28891D5B9D58009FADF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 		49FB289B1D5B9DCA009FADF3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				49E5D73A1E481AE500CDF24D /* heaven.wav */,
 				49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */,
 				49E5D7381E480B3800CDF24D /* swoosh.wav */,
 				49FB288B1D5B9D58009FADF3 /* Assets.xcassets */,
@@ -289,6 +292,7 @@
 				49E5D7351E47FFE600CDF24D /* tap-mellow.aif in Resources */,
 				49E5D7391E480B3800CDF24D /* swoosh.wav in Resources */,
 				49FB288A1D5B9D58009FADF3 /* Main.storyboard in Resources */,
+				49E5D73B1E481AE500CDF24D /* heaven.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

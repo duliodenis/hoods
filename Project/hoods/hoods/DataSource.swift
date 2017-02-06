@@ -9,6 +9,7 @@
 import UIKit
 import Mapbox
 import MapKit
+import AVFoundation
 
 enum MapState {
     case visiting
@@ -47,6 +48,7 @@ class DataSource {
     var locationManager = CLLocationManager()
     let geocoder = CLGeocoder()
     let weather = WeatherGetter()
+    var audioPlayer: AVAudioPlayer?
     
     var visitingHoodName: String?
     var visitingArea: String?
@@ -398,6 +400,20 @@ class DataSource {
         let image = UIImage(cgImage: imageRef, scale: image.scale, orientation: image.imageOrientation)
         
         return image
+    }
+    
+    func playSound(name: String, fileExtension: String) {
+        let url = Bundle.main.url(forResource: name, withExtension: fileExtension)!
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            guard let player = audioPlayer else { return }
+            
+            player.prepareToPlay()
+            player.play()
+        } catch let error {
+            print(error.localizedDescription)
+        }
     }
     
     func centroid(from coords: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D {

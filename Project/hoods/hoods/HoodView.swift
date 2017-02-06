@@ -31,7 +31,6 @@ class HoodView: UIView {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         configureSearchBar()
-        weatherLabel.text = "⏳"
         
         let labels = [areaLabel, hoodLabel, weatherLabel]
         for label in labels {

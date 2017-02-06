@@ -10,7 +10,6 @@ import UIKit
 import Mapbox
 import MapKit
 import AudioToolbox
-import AVFoundation
 
 struct Frames {
     var cameraView: CGRect
@@ -80,7 +79,6 @@ class MapViewController: UIViewController {
     let padding: CGFloat = 20
     fileprivate var hoodScanning = false
     fileprivate var frames: Frames?
-    var audioPlayer: AVAudioPlayer?
     
     // gestures
     fileprivate var tap = TouchDownGestureRecognizer()
@@ -232,19 +230,13 @@ class MapViewController: UIViewController {
     }
     
     fileprivate func moveCameraToManhattanAnimated(_ animated: Bool) {
-        
         if animated {
             
             // start far out at a 50° angle
-            zoom(into: CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
+            zoom(into: CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 17000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into manhattan at a 30° angle over 3 seconds
             zoom(into: manhattan, distance: 5000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
-            
-        } else {
-            
-            // set camera to manhattan instantly
-            zoom(into: manhattan, distance: 13000, zoom: 10, pitch: 30, duration: 0, animatedCenterChange: false)
         }
     }
     
@@ -501,7 +493,7 @@ class MapViewController: UIViewController {
     
     @objc fileprivate func federationButtonTapped(_ sender: UIButton) {
         
-        playSound(name: "swoosh", fileExtension: "wav")
+        DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
         
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
@@ -551,7 +543,7 @@ class MapViewController: UIViewController {
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) && !searchResultsView.frame.contains(sender.location(in: mapboxView)) {
             
             // play map tap sound
-            playSound(name: "tap-mellow", fileExtension: "aif")
+            DataSource.si.playSound(name: "tap-mellow", fileExtension: "aif")
             
             // update map state
             DataSource.si.mapState = .tapping
@@ -713,20 +705,6 @@ class MapViewController: UIViewController {
     }
     
 // MARK: Miscellaneous
-    
-    fileprivate func playSound(name: String, fileExtension: String) {
-        let url = Bundle.main.url(forResource: name, withExtension: fileExtension)!
-        
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-            guard let player = audioPlayer else { return }
-            
-            player.prepareToPlay()
-            player.play()
-        } catch let error {
-            print(error.localizedDescription)
-        }
-    }
     
     fileprivate func showShakeHintView() {
         shakeHintView = HintView(frame: (frames?.shakeHintHidden)!)
@@ -1273,7 +1251,7 @@ extension MapViewController: CLLocationManagerDelegate {
             
         } else if status == .denied {
             
-            moveCameraToManhattanAnimated(false)
+            moveCameraToManhattanAnimated(true)
         }
         
         if status != .notDetermined {
