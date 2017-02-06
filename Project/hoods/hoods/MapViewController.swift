@@ -218,15 +218,16 @@ class MapViewController: UIViewController {
         
         // if location available...
         if let coord = DataSource.si.locationManager.location?.coordinate {
-            
-            let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5000, pitch: 30, heading: 0)
-            mapboxView.fly(to: mapCam, withDuration: 3.5, peakAltitude: 13000, completionHandler: nil)
+
+            fly(to: coord, duration: 3.5, peakAltitude: 13000)
+            DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
         }
     }
     
-    fileprivate func fly(to coord: CLLocationCoordinate2D) {
+    fileprivate func fly(to coord: CLLocationCoordinate2D, duration: TimeInterval, peakAltitude: CLLocationDistance) {
+
         let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
-        mapboxView.fly(to: mapCam, withDuration: 1, peakAltitude: 7000, completionHandler: nil)
+        mapboxView.fly(to: mapCam, withDuration: duration, peakAltitude: peakAltitude, completionHandler: nil)
     }
     
     fileprivate func moveCameraToManhattanAnimated(_ animated: Bool) {
@@ -493,8 +494,6 @@ class MapViewController: UIViewController {
     
     @objc fileprivate func federationButtonTapped(_ sender: UIButton) {
         
-        DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
-        
         // animate the color green for half a sec
         federationButton.backgroundColor = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
         UIView.animate(withDuration: 0.1, animations: {
@@ -572,7 +571,7 @@ class MapViewController: UIViewController {
                         do {
                             if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                                 self.cameraView.hoodView.hoodLabel.text = hood
-                                self.fly(to: tappedLocationCoord)
+                                self.fly(to: tappedLocationCoord, duration: 1, peakAltitude: 7000)
                             }
                         } catch {}
                         
@@ -592,7 +591,7 @@ class MapViewController: UIViewController {
                 // try to update hood label from tapped location and fly there...
                 if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
-                    fly(to: tappedLocationCoord)
+                    fly(to: tappedLocationCoord, duration: 1, peakAltitude: 7000)
                     
                 // else use reverse geocode func to update area and then update hood/area/weather labels
                 } else {
@@ -977,6 +976,8 @@ class MapViewController: UIViewController {
         // if buttons are not already showing
         if DataSource.si.mapButtonState != .shown {
             
+            DataSource.si.playSound(name: "woosh", fileExtension: "wav")
+            
             // animate showing of icons
             UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .curveEaseIn, animations: {
                 
@@ -1358,7 +1359,7 @@ extension MapViewController: UISearchResultsUpdating {
                 if hood["neighborhood"]?.lowercased() == searchText {
                     DataSource.si.updateSearchedHoodCoords(from: hood["neighborhood"]!, area: hood["area"]!)
                     let centroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
-                    self.fly(to: centroid)
+                    self.fly(to: centroid, duration: 1, peakAltitude: 7000)
                     self.cameraView.hoodView.searchBar.resignFirstResponder()
                     self.updateHoodLabels(with: centroid, from: "hoodSearch", hoodName: hood["neighborhood"]!, areaName: hood["area"]!)
                     DataSource.si.weather.updateWeatherIDAndTemp(coordinate: centroid, from: "search")
@@ -1374,7 +1375,7 @@ extension MapViewController: UISearchResultsUpdating {
                         DataSource.si.updateSearchedAddressArea(with: placemark)
                         
                         if let coord = placemark.location?.coordinate {
-                            self.fly(to: coord)
+                            self.fly(to: coord, duration: 1, peakAltitude: 7000)
                             self.cameraView.hoodView.searchBar.resignFirstResponder()
                             self.updateHoodLabels(with: coord, from: "addressSearch", hoodName: nil, areaName: nil)
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
@@ -1425,12 +1426,17 @@ extension MapViewController: UITableViewDelegate, UITableViewDataSource {
         let filteredHood = filteredHoods[indexPath.row]
         DataSource.si.updateSearchedHoodCoords(from: filteredHood["neighborhood"]!, area: filteredHood["area"]!)
         let searchedCentroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
-        fly(to: searchedCentroid)
+        
+        fly(to: searchedCentroid, duration: 1, peakAltitude: 7000)
+        DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
+        
         cameraView.hoodView.searchBar.resignFirstResponder()
+        
         cameraView.hoodView.hoodLabel.text = filteredHood["neighborhood"]!
         cameraView.hoodView.areaLabel.text = filteredHood["area"]!
         DataSource.si.weather.updateWeatherIDAndTemp(coordinate: searchedCentroid, from: "search")
         updateWeatherLabelFromSearch()
+        
         hoodScanning = false
     }
 }
