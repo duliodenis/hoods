@@ -24,7 +24,6 @@
 		49AD0FA71DBA393800531AA1 /* HoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AD0FA61DBA393800531AA1 /* HoodView.swift */; };
 		49C2B3F01E3BD598003F4488 /* SearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C2B3EF1E3BD598003F4488 /* SearchResultsView.swift */; };
 		49E5D7351E47FFE600CDF24D /* tap-mellow.aif in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */; };
-		49E5D7371E48038900CDF24D /* TouchDownGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E5D7361E48038900CDF24D /* TouchDownGestureRecognizer.swift */; };
 		49E5D7391E480B3800CDF24D /* swoosh.wav in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D7381E480B3800CDF24D /* swoosh.wav */; };
 		49E5D73B1E481AE500CDF24D /* heaven.wav in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D73A1E481AE500CDF24D /* heaven.wav */; };
 		49E5D73D1E482A5500CDF24D /* woosh.wav in Resources */ = {isa = PBXBuildFile; fileRef = 49E5D73C1E482A5500CDF24D /* woosh.wav */; };
@@ -58,7 +57,6 @@
 		49C2B3EF1E3BD598003F4488 /* SearchResultsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultsView.swift; sourceTree = "<group>"; };
 		49E1F28E1D9AE13000F5B8E4 /* hoods.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = hoods.entitlements; sourceTree = "<group>"; };
 		49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "tap-mellow.aif"; sourceTree = "<group>"; };
-		49E5D7361E48038900CDF24D /* TouchDownGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchDownGestureRecognizer.swift; sourceTree = "<group>"; };
 		49E5D7381E480B3800CDF24D /* swoosh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = swoosh.wav; sourceTree = "<group>"; };
 		49E5D73A1E481AE500CDF24D /* heaven.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = heaven.wav; sourceTree = "<group>"; };
 		49E5D73C1E482A5500CDF24D /* woosh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = woosh.wav; sourceTree = "<group>"; };
@@ -154,7 +152,6 @@
 				49395FB91D6D3CD3007C34FD /* FederationButton.swift */,
 				49FB28A11D5BE137009FADF3 /* Annotation.swift */,
 				49FB28A31D5BE186009FADF3 /* CalloutViewController.swift */,
-				49E5D7361E48038900CDF24D /* TouchDownGestureRecognizer.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -363,7 +360,6 @@
 				49FB28A21D5BE137009FADF3 /* Annotation.swift in Sources */,
 				49AD0FA71DBA393800531AA1 /* HoodView.swift in Sources */,
 				49395FBA1D6D3CD3007C34FD /* FederationButton.swift in Sources */,
-				49E5D7371E48038900CDF24D /* TouchDownGestureRecognizer.swift in Sources */,
 				492BE17D1E304CC800DD88C5 /* HintView.swift in Sources */,
 				490BD1A21E298D9B0042FBE7 /* CameraView.swift in Sources */,
 				49FB28A61D5BE1DD009FADF3 /* DataSource.swift in Sources */,

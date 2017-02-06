@@ -81,7 +81,7 @@ class MapViewController: UIViewController {
     fileprivate var frames: Frames?
     
     // gestures
-    fileprivate var tap = TouchDownGestureRecognizer()
+    fileprivate var tap = UITapGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
 
     // map
@@ -534,7 +534,7 @@ class MapViewController: UIViewController {
         mapboxView.addGestureRecognizer(tap)
     }
     
-    @objc fileprivate func tapFired(_ sender: TouchDownGestureRecognizer) {
+    @objc fileprivate func tapFired(_ sender: UITapGestureRecognizer) {
         
     // map behavior
         
@@ -1225,7 +1225,12 @@ extension MapViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
 
         // if touch is not in camera, profile, search results, enable location hint, or federation button, let gesture pass through to map
-        if !cameraView!.frame.contains(touch.location(in: mapboxView)) && !profileView.frame.contains(touch.location(in: mapboxView)) && !searchResultsView.frame.contains(touch.location(in: mapboxView)) && !enableLocationHintView.frame.contains(touch.location(in: mapboxView)) && !federationButton.frame.contains(touch.location(in: mapboxView)) {
+        if !cameraView!.frame.contains(touch.location(in: mapboxView)) &&
+            !profileView.frame.contains(touch.location(in: mapboxView)) &&
+            !searchResultsView.frame.contains(touch.location(in: mapboxView)) &&
+            !enableLocationHintView.frame.contains(touch.location(in: mapboxView)) &&
+            !federationButton.frame.contains(touch.location(in: mapboxView))
+                {
             return true
         }
         return false
