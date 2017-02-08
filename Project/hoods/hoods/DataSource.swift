@@ -61,6 +61,7 @@ class DataSource {
     var tappedArea: String?
     var tappedWeather: String?
     var tappedPlacemark: CLPlacemark?
+    var tappedHoodCoords = [CLLocationCoordinate2D]()
     
     var searchedAddressHoodName: String?
     var searchedAddressArea: String?
@@ -250,6 +251,7 @@ class DataSource {
                                         visitingHoodCoords = coords
                                         print("You are in \(currentNeighborhood).")
                                     } else {
+                                        tappedHoodCoords = coords
                                         print("You just tapped \(currentNeighborhood).")
                                     }
                                     return currentNeighborhood
@@ -416,41 +418,63 @@ class DataSource {
         }
     }
     
-    func centroid(from coords: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D {
+    func cameraDistanceForHoodDiameter(from coords: [CLLocationCoordinate2D]) -> CLLocationDistance {
         
         // get the lowest and highest longitude and latitude
-        var x1Long = coords.first?.longitude
-        var x2Long = coords.first?.longitude
-        var y1Lat = coords.first?.latitude
-        var y2Lat = coords.first?.latitude
+        var x1 = coords.first?.longitude
+        var x2 = coords.first?.longitude
+        var y1 = coords.first?.latitude
+        var y2 = coords.first?.latitude
+        
         for coord in coords {
-            if coord.longitude < 0 {
-                if coord.longitude > x1Long! {
-                    x2Long = coord.longitude
-                } else {
-                    x1Long = coord.longitude
-                }
-            } else {
-                if coord.longitude < x1Long! {
-                    x1Long = coord.longitude
-                } else {
-                    x2Long = coord.longitude
-                }
+            
+            // longitude
+            if coord.longitude > x2! {
+                x2 = coord.longitude
+            } else if coord.longitude < x1! {
+                x1 = coord.longitude
             }
-            if coord.latitude < 0 {
-                if coord.latitude > y1Lat! {
-                    y2Lat = coord.latitude
-                } else {
-                    y1Lat = coord.latitude
-                }
-            } else {
-                if coord.latitude < y1Lat! {
-                    y1Lat = coord.latitude
-                } else {
-                    y2Lat = coord.latitude
-                }
+            
+            // latitude
+            if coord.latitude > y2! {
+                y2 = coord.latitude
+            } else if coord.latitude < y1! {
+                y1 = coord.latitude
             }
         }
-        return CLLocationCoordinate2D(latitude: y1Lat! + ((y2Lat! - y1Lat!) / 2), longitude: x1Long! + ((x2Long! - x1Long!) / 2))
+        
+        // set diameter to longer diameter
+        let latitudeDiameter = y2! - y1!
+        let longitudeDiameter = x2! - x1!
+        let diameter = (latitudeDiameter > longitudeDiameter) ? latitudeDiameter : longitudeDiameter
+
+        return diameter * 325443
+    }
+    
+    func polygonCenter(from coords: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D {
+        
+        // get the lowest and highest longitude and latitude
+        var x1 = coords.first?.longitude
+        var x2 = coords.first?.longitude
+        var y1 = coords.first?.latitude
+        var y2 = coords.first?.latitude
+        
+        for coord in coords {
+            
+            // longitude
+            if coord.longitude > x2! {
+                x2 = coord.longitude
+            } else if coord.longitude < x1! {
+                x1 = coord.longitude
+            }
+            
+            // latitude
+            if coord.latitude > y2! {
+                y2 = coord.latitude
+            } else if coord.latitude < y1! {
+                y1 = coord.latitude
+            }
+        }
+        return CLLocationCoordinate2D(latitude: y1! + ((y2! - y1!) / 2), longitude: x1! + ((x2! - x1!) / 2))
     }
 }

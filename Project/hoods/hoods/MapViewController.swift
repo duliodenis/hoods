@@ -206,7 +206,7 @@ class MapViewController: UIViewController {
             zoom(into: CLLocationCoordinate2DMake(coord.latitude - 0.05, coord.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
             // move into your location at a 30° angle over 3 seconds
-            zoom(into: coord, distance: 5000, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
+            zoom(into: coord, distance: 5500, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
             
             // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
@@ -219,14 +219,15 @@ class MapViewController: UIViewController {
         // if location available...
         if let coord = DataSource.si.locationManager.location?.coordinate {
 
-            fly(to: coord, duration: 3.5, peakAltitude: 13000)
+            let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.visitingHoodCoords)
+            fly(to: coord, duration: 3.5, cameraDistance: distance, peakAltitude: 13000)
             DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
         }
     }
     
-    fileprivate func fly(to coord: CLLocationCoordinate2D, duration: TimeInterval, peakAltitude: CLLocationDistance) {
+    fileprivate func fly(to coord: CLLocationCoordinate2D, duration: TimeInterval, cameraDistance: CLLocationDistance, peakAltitude: CLLocationDistance) {
 
-        let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: 5500, pitch: 30, heading: 0)
+        let mapCam = MGLMapCamera(lookingAtCenter: coord, fromDistance: cameraDistance, pitch: 30, heading: 0)
         mapboxView.fly(to: mapCam, withDuration: duration, peakAltitude: peakAltitude, completionHandler: nil)
     }
     
@@ -571,7 +572,9 @@ class MapViewController: UIViewController {
                         do {
                             if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                                 self.cameraView.hoodView.hoodLabel.text = hood
-                                self.fly(to: tappedLocationCoord, duration: 1, peakAltitude: 7000)
+                                let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
+                                let centroid = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
+                                self.fly(to: centroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                             }
                         } catch {}
                         
@@ -591,7 +594,9 @@ class MapViewController: UIViewController {
                 // try to update hood label from tapped location and fly there...
                 if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
-                    fly(to: tappedLocationCoord, duration: 1, peakAltitude: 7000)
+                    let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
+                    let centroid = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
+                    fly(to: centroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                     
                 // else use reverse geocode func to update area and then update hood/area/weather labels
                 } else {
@@ -1363,8 +1368,9 @@ extension MapViewController: UISearchResultsUpdating {
                 let searchText = searchBar.text?.lowercased()
                 if hood["neighborhood"]?.lowercased() == searchText {
                     DataSource.si.updateSearchedHoodCoords(from: hood["neighborhood"]!, area: hood["area"]!)
-                    let centroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
-                    self.fly(to: centroid, duration: 1, peakAltitude: 7000)
+                    let centroid = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
+                    let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.searchedHoodCoords)
+                    self.fly(to: centroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                     self.cameraView.hoodView.searchBar.resignFirstResponder()
                     self.updateHoodLabels(with: centroid, from: "hoodSearch", hoodName: hood["neighborhood"]!, areaName: hood["area"]!)
                     DataSource.si.weather.updateWeatherIDAndTemp(coordinate: centroid, from: "search")
@@ -1380,7 +1386,8 @@ extension MapViewController: UISearchResultsUpdating {
                         DataSource.si.updateSearchedAddressArea(with: placemark)
                         
                         if let coord = placemark.location?.coordinate {
-                            self.fly(to: coord, duration: 1, peakAltitude: 7000)
+                            let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
+                            self.fly(to: coord, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                             self.cameraView.hoodView.searchBar.resignFirstResponder()
                             self.updateHoodLabels(with: coord, from: "addressSearch", hoodName: nil, areaName: nil)
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
@@ -1430,9 +1437,10 @@ extension MapViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let filteredHood = filteredHoods[indexPath.row]
         DataSource.si.updateSearchedHoodCoords(from: filteredHood["neighborhood"]!, area: filteredHood["area"]!)
-        let searchedCentroid = DataSource.si.centroid(from: DataSource.si.searchedHoodCoords)
+        let searchedCentroid = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
         
-        fly(to: searchedCentroid, duration: 1, peakAltitude: 7000)
+        let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.searchedHoodCoords)
+        fly(to: searchedCentroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
         DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
         
         cameraView.hoodView.searchBar.resignFirstResponder()

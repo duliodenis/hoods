@@ -101,6 +101,17 @@
 			name = GeoJSON;
 			sourceTree = "<group>";
 		};
+		49E5D73E1E4996BF00CDF24D /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				49E5D73A1E481AE500CDF24D /* heaven.wav */,
+				49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */,
+				49E5D73C1E482A5500CDF24D /* woosh.wav */,
+				49E5D7381E480B3800CDF24D /* swoosh.wav */,
+			);
+			name = Sounds;
+			sourceTree = "<group>";
+		};
 		49FB28781D5B9D58009FADF3 = {
 			isa = PBXGroup;
 			children = (
@@ -168,11 +179,8 @@
 		49FB289B1D5B9DCA009FADF3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				49E5D73A1E481AE500CDF24D /* heaven.wav */,
-				49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */,
-				49E5D73C1E482A5500CDF24D /* woosh.wav */,
-				49E5D7381E480B3800CDF24D /* swoosh.wav */,
 				49FB288B1D5B9D58009FADF3 /* Assets.xcassets */,
+				49E5D73E1E4996BF00CDF24D /* Sounds */,
 				49C143F41D6F6AE300305EE7 /* GeoJSON */,
 			);
 			name = Resources;
