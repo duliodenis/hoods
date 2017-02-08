@@ -91,7 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CAAnimationDelegate {
         UIView.animate(withDuration: 0.1, delay: 1.35, options: .curveEaseIn, animations: {
             self.maskBgView.alpha = 0.0
         }) { finished in
-            DataSource.si.playSound(name: "heaven", fileExtension: "wav")
+            DataSource.si.playSound(named: "heaven", fileExtension: "wav")
 
             self.maskBgView.removeFromSuperview()
         }

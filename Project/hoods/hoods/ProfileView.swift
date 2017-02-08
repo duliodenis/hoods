@@ -30,7 +30,7 @@ class ProfileView: UIView {
         backgroundColor = UIColor.white
         
         // subview specific properties
-        profileImageView.image = DataSource.si.cropToBounds(UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
+        profileImageView.image = DataSource.si.crop(image: UIImage(named: "profile_placeholder")!, width: Double(frame.width), height: Double(frame.height))
         profileImageView.layer.cornerRadius = (frame.width - 4) / 2
         profileImageView.layer.masksToBounds = true
                 

@@ -127,7 +127,7 @@ class DataSource {
         if visitingArea != nil {
             
             // if coord not found in last hood polygon...
-            if !stillInTheHood(location) {
+            if !stillInTheHood(at: location) {
                 
                 // if found in hood...
                 if let hood = hoodName(for: location, in: visitingArea!, fromTap: false) {
@@ -267,7 +267,7 @@ class DataSource {
         return nil
     }
     
-    func stillInTheHood(_ currentLocation: CLLocationCoordinate2D) -> Bool {
+    func stillInTheHood(at currentLocation: CLLocationCoordinate2D) -> Bool {
         
         // if location available...
         if locationManager.location != nil {
@@ -311,7 +311,7 @@ class DataSource {
         }
     }
     
-    func updateSearchedHoodCoords(from searchedHood: String, area: String) {
+    func updateSearchedHoodCoords(from searchedHood: String, in area: String) {
         searchedHoodCoords.removeAll()
         var filePath = ""
         filePath = Bundle.main.path(forResource: geoJSONFileName(for: area), ofType: "geojson")!
@@ -365,13 +365,13 @@ class DataSource {
         }
     }
     
-    func getDataFromURL(url: URL, completion: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+    func getData(from url: URL, completion: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             completion(data, response, error)
         }.resume()
     }
     
-    func cropToBounds(_ image: UIImage, width: Double, height: Double) -> UIImage {
+    func crop(image: UIImage, width: Double, height: Double) -> UIImage {
         
         let contextImage = UIImage(cgImage: image.cgImage!)
         let contextSize = contextImage.size
@@ -404,8 +404,8 @@ class DataSource {
         return image
     }
     
-    func playSound(name: String, fileExtension: String) {
-        let url = Bundle.main.url(forResource: name, withExtension: fileExtension)!
+    func playSound(named soundName: String, fileExtension: String) {
+        let url = Bundle.main.url(forResource: soundName, withExtension: fileExtension)!
         
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)

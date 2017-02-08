@@ -153,7 +153,7 @@ class MapViewController: UIViewController {
         cameraView.hoodView.searchBar.delegate = self
         DataSource.si.populateHoodNamesForSearching()
         
-        initialZoomToUserLocation()
+        initialZoomIntoUserLocation()
     }
     
     func appDidBecomeActive() {
@@ -189,7 +189,7 @@ class MapViewController: UIViewController {
     
     fileprivate func zoom(into coord: CLLocationCoordinate2D, distance: CLLocationDistance, zoom: Double, pitch: CGFloat, duration: TimeInterval, animatedCenterChange: Bool) {
         
-        // if the camera is not already on the coords passed in, move camera
+        // if the camera is not already on the coords passed in, zoom camera
         if mapboxView.centerCoordinate.latitude != coord.latitude && mapboxView.centerCoordinate.longitude != coord.longitude {
             mapboxView.setCenter(coord, zoomLevel: zoom, direction: 0, animated: animatedCenterChange, completionHandler: {
             })
@@ -198,19 +198,16 @@ class MapViewController: UIViewController {
         }
     }
     
-    @objc fileprivate func initialZoomToUserLocation() {
-        // if location available, start far out and then zoom into location at an angle over 3s
+    @objc fileprivate func initialZoomIntoUserLocation() {
         if let coord = DataSource.si.locationManager.location?.coordinate {
             
             // start far out at a 50° angle
             zoom(into: CLLocationCoordinate2DMake(coord.latitude - 0.05, coord.longitude - 0.05), distance: 13000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
-            // move into your location at a 30° angle over 3 seconds
+            // zoom into user location at a 30° angle over 3 seconds
             zoom(into: coord, distance: 5500, zoom: 10, pitch: 30, duration: 4, animatedCenterChange: false)
-            
-            // else move camera into manhattan from 50° to 30° over 3 seconds
         } else {
-            moveCameraToManhattanAnimated(true)
+            zoomIntoManhattan(animated: true)
         }
     }
     
@@ -221,7 +218,7 @@ class MapViewController: UIViewController {
 
             let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.visitingHoodCoords)
             fly(to: coord, duration: 3.5, cameraDistance: distance, peakAltitude: 13000)
-            DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
+            DataSource.si.playSound(named: "swoosh", fileExtension: "wav")
         }
     }
     
@@ -231,13 +228,13 @@ class MapViewController: UIViewController {
         mapboxView.fly(to: mapCam, withDuration: duration, peakAltitude: peakAltitude, completionHandler: nil)
     }
     
-    fileprivate func moveCameraToManhattanAnimated(_ animated: Bool) {
+    fileprivate func zoomIntoManhattan(animated: Bool) {
         if animated {
             
             // start far out at a 50° angle
             zoom(into: CLLocationCoordinate2DMake(manhattan.latitude - 0.05, manhattan.longitude - 0.05), distance: 17000, zoom: 10, pitch: 50, duration: 0, animatedCenterChange: false)
             
-            // move into manhattan at a 30° angle over 3 seconds
+            // zoom into manhattan at a 30° angle over 3 seconds
             zoom(into: manhattan, distance: 5000, zoom: 10, pitch: 30, duration: 3, animatedCenterChange: false)
         }
     }
@@ -401,7 +398,7 @@ class MapViewController: UIViewController {
         // if the pan was not in the profile pic and the profile was not closed already
         if DataSource.si.profileState != .closed {
             
-            toggleProfileSizeForState(.closed)
+            toggleProfileSize(to: .closed)
             
             self.profileView.layer.cornerRadius = self.profileView.closedRoundedCornerRadius
         }
@@ -413,14 +410,14 @@ class MapViewController: UIViewController {
         if DataSource.si.mapButtonState != .hiding {
             
             // open profile
-            toggleProfileSizeForState(.open)
+            toggleProfileSize(to: .open)
             
             // animate corner radius to 0
-            profileView.animateCornerRadiusOf(self.profileView, fromValue: profileView.closedRoundedCornerRadius, toValue: profileView.openRoundedCornerRadius, duration: 0)
+            profileView.animateCornerRadius(of: self.profileView, fromValue: profileView.closedRoundedCornerRadius, toValue: profileView.openRoundedCornerRadius, duration: 0)
         }
     }
     
-    fileprivate func toggleProfileSizeForState(_ desiredState: ProfileState) {
+    fileprivate func toggleProfileSize(to desiredState: ProfileState) {
         
         // open the profile
         if desiredState == .open {
@@ -448,7 +445,7 @@ class MapViewController: UIViewController {
                 }, completion: { (Bool) in
                     
                     // sharpen edges of hood/camera view
-                    self.cameraView.animateCornerRadiusOf(self.cameraView, fromValue: self.cameraView.roundedCornerRadius, toValue: 0.0, duration: 0.3)
+                    self.cameraView.animateCornerRadius(of: self.cameraView, fromValue: self.cameraView.roundedCornerRadius, toValue: 0.0, duration: 0.3)
             })
          
         // else close it
@@ -510,7 +507,7 @@ class MapViewController: UIViewController {
         
         // close profile
         if DataSource.si.profileState == .open {
-            toggleProfileSizeForState(.closed)
+            toggleProfileSize(to: .closed)
         }
         
         // if location is available
@@ -543,7 +540,7 @@ class MapViewController: UIViewController {
         if !cameraView.frame.contains(sender.location(in: mapboxView)) && !profileView.frame.contains(sender.location(in: mapboxView)) && !federationButton.frame.contains(sender.location(in: mapboxView)) && !searchResultsView.frame.contains(sender.location(in: mapboxView)) {
             
             // play map tap sound
-            DataSource.si.playSound(name: "tap-mellow", fileExtension: "aif")
+            DataSource.si.playSound(named: "tap-mellow", fileExtension: "aif")
             
             // update map state
             DataSource.si.mapState = .tapping
@@ -573,8 +570,8 @@ class MapViewController: UIViewController {
                             if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                                 self.cameraView.hoodView.hoodLabel.text = hood
                                 let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
-                                let centroid = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
-                                self.fly(to: centroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
+                                let center = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
+                                self.fly(to: center, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                             }
                         } catch {}
                         
@@ -595,8 +592,8 @@ class MapViewController: UIViewController {
                 if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
                     let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
-                    let centroid = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
-                    fly(to: centroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
+                    let center = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
+                    fly(to: center, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                     
                 // else use reverse geocode func to update area and then update hood/area/weather labels
                 } else {
@@ -629,7 +626,7 @@ class MapViewController: UIViewController {
                 
                 // hide map icons and close profile
                 hideMapIcons()
-                toggleProfileSizeForState(.closed)
+                toggleProfileSize(to: .closed)
             }
         }
     }
@@ -981,7 +978,7 @@ class MapViewController: UIViewController {
         // if buttons are not already showing
         if DataSource.si.mapButtonState != .shown {
             
-            DataSource.si.playSound(name: "woosh", fileExtension: "wav")
+            DataSource.si.playSound(named: "woosh", fileExtension: "wav")
             
             // animate showing of icons
             UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 4, options: .curveEaseIn, animations: {
@@ -1017,7 +1014,7 @@ class MapViewController: UIViewController {
                     DataSource.si.mapButtonState = .hiding
                     
                     if DataSource.si.profileState == .open {
-                        self.toggleProfileSizeForState(.closed)
+                        self.toggleProfileSize(to: .closed)
                     }
                     
 //                    self.profileViewShadow.frame = self.frameDict["profileViewShadowHidden"]!
@@ -1262,7 +1259,7 @@ extension MapViewController: CLLocationManagerDelegate {
             
         } else if status == .denied {
             
-            moveCameraToManhattanAnimated(true)
+            zoomIntoManhattan(animated: true)
         }
         
         if status != .notDetermined {
@@ -1281,7 +1278,7 @@ extension MapViewController: CLLocationManagerDelegate {
                 
                 // if not still in the hood...
                 if DataSource.si.locationManager.location != nil {
-                    if !DataSource.si.stillInTheHood(locations[0].coordinate) {
+                    if !DataSource.si.stillInTheHood(at: locations[0].coordinate) {
                         
                         // reverse geocode coord to get the area
                         DataSource.si.geocoder.reverseGeocodeLocation(locations[0], completionHandler: { (placemarks, error) in
@@ -1367,15 +1364,15 @@ extension MapViewController: UISearchResultsUpdating {
             for hood in DataSource.si.hoodAndAreaNames {
                 let searchText = searchBar.text?.lowercased()
                 if hood["neighborhood"]?.lowercased() == searchText {
-                    DataSource.si.updateSearchedHoodCoords(from: hood["neighborhood"]!, area: hood["area"]!)
-                    let centroid = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
+                    DataSource.si.updateSearchedHoodCoords(from: hood["neighborhood"]!, in: hood["area"]!)
+                    let center = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
                     let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.searchedHoodCoords)
-                    self.fly(to: centroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
+                    self.fly(to: center, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                     self.cameraView.hoodView.searchBar.resignFirstResponder()
-                    self.updateHoodLabels(with: centroid, from: "hoodSearch", hoodName: hood["neighborhood"]!, areaName: hood["area"]!)
-                    DataSource.si.weather.updateWeatherIDAndTemp(coordinate: centroid, from: "search")
+                    self.updateHoodLabels(with: center, from: "hoodSearch", hoodName: hood["neighborhood"]!, areaName: hood["area"]!)
+                    DataSource.si.weather.updateWeatherIDAndTemp(coordinate: center, from: "search")
                     self.updateWeatherLabelFromSearch()
-                    self.hoodScanning = false
+                    self.setHoodScanningToFalse()
                     return
                 }
             }
@@ -1392,7 +1389,7 @@ extension MapViewController: UISearchResultsUpdating {
                             self.updateHoodLabels(with: coord, from: "addressSearch", hoodName: nil, areaName: nil)
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
                             self.updateWeatherLabelFromSearch()
-                            self.hoodScanning = false
+                            self.setHoodScanningToFalse()
                         }
                     }
                 }
@@ -1436,27 +1433,27 @@ extension MapViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let filteredHood = filteredHoods[indexPath.row]
-        DataSource.si.updateSearchedHoodCoords(from: filteredHood["neighborhood"]!, area: filteredHood["area"]!)
-        let searchedCentroid = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
+        DataSource.si.updateSearchedHoodCoords(from: filteredHood["neighborhood"]!, in: filteredHood["area"]!)
+        let searchedCenter = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
         
         let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.searchedHoodCoords)
-        fly(to: searchedCentroid, duration: 1, cameraDistance: distance, peakAltitude: 7000)
-        DataSource.si.playSound(name: "swoosh", fileExtension: "wav")
+        fly(to: searchedCenter, duration: 1, cameraDistance: distance, peakAltitude: 7000)
+        DataSource.si.playSound(named: "swoosh", fileExtension: "wav")
         
         cameraView.hoodView.searchBar.resignFirstResponder()
         
         cameraView.hoodView.hoodLabel.text = filteredHood["neighborhood"]!
         cameraView.hoodView.areaLabel.text = filteredHood["area"]!
-        DataSource.si.weather.updateWeatherIDAndTemp(coordinate: searchedCentroid, from: "search")
+        DataSource.si.weather.updateWeatherIDAndTemp(coordinate: searchedCenter, from: "search")
         updateWeatherLabelFromSearch()
         
-        hoodScanning = false
+        setHoodScanningToFalse()
     }
 }
 
 extension UIView {
     
-    func animateCornerRadiusOf(_ viewToAnimate: UIView, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval) {
+    func animateCornerRadius(of viewToAnimate: UIView, fromValue: CGFloat, toValue: CGFloat, duration: CFTimeInterval) {
         let animation = CABasicAnimation(keyPath: "cornerRadius")
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
         animation.fromValue = fromValue
