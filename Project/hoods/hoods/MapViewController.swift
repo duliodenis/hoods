@@ -79,15 +79,16 @@ class MapViewController: UIViewController {
     let padding: CGFloat = 20
     fileprivate var hoodScanning = false
     fileprivate var frames: Frames?
-    
+
     // gestures
     fileprivate var tap = UITapGestureRecognizer()
     fileprivate var profilePan = UIPanGestureRecognizer()
 
     // map
-    fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
     @IBOutlet var mapboxView: MGLMapView!
-    
+    fileprivate var addressAnnotation: Annotation?
+    fileprivate let manhattan = CLLocationCoordinate2DMake(40.722716755829168, -73.986322678333224)
+
     // search results
     fileprivate var searchResultsView = UIView()
     fileprivate var filteredHoods = [[String:String]]()
@@ -124,7 +125,7 @@ class MapViewController: UIViewController {
     fileprivate var tapHintView = HintView()
     fileprivate var tapHintViewShadow = UIView()
     
-    // allow location hint
+    // enable location hint
     fileprivate var enableLocationHintView = HintView()
     fileprivate var enableLocationHintViewShadow = UIView()
     
@@ -569,6 +570,10 @@ class MapViewController: UIViewController {
                         do {
                             if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                                 self.cameraView.hoodView.hoodLabel.text = hood
+                                
+//                                self.updateHoodNameImage(fromText: hood)
+//                                self.addAnnotation(at: DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords), title: hood, imageName: "hoodNameImage", reuseIdentifier: "hoodNameImage")
+
                                 let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
                                 let center = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
                                 self.fly(to: center, duration: 1, cameraDistance: distance, peakAltitude: 7000)
@@ -591,6 +596,10 @@ class MapViewController: UIViewController {
                 // try to update hood label from tapped location and fly there...
                 if let hood = try DataSource.si.tappedHoodName(for: tappedLocationCoord) {
                     cameraView.hoodView.hoodLabel.text = hood
+                    
+//                    updateHoodNameImage(fromText: hood)
+//                    addAnnotation(at: DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords), title: hood, imageName: "hoodNameImage", reuseIdentifier: "hoodNameImage")
+                    
                     let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
                     let center = DataSource.si.polygonCenter(from: DataSource.si.tappedHoodCoords)
                     fly(to: center, duration: 1, cameraDistance: distance, peakAltitude: 7000)
@@ -630,6 +639,48 @@ class MapViewController: UIViewController {
             }
         }
     }
+    
+// MARK: Annotations
+    
+    fileprivate func addAnnotation(at coordinate: CLLocationCoordinate2D, title: String, imageName: String, reuseIdentifier: String) {
+        
+        // if there's already an address annotation on the map, remove it first
+        if addressAnnotation != nil {
+            mapboxView.removeAnnotation(addressAnnotation!)
+        }
+        
+        addressAnnotation?.image = UIImage(named: "address")
+        
+        addressAnnotation = Annotation(coordinate: coordinate, title: title, imageName: imageName, reuseIdentifier: reuseIdentifier)
+        mapboxView.addAnnotation(addressAnnotation!)
+    }
+    
+    fileprivate func updateHoodNameImage(fromText hoodName: String) {
+        if hoodName != "" {
+            let hoodNameImage = DataSource.si.image(from: hoodName as NSString, attributes: [NSFontAttributeName: UIFont.boldSystemFont(ofSize: 7)], size: CGSize(width: 100, height: 50))
+            print("hoodNameImage: \(hoodNameImage)")
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileURL = documentsURL.appendingPathComponent("hoodNameImage")
+            
+            if let pngImageData = UIImagePNGRepresentation(hoodNameImage) {
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    print("file exists")
+                    do {
+                        try FileManager.default.removeItem(atPath: fileURL.path)
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                    FileManager.default.createFile(atPath: fileURL.path, contents: pngImageData, attributes: nil)
+                } else {
+                    print("file didn't exist, creating")
+                    FileManager.default.createFile(atPath: fileURL.path, contents: pngImageData, attributes: nil)
+                }
+            }
+        } else {
+            print("hood name was nil")
+        }
+    }
+
     
 // MARK: Offline Maps
     
@@ -1139,12 +1190,12 @@ class MapViewController: UIViewController {
         let tapHintShadowShowingSmall = CGRect(x: tapHintShowingSmall.minX + 4, y: tapHintShowingSmall.minY + 5, width: buttonSize.width, height: buttonSize.height)
         let tapHintShadowShowingBig = CGRect(x: tapHintShowingBig.minX + 4, y: tapHintShowingBig.minY + 5, width: hintViewSize.width, height: hintViewSize.height)
         
-        // allow location hint
+        // enable location hint
         let enableLocationHintHidden = tapHintHidden
         let enableLocationHintShowingSmall = tapHintShowingSmall
         let enableLocationHintShowingBig = tapHintShowingBig
         
-        // allow location hint shadow
+        // enable location hint shadow
         let enableLocationHintShadowHidden = tapHintShadowHidden
         let enableLocationHintShadowShowingSmall = tapHintShadowShowingSmall
         let enableLocationHintShadowShowingBig = tapHintShadowShowingBig
@@ -1364,12 +1415,17 @@ extension MapViewController: UISearchResultsUpdating {
             for hood in DataSource.si.hoodAndAreaNames {
                 let searchText = searchBar.text?.lowercased()
                 if hood["neighborhood"]?.lowercased() == searchText {
+                    print("got a hood from search button")
                     DataSource.si.updateSearchedHoodCoords(from: hood["neighborhood"]!, in: hood["area"]!)
                     let center = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
                     let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.searchedHoodCoords)
                     self.fly(to: center, duration: 1, cameraDistance: distance, peakAltitude: 7000)
                     self.cameraView.hoodView.searchBar.resignFirstResponder()
                     self.updateHoodLabels(with: center, from: "hoodSearch", hoodName: hood["neighborhood"]!, areaName: hood["area"]!)
+                    
+//                    updateHoodNameImage(fromText: hood["neighborhood"]!)
+//                    addAnnotation(at: DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords), title: hood["neighborhood"]!, imageName: "hoodNameImage", reuseIdentifier: "hoodNameImage")
+
                     DataSource.si.weather.updateWeatherIDAndTemp(coordinate: center, from: "search")
                     self.updateWeatherLabelFromSearch()
                     self.setHoodScanningToFalse()
@@ -1383,15 +1439,21 @@ extension MapViewController: UISearchResultsUpdating {
                         DataSource.si.updateSearchedAddressArea(with: placemark)
                         
                         if let coord = placemark.location?.coordinate {
-                            let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.tappedHoodCoords)
-                            self.fly(to: coord, duration: 1, cameraDistance: distance, peakAltitude: 7000)
+                            self.fly(to: coord, duration: 1, cameraDistance: 5500, peakAltitude: 7000)
+                            DataSource.si.playSound(named: "swoosh", fileExtension: "wav")
                             self.cameraView.hoodView.searchBar.resignFirstResponder()
                             self.updateHoodLabels(with: coord, from: "addressSearch", hoodName: nil, areaName: nil)
                             DataSource.si.weather.updateWeatherIDAndTemp(coordinate: coord, from: "search")
                             self.updateWeatherLabelFromSearch()
+                            
+                            self.addAnnotation(at: coord, title: "address", imageName: "address", reuseIdentifier: "address")
+
                             self.setHoodScanningToFalse()
                         }
                     }
+                } else {
+                    DataSource.si.playSound(named: "rigidFart", fileExtension: "wav")
+                    print(error?.localizedDescription as Any)
                 }
             })
         }
@@ -1434,16 +1496,24 @@ extension MapViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let filteredHood = filteredHoods[indexPath.row]
         DataSource.si.updateSearchedHoodCoords(from: filteredHood["neighborhood"]!, in: filteredHood["area"]!)
-        let searchedCenter = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
         
+        let searchedCenter = DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords)
         let distance = DataSource.si.cameraDistanceForHoodDiameter(from: DataSource.si.searchedHoodCoords)
         fly(to: searchedCenter, duration: 1, cameraDistance: distance, peakAltitude: 7000)
+        
         DataSource.si.playSound(named: "swoosh", fileExtension: "wav")
         
+        // hide keyboard
         cameraView.hoodView.searchBar.resignFirstResponder()
         
+        // update labels
         cameraView.hoodView.hoodLabel.text = filteredHood["neighborhood"]!
         cameraView.hoodView.areaLabel.text = filteredHood["area"]!
+        
+        // add hood name annotation
+//        updateHoodNameImage(fromText: filteredHood["neighborhood"]!)
+//        addAnnotation(at: DataSource.si.polygonCenter(from: DataSource.si.searchedHoodCoords), title: filteredHood["neighborhood"]!, imageName: "hoodNameImage", reuseIdentifier: "hoodNameImage")
+        
         DataSource.si.weather.updateWeatherIDAndTemp(coordinate: searchedCenter, from: "search")
         updateWeatherLabelFromSearch()
         

@@ -15,6 +15,8 @@
 		490BD1B01E2DF3CF0042FBE7 /* brooklyn.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490BD1AF1E2DF3CF0042FBE7 /* brooklyn.geojson */; };
 		490BD1B21E2EF9780042FBE7 /* WeatherGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490BD1B11E2EF9780042FBE7 /* WeatherGetter.swift */; };
 		490CAD431D71556D003E9B34 /* sanFrancisco.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 490CAD421D71556D003E9B34 /* sanFrancisco.geojson */; };
+		491DFD141E4EEB5500433DA1 /* broward.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 491DFD131E4EEB5500433DA1 /* broward.geojson */; };
+		491DFD181E4EEFF700433DA1 /* rigidFart.wav in Resources */ = {isa = PBXBuildFile; fileRef = 491DFD171E4EEFF700433DA1 /* rigidFart.wav */; };
 		492BE1771E2F1EE000DD88C5 /* bronx.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 492BE1761E2F1EE000DD88C5 /* bronx.geojson */; };
 		492BE17A1E2F6D9200DD88C5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 492BE1791E2F6D9200DD88C5 /* MapKit.framework */; };
 		492BE17D1E304CC800DD88C5 /* HintView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492BE17C1E304CC800DD88C5 /* HintView.swift */; };
@@ -47,6 +49,8 @@
 		490BD1AF1E2DF3CF0042FBE7 /* brooklyn.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = brooklyn.geojson; sourceTree = "<group>"; };
 		490BD1B11E2EF9780042FBE7 /* WeatherGetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherGetter.swift; sourceTree = "<group>"; };
 		490CAD421D71556D003E9B34 /* sanFrancisco.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sanFrancisco.geojson; sourceTree = "<group>"; };
+		491DFD131E4EEB5500433DA1 /* broward.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = broward.geojson; sourceTree = "<group>"; };
+		491DFD171E4EEFF700433DA1 /* rigidFart.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rigidFart.wav; sourceTree = "<group>"; };
 		492BE1761E2F1EE000DD88C5 /* bronx.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bronx.geojson; sourceTree = "<group>"; };
 		492BE1791E2F6D9200DD88C5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		492BE17C1E304CC800DD88C5 /* HintView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HintView.swift; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 				490BD1AD1E2C236E0042FBE7 /* statenIsland.geojson */,
 				492BE1761E2F1EE000DD88C5 /* bronx.geojson */,
 				490CAD421D71556D003E9B34 /* sanFrancisco.geojson */,
+				491DFD131E4EEB5500433DA1 /* broward.geojson */,
 			);
 			name = GeoJSON;
 			sourceTree = "<group>";
@@ -108,6 +113,7 @@
 				49E5D7341E47EDEB00CDF24D /* tap-mellow.aif */,
 				49E5D73C1E482A5500CDF24D /* woosh.wav */,
 				49E5D7381E480B3800CDF24D /* swoosh.wav */,
+				491DFD171E4EEFF700433DA1 /* rigidFart.wav */,
 			);
 			name = Sounds;
 			sourceTree = "<group>";
@@ -290,6 +296,8 @@
 				490BD1B01E2DF3CF0042FBE7 /* brooklyn.geojson in Resources */,
 				490BD1AE1E2C236E0042FBE7 /* statenIsland.geojson in Resources */,
 				490BD1AC1E2C23680042FBE7 /* queens.geojson in Resources */,
+				491DFD181E4EEFF700433DA1 /* rigidFart.wav in Resources */,
+				491DFD141E4EEB5500433DA1 /* broward.geojson in Resources */,
 				490BD1A41E29A5F40042FBE7 /* manhattan.geojson in Resources */,
 				49E5D73D1E482A5500CDF24D /* woosh.wav in Resources */,
 				49AD0FA51DB6830F00531AA1 /* GoogleService-Info.plist in Resources */,

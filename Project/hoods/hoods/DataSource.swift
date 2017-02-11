@@ -75,16 +75,24 @@ class DataSource {
     var hoodViewHeight: CGFloat?
     
     func updateVisitingArea(with placemark: CLPlacemark) {
-        
-        // if locality is SF, set the area singleton to locality...
+
+        // if in SF...
         if let locality = placemark.locality {
             if locality == "San Francisco" {
                 visitingArea = locality
-                
-            // else it's not SF, set the area to subLocality for NYC boroughs
             } else {
-                if let subLocality = placemark.subLocality {
-                    visitingArea = subLocality
+                
+                // if in FL...
+                if let administrativeArea = placemark.administrativeArea {
+                    if administrativeArea == "FL" {
+                        visitingArea = administrativeArea
+                        
+                    // else in NY
+                    } else {
+                        if let subLocality = placemark.subLocality {
+                            visitingArea = subLocality
+                        }
+                    }
                 }
             }
         }
@@ -92,32 +100,47 @@ class DataSource {
     
     func updateTappedArea(with placemark: CLPlacemark) {
         
-        // if locality is SF, set the area singleton to locality...
+        // if in SF...
         if let locality = tappedPlacemark!.locality {
             if locality == "San Francisco" {
                 tappedArea = locality
-                
-            // else it's not SF, set the area to subLocality for NYC boroughs
             } else {
-                if let subLocality = tappedPlacemark!.subLocality {
-                    tappedArea = subLocality
+                
+                // if in FL...
+                if let administrativeArea = tappedPlacemark!.administrativeArea {
+                    if administrativeArea == "FL" {
+                        tappedArea = administrativeArea
+                        
+                    // else in NY
+                    } else {
+                        if let subLocality = tappedPlacemark!.subLocality {
+                            tappedArea = subLocality
+                        }
+                    }
                 }
             }
         }
     }
     
     func updateSearchedAddressArea(with placemark: CLPlacemark) {
-        
-        // if locality is SF, set the area singleton to locality...
+
+        // if in SF...
         if let locality = searchedAddressPlacemark!.locality {
             if locality == "San Francisco" {
                 searchedAddressArea = locality
-                
-            // else it's not SF, set the area to subLocality for NYC boroughs
             } else {
-                if let subLocality = searchedAddressPlacemark!.subLocality {
-                    print("searchedAddressPlacemark: \(searchedAddressPlacemark)")
-                    searchedAddressArea = subLocality
+                
+                // if in FL...
+                if let administrativeArea = searchedAddressPlacemark!.administrativeArea {
+                    if administrativeArea == "FL" {
+                        searchedAddressArea = administrativeArea
+                        
+                    // else in NY
+                    } else {
+                        if let subLocality = searchedAddressPlacemark!.subLocality {
+                            searchedAddressArea = subLocality
+                        }
+                    }
                 }
             }
         }
@@ -291,7 +314,7 @@ class DataSource {
     func populateHoodNamesForSearching() {
         
         // for all passed in areas, get the hood name and add it to hoodNames for searching
-        let areas = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "San Francisco"]
+        let areas = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "San Francisco", "FL"]
         for area in areas {
             var filePath = ""
             filePath = Bundle.main.path(forResource: geoJSONFileName(for: area), ofType: "geojson")!
@@ -360,6 +383,8 @@ class DataSource {
             return "statenIsland"
         case "San Francisco":
             return "sanFrancisco"
+        case "FL":
+            return "broward"
         default:
             return ""
         }
@@ -448,7 +473,7 @@ class DataSource {
         let longitudeDiameter = x2! - x1!
         let diameter = (latitudeDiameter > longitudeDiameter) ? latitudeDiameter : longitudeDiameter
 
-        return diameter * 325443
+        return diameter * 300000
     }
     
     func polygonCenter(from coords: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D {
@@ -476,5 +501,13 @@ class DataSource {
             }
         }
         return CLLocationCoordinate2D(latitude: y1! + ((y2! - y1!) / 2), longitude: x1! + ((x2! - x1!) / 2))
+    }
+    
+    func image(from text: NSString, attributes: NSDictionary, size imageSize: CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(imageSize, false, 0)
+        text.draw(in: CGRect(x: 0, y: 0, width: imageSize.width, height: imageSize.height), withAttributes: attributes as? [String : Any])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
     }
 }
