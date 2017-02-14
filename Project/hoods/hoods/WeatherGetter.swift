@@ -83,7 +83,7 @@ class WeatherGetter {
         case 781: return "🌪"
             
         // clear sky
-        case 800: return "☀️"
+        case 800: return clearWeatherEmojiForNow()
             
         // clouds
         case 801: return "☁️"
@@ -101,7 +101,7 @@ class WeatherGetter {
         case 906: return "❄️🌧"
             
         // additional
-        case 951: return "☀️"
+        case 951: return clearWeatherEmojiForNow()
         case 952: return "🌬"
         case 953: return "🌬"
         case 954: return "🌬"
@@ -115,7 +115,21 @@ class WeatherGetter {
         case 962: return "🌊🌊🌊"
             
         // clear
-        default: return "☀️"
+        default: return clearWeatherEmojiForNow()
+        }
+    }
+    
+    func clearWeatherEmojiForNow() -> String {
+        let hoursFormatter = DateFormatter()
+        hoursFormatter.dateFormat = "HH"
+        let date = Date()
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour], from: date)
+        switch components.hour! {
+        case 6...17:
+            return "☀️"
+        default:
+            return "🌙"
         }
     }
     
